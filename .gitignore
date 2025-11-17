@@ -1,0 +1,14 @@
+/vendor/
+*.old
+*.old.xet
+*.old.lang
+*.old.inc.php
+*.min.js
+*.min.js.map
+*.min.css
+*.min.css.map
+*.js.map
+*.sql
+*.diff
+*.patch
+*.log

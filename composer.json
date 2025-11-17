@@ -1,0 +1,14 @@
+{
+    "name": "egroupware/rag",
+    "description": "A RAG system for EGroupware.",
+    "type": "egroupware-app",
+    "authors": [
+        {
+            "name": "ralf",
+            "email": "rb@egroupware.org"
+        }
+    ],
+    "require": {
+        "ardagnsrn/ollama-php": "^1.0"
+    }
+}

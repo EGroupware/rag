@@ -10,9 +10,11 @@
  */
 
 /**
- * ALTER TABLE egw_rag MODIFY COLUMN rag_embedding VECTOR(1024) NOT NULL;
+ * ALTER TABLE egw_rag ADD COLUMN rag_embedding VECTOR(1024) NOT NULL;
  * CREATE VECTOR INDEX vec_index ON egw_rag (rag_embedding);
  */
+ // INSERT INTO `egw_async` (`async_id`, `async_next`, `async_times`, `async_method`, `async_data`, `async_account_id`, `async_auto_id`) VALUES
+ // ('rag:embed', 1763449800, '{\"min\":\"*\\/5\"}', 'EGroupware\\Rag\\Embedding::asyncJob', '', 5, 12410);
 
 $phpgw_baseline = array(
 	'egw_rag' => array(

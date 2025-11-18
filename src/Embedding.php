@@ -81,10 +81,10 @@ class Embedding
 	public function embed()
 	{
 		$start = microtime(true);
-		foreach(scandir(__DIR__.'/Embedding'.self::APP) as $class)
+		foreach(scandir(__DIR__.'/Embedding') as $class)
 		{
-			if (in_array($app, ['.', '..', 'Base'])) continue;
-			$app = strtolower($class);
+			if (in_array($class, ['.', '..', 'Base.php'])) continue;
+			$app = strtolower($class=basename($class, '.php'));
 			$class = __CLASS__ . '\\' . $class;
 			$plugin = new $class();
 

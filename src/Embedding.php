@@ -165,13 +165,70 @@ class Embedding
 	/**
 	 * Semantic search in given app for $pattern
 	 *
-	 * Returns an SQL fragment to be AND-ed in to query
+	 * Returns found IDs and their distance ordered by the smallest distance / the best match first.
+	 *
+	 * @param string $pattern
+	 * @param string $app app-name of '' for searching all apps
+	 * @param int $offset default 0
+	 * @param int $num_rows default 50
+	 * @param float $max_distance default .4
+	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
+	 */
+	public function search(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
+	{
+		$response = $this->client->embeddings()->create([
+			'model' => self::$model,
+			'input' => [$pattern],
+		]);
+		$id_distance = [];
+		foreach($this->db->select(self::TABLE, [
+			self::EMBEDDING_APP,
+			self::EMBEDDING_APP_ID,
+			'VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($response->embeddings[0]->embedding, 'vector').') as distance',
+		], [
+			self::EMBEDDING_APP => $app,
+		], __LINE__, __FILE__, $offset, 'HAVING distance<'.$max_distance.' ORDER BY distance', self::APP, $num_rows) as $row)
+		{
+			$id = $app ? (int)$row[self::EMBEDDING_APP_ID] : $row[self::EMBEDDING_APP].':'.$row[self::EMBEDDING_APP_ID];
+			// only insert the first / best match, as multiple chunks could match
+			if (!isset($id_distance[$id]))
+			{
+				$id_distance[$id] = (float)$row['distance'];
+			}
+		}
+		return $id_distance;
+	}
+
+	/**
+	 * Create SQL fragment to return distance by id-column
+	 *
+	 * @param array $id_distance id => distance pairs
+	 * @param string $id_column
+	 * @return string SQL "CASE $id_column WHEN $id1 THEN $distance1 WHEN ... END"
+	 */
+	public static function distanceById(array $id_distance, string $id_column) : string
+	{
+		$sql = "CASE $id_column ";
+		foreach ($id_distance as $id => $distance)
+		{
+			$sql .= " WHEN ".(int)$id." THEN ".(float)$distance;
+		}
+		$sql .= " END";
+		return $sql;
+	}
+
+	/**
+	 * Semantic search in given app for $pattern
+	 *
+	 * Returns an SQL fragment for a column and a join.
 	 *
 	 * @param string $pattern search query
 	 * @param string $app app-name
 	 * @return string SQL fragment
 	 */
-	public function search(string $pattern, string $app, ?string &$join=null) : string
+	public function searchColumnJoin(string $pattern, string $app, ?string &$join=null) : string
 	{
 		$response = $this->client->embeddings()->create([
 			'model' => self::$model,
@@ -179,7 +236,7 @@ class Embedding
 		]);
 		$plugin = ucfirst(__CLASS__.'\\'.ucfirst($app));
 		$plugin = new $plugin();
-		return $plugin->search($response->embeddings[0]->embedding, $join);
+		return $plugin->searchColumnJoin($response->embeddings[0]->embedding, $join);
 	}
 
 	/**

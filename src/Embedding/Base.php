@@ -48,7 +48,7 @@ abstract class Base
 	 * @param array $embedding embedding for the pattern to search
 	 * @return string SQL fragment
 	 */
-	public function search(array $embedding, ?string &$join=null)
+	public function searchColumnJoin(array $embedding, ?string &$join=null)
 	{
 		$join = ' JOIN '.Embedding::TABLE.' ON '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).
 			' AND '.Embedding::EMBEDDING_APP_ID.'='.static::TABLE.'.'.static::ID;

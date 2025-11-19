@@ -12,8 +12,8 @@
 namespace EGroupware\Rag;
 
 use EGroupware\Api;
-use ArdaGnsrn\Ollama\Ollama;
 use GuzzleHttp\Exception\InvalidArgumentException;
+use OpenAI;
 
 require_once __DIR__.'/../vendor/autoload.php';
 
@@ -34,11 +34,10 @@ class Embedding
 	 */
 	const MAX_RUNTIME = 285;
 
-
 	/**
-	 * @var Ollama
+	 * @var OpenAI\Client
 	 */
-	protected $ollama;
+	protected $client;
 
 	/**
 	 * @var Api\Db;
@@ -58,12 +57,21 @@ class Embedding
 	 */
 	protected static string $model = 'bge-m3';
 
-	protected static string $url = 'http://10.44.253.3:11434';
+	/**
+	 * @var string base-url of OpenAI compatible api:
+	 * - Ollama: http://10.44.253.3:11434/v1
+	 * - IONOS:  ...
+	 */
+	protected static string $url = 'http://10.44.253.3:11434/v1';
 	protected static ?string $api_key = null;
 
 	public function __construct()
 	{
-		$this->ollama = Ollama::client(self::$url, self::$api_key);
+		$factory = Openai::factory();
+		if (self::$url) $factory->withBaseUri(self::$url);
+		if (self::$api_key) $factory->withApiKey(self::$api_key);
+		$this->client = $factory->make();
+
 		$this->db = $GLOBALS['egw']->db;
 	}
 
@@ -100,11 +108,12 @@ class Embedding
 
 				try
 				{
-					$response = $this->ollama->embed()->create([
+					$response = $this->client->embeddings()->create([
 						'model' => self::$model,
 						'input' => $chunks,
 					]);
-				} catch (InvalidArgumentException $e)
+				}
+				catch (InvalidArgumentException $e)
 				{
 					// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
 					if ($e->getMessage() === 'json_encode error: Malformed UTF-8 characters, possibly incorrectly encoded')
@@ -112,16 +121,18 @@ class Embedding
 						try
 						{
 							$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
-							$response = $this->ollama->embed()->create([
+							$response = $this->client->embeddings()->create([
 								'model' => self::$model,
 								'input' => $chunks,
 							]);
 							unset($e);
-						} catch (\Exception $e)
+						}
+						catch (\Exception $e)
 						{
 						}
 					}
-				} catch (\Exception $e)
+				}
+				catch (\Exception $e)
 				{
 				}
 				// handle all exceptions by logging them to PHP error-log and continuing with the next entry
@@ -144,7 +155,7 @@ class Embedding
 						self::EMBEDDING_APP => $app,
 						self::EMBEDDING_APP_ID => $id,
 						self::EMBEDDING_CHUNK => $n,
-						self::EMBEDDING => $embedding,
+						self::EMBEDDING => $embedding->embedding,
 					], false, __LINE__, __FILE__, self::APP);
 				}
 			}
@@ -162,13 +173,13 @@ class Embedding
 	 */
 	public function search(string $pattern, string $app, ?string &$join=null) : string
 	{
-		$response = $this->ollama->embed()->create([
+		$response = $this->client->embeddings()->create([
 			'model' => self::$model,
 			'input' => [$pattern],
 		]);
 		$plugin = ucfirst(__CLASS__.'\\'.ucfirst($app));
 		$plugin = new $plugin();
-		return $plugin->search($response->embeddings[0], $join);
+		return $plugin->search($response->embeddings[0]->embedding, $join);
 	}
 
 	/**

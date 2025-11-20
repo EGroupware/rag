@@ -4,15 +4,13 @@
  * https://www.egroupware.org
  * Created by eTemplates DB-Tools written by ralfbecker@outdoor-training.de
  *
+ * Requires MariaDB 11.7+!
+ *
  * @license https://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @package rag
  * @subpackage setup
  */
 
-/**
- * ALTER TABLE egw_rag ADD COLUMN rag_embedding VECTOR(1024) NOT NULL;
- * CREATE VECTOR INDEX vec_index ON egw_rag (rag_embedding);
- */
  // INSERT INTO `egw_async` (`async_id`, `async_next`, `async_times`, `async_method`, `async_data`, `async_account_id`, `async_auto_id`) VALUES
  // ('rag:embed', 1763449800, '{\"min\":\"*\\/5\"}', 'EGroupware\\Rag\\Embedding::asyncJob', '', 5, 12410);
 
@@ -28,7 +26,7 @@ $phpgw_baseline = array(
 		),
 		'pk' => array('rag_id'),
 		'fk' => array(),
-		'ix' => array(),
-		'uc' => array(array('rag_app','rag_app_id','rag_chunk'))
+		'ix' => array('rag_app_id','rag_embedding'),
+		'uc' => array(array('rag_app','rag_app_id','rag_chunk')),
 	)
 );

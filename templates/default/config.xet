@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2.0//EN" "https://www.egroupware.org/etemplate2.0.dtd">
+<overlay>
+	<template id="rag.config" template="" lang="" group="0" version="16.1">
+		<grid width="100%" class="admin-config egwGridView_grid">
+			<columns>
+				<column width="40%"/>
+				<column/>
+			</columns>
+			<rows>
+				<row>
+					<et2-description  value="General configuration" span="all" class="subHeader"></et2-description>
+				</row>
+				<row>
+					<et2-description  value="URL of OpenAI compatible API"></et2-description>
+					<et2-url id="newsettings[url]" required="true" placeholder="http://172.17.0.1:11434/v1"></et2-url>
+				</row>
+				<row>
+					<et2-description  value="API Key"></et2-description>
+					<et2-textbox id="newsettings[api_key]"></et2-textbox>
+				</row>
+				<row>
+					<et2-description  value="Embedding configuration" span="all" class="subHeader"></et2-description>
+				</row>
+				<row>
+					<et2-description  value="Model to use"></et2-description>
+					<et2-textbox id="newsettings[embedding_model]" placeholder="bge-m3"></et2-textbox>
+				</row>
+				<row>
+					<et2-description  value="Chunk size"></et2-description>
+					<et2-number id="newsettings[chunk_size]" min="100" placeholder="500" precision="0"></et2-number>
+				</row>
+				<row>
+					<et2-description  value="Chunk overlap"></et2-description>
+					<et2-number id="newsettings[chunk_overlap]" min="0" placeholder="50" precision="0"></et2-number>
+				</row>
+				<row>
+					<et2-description  value="Minimize chunks e.g. concatenate title and description"></et2-description>
+					<et2-select  id="newsettings[minimize_chunks]">
+						<option value="">yes</option>
+						<option value="no">No</option>
+					</et2-select>
+				</row>
+			</rows>
+		</grid>
+	</template>
+</overlay>

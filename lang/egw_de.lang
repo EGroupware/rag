@@ -1,0 +1,9 @@
+api key	rag	de	API Key
+chunk overlap	rag	de	Chunk Überlappung
+chunk size	rag	de	Größe der Chunks
+embedding configuration	rag	de	Embedding Konfiguration
+general configuration	rag	de	Allgemeine Konfiguration
+minimize chunks e.g. concatenate title and description	rag	de	Minimiere die Chunks z.B. durch aneinander hängen von Titel und Beschreibung
+model to use	rag	de	Benutztes Model
+rag	common	de	RAG
+url of openai compatible api	rag	de	URL der OpenAI kompatiblen API

@@ -13,7 +13,7 @@ $setup_info['rag']['name']      = 'rag';
 $setup_info['rag']['version']   = '0.1.001';
 $setup_info['rag']['app_order'] = 5;
 $setup_info['rag']['tables']    = ['egw_rag'];
-$setup_info['rag']['only_db']   = ['mysql'];
+$setup_info['rag']['only_db']   = ['mysql' => 11.7]; // MariaDB 11.7+ required
 $setup_info['rag']['enable']    = 1;
 $setup_info['rag']['index']     = 'rag.EGroupware\\Rag\\Ui.index&ajax=true';
 
@@ -23,10 +23,13 @@ $setup_info['rag']['maintainer'] = array(
 	'email' => 'rb@egroupware.org',
 );
 $setup_info['rag']['description'] = 'A RAG system for EGroupware';
-$setup_info['rag']['note'] = '';
+$setup_info['rag']['note'] = 'Requires MariaDB 11.7+!';
 
 /* The hooks this app includes, needed for hooks registration */
 $setup_info['rag']['hooks'] = array();
+$setup_info['rag']['hooks']['admin'] = 'EGroupware\\Rag\\Hooks::allHooks';
+$setup_info['rag']['hooks']['sidebox_menu'] = 'EGroupware\\Rag\\Hooks::allHooks';
+$setup_info['rag']['hooks']['notify-all'] = 'EGroupware\\Rag\\Embedding::notify';
 
 /* Dependencies for this app to work */
 $setup_info['rag']['depends'][] = array(

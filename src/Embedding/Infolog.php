@@ -11,8 +11,9 @@
 
 namespace EGroupware\Rag\Embedding;
 
-use EGroupware\Api;
-
+/**
+ * Plugin for InfoLog
+ */
 class Infolog extends Base
 {
 	const APP = 'infolog';
@@ -21,11 +22,20 @@ class Infolog extends Base
 	const MODIFIED = 'info_datemodified';
 	const TITLE = 'info_subject';
 	const DESCRIPTION = 'info_des';
+	const NOT_DELETED = "info_status<>'deleted'";
 
-
+	/**
+	 * Get updated entries
+	 *
+	 * @return Generator|\Generator
+	 * @throws \EGroupware\Api\Db\Exception
+	 * @throws \EGroupware\Api\Db\Exception\InvalidSql
+	 */
 	public function getUpdated()
 	{
-		$where = [];
+		$where = [
+			self::NOT_DELETED, // no need to embed deleted entries
+		];
 		$join = $this->getJoin('int', $where);
 		do
 		{
@@ -35,9 +45,9 @@ class Infolog extends Base
 				self::CHUNK_SIZE, $join) as $row)
 			{
 				// makes no sense to calculate embeddings for PGP encrypted descriptions
-				if (!str_starts_with($row['info_des'], '-----BEGIN PGP MESSAGE-----'))
+				if (!str_starts_with($row[self::DESCRIPTION], '-----BEGIN PGP MESSAGE-----'))
 				{
-					unset($row['info_des']);
+					unset($row[self::DESCRIPTION]);
 				}
 				++$r;
 				yield $row;

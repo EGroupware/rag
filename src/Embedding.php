@@ -56,13 +56,17 @@ class Embedding
 	 * @var string embedding model to use
 	 */
 	protected static string $model = 'bge-m3';
+	/**
+	 * @var bool minimize number of chunks e.g. by concatenating title and describtion
+	 */
+	public static bool $minimize_chunks = true;
 
 	/**
 	 * @var string base-url of OpenAI compatible api:
-	 * - Ollama: http://10.44.253.3:11434/v1
+	 * - Ollama: http://172.17.0.1:11434/v1/v1
 	 * - IONOS:  ...
 	 */
-	protected static string $url = 'http://10.44.253.3:11434/v1';
+	protected static string $url = 'http://172.17.0.1:11434/v1';
 	protected static ?string $api_key = null;
 
 	public function __construct()
@@ -76,6 +80,22 @@ class Embedding
 	}
 
 	/**
+	 * Init our static variables from configuration
+	 */
+	public static function initStatic()
+	{
+		$config = Api\Config::read(self::APP);
+
+		self::$url = $config['url'] ?? 'http://172.17.0.1:11434/v1';
+		self::$api_key = $config['url'] ?? null;
+
+		self::$chunk_size = $config['chunk_size'] ?? 500;
+		self::$chunk_overlap = $config['chunk_overlap'] ?? 50;
+		self::$model = $config['embedding_model'] ?? 'bge-m3';
+		self::$minimize_chunks = ($config['minimize_chunks'] ?? 'yes') !== 'no';
+	}
+
+	/**
 	 * run an async job to update the RAG
 	 *
 	 * @return void
@@ -86,14 +106,88 @@ class Embedding
 		$self->embed();
 	}
 
+	const ASYNC_JOB = 'rag:embed';
+
+	public static function installAsyncJob()
+	{
+		$async = new Api\Asyncservice();
+		if (!$async->read(self::ASYNC_JOB))
+		{
+			$async->set_timer(['min'=>'*/5'], self::ASYNC_JOB, self::class.'::asyncJob');
+		}
+	}
+
+	public static function removeAsyncJob()
+	{
+		$async = new Api\Asyncservice();
+		$async->cancel_timer(self::ASYNC_JOB);
+	}
+
+	/**
+	 * Callback for hook "notify-all" to enable embedding (on new/updated entries) and remove embeddings of deleted entries
+	 *
+	 * @param array $location
+	 * @return void
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
+	 */
+	public static function notify($location)
+	{
+		// check if we're interested in the given app
+		if (empty($location['app']) || !isset(self::plugins()[$location['app']]))
+		{
+			return;
+		}
+		// delete embeddings of deleted entries
+		if ($location['type'] === 'delete' && !empty($location['hold_for_purge']) && !empty($location['id']))
+		{
+			/** @var Api\Db $db */
+			$db = $GLOBALS['egw']->db;
+			$db->delete(self::TABLE, [
+				self::EMBEDDING_APP => $location['app'],
+				self::EMBEDDING_APP_ID => $location['id'],
+			], __LINE__, __FILE__, self::APP);
+		}
+		// install the async job for added or updated entries to embed
+		elseif ($location['type'] !== 'delete')
+		{
+			self::installAsyncJob();
+		}
+	}
+
+	/**
+	 * Get all embedding plugins
+	 *
+	 * @return array app-name => class-name pairs
+	 */
+	public static function plugins() : array
+	{
+		return Api\Cache::getTree(self::APP, 'plugins', static function()
+		{
+			$plugins = [];
+			foreach(scandir(__DIR__.'/Embedding') as $class)
+			{
+				if (in_array($class, ['.', '..', 'Base.php'])) continue;
+				$app = strtolower($class = basename($class, '.php'));
+				$class = __CLASS__ . '\\' . $class;
+				$plugins[$app] = $class;
+			}
+			return $plugins;
+		}, [], 86400);
+	}
+
+	/**
+	 * Run all embedding plugins and embed all not yet or updated entries
+	 *
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
+	 * @throws Api\Exception\WrongParameter
+	 */
 	public function embed()
 	{
 		$start = microtime(true);
-		foreach(scandir(__DIR__.'/Embedding') as $class)
+		foreach(self::plugins() as $app => $class)
 		{
-			if (in_array($class, ['.', '..', 'Base.php'])) continue;
-			$app = strtolower($class=basename($class, '.php'));
-			$class = __CLASS__ . '\\' . $class;
 			$plugin = new $class();
 
 			foreach ($plugin->getUpdated() as $entry)
@@ -102,9 +196,21 @@ class Embedding
 				{
 					break;
 				}
-				[$id, $title, $description] = array_values($entry);
-				$chunks = self::chunkSplit($description, [$title]);
-				// makes no sense to calculate embeddings from encrypted entries
+				[$id, $title, $description, $modified, $replies] = array_values($entry)+[null, null, null, null, []];
+				if (self::$minimize_chunks)
+				{
+					$chunks = self::chunkSplit($title."\n".$description.
+						($replies ? "\n".implode("\n", $replies) : ""));
+				}
+				else
+				{
+					$chunks = self::chunkSplit($description, [$title]);
+					// embed each reply on its own
+					foreach($replies as $reply)
+					{
+						$chunks = self::chunkSplit($reply, $chunks);
+					}
+				}
 
 				try
 				{
@@ -159,6 +265,11 @@ class Embedding
 					], false, __LINE__, __FILE__, self::APP);
 				}
 			}
+		}
+		// if we finished, we can remove the job (gets readded for new entries via notify hook)
+		if (microtime(true) - $start < self::MAX_RUNTIME)
+		{
+			self::removeAsyncJob();
 		}
 	}
 
@@ -262,3 +373,4 @@ class Embedding
 		return $chunks;
 	}
 }
+Embedding::initStatic();

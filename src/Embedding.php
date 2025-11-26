@@ -26,6 +26,13 @@ class Embedding
 	const EMBEDDING_APP_ID = 'rag_app_id';
 	const EMBEDDING_CHUNK = 'rag_chunk';
 	const EMBEDDING = 'rag_embedding';
+	const FULLTEXT_TABLE = 'egw_rag_fulltext';
+	const FULLTEXT_UPDATED = 'ft_updated';
+	const FULLTEXT_APP = 'ft_app';
+	const FULLTEXT_APP_ID = 'ft_app_id';
+	const FULLTEXT_TITLE = 'ft_title';
+	const FULLTEXT_DESCRIPTION = 'ft_description';
+	const FULLTEXT_EXTRA = 'ft_extra';
 
 	/**
 	 * Stop calculating embeddings after this time: 5min - 15sec
@@ -147,6 +154,10 @@ class Embedding
 				self::EMBEDDING_APP => $location['app'],
 				self::EMBEDDING_APP_ID => $location['id'],
 			], __LINE__, __FILE__, self::APP);
+			$db->delete(self::FULLTEXT_TABLE, [
+				self::FULLTEXT_APP => $location['app'],
+				self::FULLTEXT_APP_ID => $location['id'],
+			], __LINE__, __FILE__, self::APP);
 		}
 		// install the async job for added or updated entries to embed
 		elseif ($location['type'] !== 'delete')
@@ -188,81 +199,113 @@ class Embedding
 		$start = microtime(true);
 		foreach(self::plugins() as $app => $class)
 		{
+			/** @var Embedding\Base $plugin */
 			$plugin = new $class();
 
-			foreach ($plugin->getUpdated() as $entry)
+			foreach([
+				'fulltext' => true,
+				'rag' => false,
+			] as $fulltext)
 			{
-				if (microtime(true) - $start > self::MAX_RUNTIME)
+				foreach ($plugin->getUpdated($fulltext) as $entry)
 				{
-					break;
-				}
-				[$id, $title, $description, $modified, $replies] = array_values($entry)+[null, null, null, null, []];
-				if (self::$minimize_chunks)
-				{
-					$chunks = self::chunkSplit($title."\n".$description.
-						($replies ? "\n".implode("\n", $replies) : ""));
-				}
-				else
-				{
-					$chunks = self::chunkSplit($description, [$title]);
-					// embed each reply on its own
-					foreach($replies as $reply)
+					if (microtime(true) - $start > self::MAX_RUNTIME)
 					{
-						$chunks = self::chunkSplit($reply, $chunks);
+						break;
 					}
-				}
-
-				try
-				{
-					$response = $this->client->embeddings()->create([
-						'model' => self::$model,
-						'input' => $chunks,
-					]);
-				}
-				catch (InvalidArgumentException $e)
-				{
-					// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
-					if ($e->getMessage() === 'json_encode error: Malformed UTF-8 characters, possibly incorrectly encoded')
+					$id = array_shift($entry);
+					$title = array_shift($entry);
+					$description = array_shift($entry);
+					$extra = $entry;
+					// fulltext index or rag/embeddings
+					if ($fulltext)
 					{
-						try
+						$extra = array_values(array_filter(array_map('trim', $extra), static function ($v)
 						{
-							$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
-							$response = $this->client->embeddings()->create([
-								'model' => self::$model,
-								'input' => $chunks,
-							]);
-							unset($e);
+							return $v && strlen((string)$v) > 3;
+						}));
+						if (count($extra) <= 1)
+						{
+							$extra = $extra ? $extra[0] : null;
 						}
-						catch (\Exception $e)
+						else
 						{
+							$extra = json_encode($extra,
+								JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_IGNORE|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_LINE_TERMINATORS);
+						}
+						$this->db->insert(self::FULLTEXT_TABLE, [
+							self::FULLTEXT_APP => $app,
+							self::FULLTEXT_APP_ID => $id,
+							self::FULLTEXT_TITLE => $title ?: null,
+							self::FULLTEXT_DESCRIPTION => $description ?: null,
+							self::FULLTEXT_EXTRA => $extra,
+						], false, __LINE__, __FILE__, self::APP);
+						continue;
+					}
+					if (self::$minimize_chunks)
+					{
+						$chunks = self::chunkSplit($title . "\n" . $description .
+							($extra ? "\n" . implode("\n", $extra) : ""));
+					}
+					else
+					{
+						$chunks = self::chunkSplit($description, [$title]);
+						// embed each reply or $cfs on its own
+						foreach ($extra as $field)
+						{
+							$chunks = self::chunkSplit($field, $chunks);
 						}
 					}
-				}
-				catch (\Exception $e)
-				{
-				}
-				// handle all exceptions by logging them to PHP error-log and continuing with the next entry
-				if (isset($e))
-				{
-					error_log(__METHOD__ . "() row=" . json_encode($entry, JSON_INVALID_UTF8_IGNORE));
-					_egw_log_exception($e);
-					unset($e);
-					continue;
-				}
 
-				$this->db->delete(self::TABLE, [
-					self::EMBEDDING_APP => $app,
-					self::EMBEDDING_APP_ID => $id,
-				], __LINE__, __FILE__, self::APP);
+					try
+					{
+						$response = $this->client->embeddings()->create([
+							'model' => self::$model,
+							'input' => $chunks,
+						]);
+					} catch (InvalidArgumentException $e)
+					{
+						// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
+						if ($e->getMessage() === 'json_encode error: Malformed UTF-8 characters, possibly incorrectly encoded')
+						{
+							try
+							{
+								$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
+								$response = $this->client->embeddings()->create([
+									'model' => self::$model,
+									'input' => $chunks,
+								]);
+								unset($e);
+							} catch (\Exception $e)
+							{
+							}
+						}
+					} catch (\Exception $e)
+					{
+					}
+					// handle all exceptions by logging them to PHP error-log and continuing with the next entry
+					if (isset($e))
+					{
+						error_log(__METHOD__ . "() row=" . json_encode($entry, JSON_INVALID_UTF8_IGNORE));
+						_egw_log_exception($e);
+						unset($e);
+						continue;
+					}
 
-				foreach ($response->embeddings as $n => $embedding)
-				{
-					$this->db->insert(self::TABLE, [
+					$this->db->delete(self::TABLE, [
 						self::EMBEDDING_APP => $app,
 						self::EMBEDDING_APP_ID => $id,
-						self::EMBEDDING_CHUNK => $n,
-						self::EMBEDDING => $embedding->embedding,
-					], false, __LINE__, __FILE__, self::APP);
+					], __LINE__, __FILE__, self::APP);
+
+					foreach ($response->embeddings as $n => $embedding)
+					{
+						$this->db->insert(self::TABLE, [
+							self::EMBEDDING_APP => $app,
+							self::EMBEDDING_APP_ID => $id,
+							self::EMBEDDING_CHUNK => $n,
+							self::EMBEDDING => $embedding->embedding,
+						], false, __LINE__, __FILE__, self::APP);
+					}
 				}
 			}
 		}
@@ -271,6 +314,30 @@ class Embedding
 		{
 			self::removeAsyncJob();
 		}
+	}
+
+	/**
+	 * Hybrid search in RAG and fulltext index for given app and $pattern
+	 *
+	 * Returns found IDs and their distance ordered by the smallest distance / the best match first,
+	 * then the fulltext search results with the highest relevance first.
+	 * Same entries are only returned once with their embedding distance!.
+	 *
+	 * @ToDo: better way to merge fulltext and embedding searches
+	 * @param string $pattern
+	 * @param string $app app-name of '' for searching all apps
+	 * @param int $offset default 0
+	 * @param int $num_rows default 50
+	 * @param float $max_distance default .4
+	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
+	 */
+	public function search(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
+	{
+		return array_slice(
+			$this->searchEmbeddings($pattern, $app, $offset, $num_rows)+
+			$this->searchFulltext($pattern, $app, $offset, $num_rows), $offset, $num_rows, true);
 	}
 
 	/**
@@ -287,7 +354,7 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function search(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
+	public function searchEmbeddings(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
 	{
 		$response = $this->client->embeddings()->create([
 			'model' => self::$model,
@@ -310,6 +377,41 @@ class Embedding
 			}
 		}
 		return $id_distance;
+	}
+
+	/**
+	 * Run a fulltext search for $pattern
+	 *
+	 * @param string $pattern
+	 * @param string $app app-name of '' for searching all apps
+	 * @param int $offset default 0
+	 * @param int $num_rows default 50
+	 * @param float $min_relevance default 0
+	 * @return float[] int id => float relevance pairs, for $app === '' we return string "$app:$id"
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
+	 */
+	public function searchFulltext(string $pattern, string $app, int $offset=0, int $num_rows=50, float $min_relevance=0) : array
+	{
+		$id_relevance = [];
+		$match = 'MATCH('.self::FULLTEXT_TITLE.','.self::FULLTEXT_DESCRIPTION.','.self::FULLTEXT_EXTRA.') AGAINST('.$this->db->quote($pattern).')';
+		foreach($this->db->select(self::FULLTEXT_TABLE, [
+			self::FULLTEXT_APP,
+			self::FULLTEXT_APP_ID,
+			$match.' AS relevance',
+		], [
+			self::FULLTEXT_APP => $app,
+			$match
+		], __LINE__, __FILE__, $offset, 'ORDER BY relevance DESC', self::APP, $num_rows) as $row)
+		{
+			if ($row['relevance'] < $min_relevance)
+			{
+				break;
+			}
+			$id = $app ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
+			$id_relevance[$id] = (float)$row['relevance'];
+		}
+		return $id_relevance;
 	}
 
 	/**

@@ -38,9 +38,10 @@ abstract class Base
 	/**
 	 * Get updated / not yet indexed app-entries
 	 *
+	 * @param bool $fulltext false: check the rag, true: check fulltext index
 	 * @return Generator<array>
 	 */
-	abstract public function getUpdated();
+	abstract public function getUpdated(bool $fulltext=false);
 
 	/**
 	 * Return SQL fragment to search entries similar to the given embedding
@@ -61,7 +62,15 @@ abstract class Base
 			// MariaDB 11.8 does NOT support LIMIT in subquery :( ' LIMIT 10)';
 	}
 
-	protected function getJoin(string $timestamp='timestamp', array &$where=[])
+	/**
+	 * Get join for egw_rag(_fulltext) table to check of not yet updated/created embeddings/fulltext index
+	 *
+	 * @param string $timestamp
+	 * @param array &$where
+	 * @param bool $fulltext false: check the rag, true: check fulltext index
+	 * @return string
+	 */
+	protected function getJoin(string $timestamp='timestamp', array &$where=[], bool $fulltext=false)
 	{
 		switch ($timestamp)
 		{
@@ -74,9 +83,48 @@ abstract class Base
 			default:
 				throw new InvalidArgumentException("Invalid / not implemented timestamp type='$timestamp'!");
 		}
-		$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$modified.')';
+		if (!$fulltext)
+		{
+			$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$modified.')';
 
-		return 'LEFT JOIN '.Embedding::TABLE.' ON '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
-			Embedding::EMBEDDING_APP_ID.'='.static::ID.' AND '.Embedding::EMBEDDING_CHUNK.'=0';
+			return 'LEFT JOIN '.Embedding::TABLE.' ON '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
+				Embedding::EMBEDDING_APP_ID.'='.static::ID.' AND '.Embedding::EMBEDDING_CHUNK.'=0';
+		}
+		$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$modified.')';
+
+		return 'LEFT JOIN '.Embedding::FULLTEXT_TABLE.' ON '.Embedding::FULLTEXT_APP.'='.$this->db->quote(static::APP).' AND '.
+			Embedding::FULLTEXT_APP_ID.'='.static::ID;
+	}
+
+	/**
+	 * Get values from textual custom-fields
+	 *
+	 * @return array
+	 */
+	protected function getExtraTexts(int $id, array $texts=[]) : array
+	{
+		static $cfs=null;
+		if (!isset($cfs))
+		{
+			$cfs = array_filter(Api\Storage\Customfields::get(static::APP), static function($cf)
+			{
+				return in_array($cf['type'], ['text', 'htmlarea']);
+			});
+		}
+		if ($cfs)
+		{
+			foreach($this->db->select(static::EXTRA_TABLE, [static::EXTRA_ID, static::EXTRA_NAME, static::EXTRA_VALUE], [
+				static::EXTRA_ID => $id,
+				static::EXTRA_NAME => array_keys($cfs),
+			], __LINE__, __FILE__, false, 'ORDER BY '.static::EXTRA_NAME, static::APP) as $row)
+			{
+				if ($cfs[$row[static::EXTRA_NAME]]['type'] == 'htmlarea')
+				{
+					$row[static::EXTRA_VALUE] = trim(strip_tags($row[static::EXTRA_VALUE]));
+				}
+				$texts[$row[STATIC::EXTRA_NAME]] = $row[static::EXTRA_VALUE];
+			}
+		}
+		return $texts;
 	}
 }

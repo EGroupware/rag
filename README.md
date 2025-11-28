@@ -29,9 +29,9 @@
   - replace image in your docker-compose(.override).yml for `egroupware-db` service with `mariadb:11.8`
   - add `- MARIADB_AUTO_UPGRADE: "true"` to the environment variables of `egroupware-db` service
   - all the above will happen automatic with egroupware-docker-26 package (once it's released)
-* [bge-m3](https://ollama.com/library/bge-m3) Embedding Model via
-  - an [Ollama installation](https://ollama.com/blog/ollama-is-now-available-as-an-official-docker-image) with bge-m3 installed
-  - on OpenAI compatible endpoint and API key to access bge-m3 e.g. via IONOS AI Hub
+* [bge-m3](https://ollama.com/library/bge-m3) Embedding Model via either:
+  - an [Ollama installation](https://ollama.com/blog/ollama-is-now-available-as-an-official-docker-image) with bge-m3 installed: `ollama pull bge-m3:latest`
+  - or an OpenAI compatible endpoint and API key to access bge-m3 e.g. via IONOS AI Hub
 * RAG application repo must be cloned into the EGroupware source directory (`/usr/share/egroupware` in an onpremis installation)
 > You currently need an account of or a deployment token for the EGroupwareGmbH organisation, as `rag` is currently (still) a private repo their!
 * RAG app then need to be installed via Setup (`https://egw.example.org/egroupware/setup/`)

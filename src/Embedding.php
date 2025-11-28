@@ -335,6 +335,7 @@ class Embedding
 	 * @param int $num_rows default 50
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
+	 *  If there is no result, we return [0 => 1.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -356,6 +357,7 @@ class Embedding
 	 * @param int $num_rows default 50
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
+	 *  If there is no result, we return [0 => 1.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -381,7 +383,7 @@ class Embedding
 				$id_distance[$id] = (float)$row['distance'];
 			}
 		}
-		return $id_distance;
+		return $id_distance ?: [0 => 1.0];
 	}
 
 	/**
@@ -393,6 +395,7 @@ class Embedding
 	 * @param int $num_rows default 50
 	 * @param float $min_relevance default 0
 	 * @return float[] int id => float relevance pairs, for $app === '' we return string "$app:$id"
+	 *  If there is no result, we return [0 => 0.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -416,7 +419,7 @@ class Embedding
 			$id = $app ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
 			$id_relevance[$id] = (float)$row['relevance'];
 		}
-		return $id_relevance;
+		return $id_relevance ?: [0 => 0.0];
 	}
 
 	/**

@@ -5,7 +5,7 @@
 - [x] stores a fulltext index for all supported applications in table `egw_rag_fulltext`
 - [x] create AND keep the above indexes up-to-date when entries are added, updated or deleted
 - [x] provides search primitives applications can use to provide:
-  * `Rag\Embeddings::searchRag()` a semantic search by given search-pattern
+  * `Rag\Embeddings::searchEmbeddings()` a semantic search by given search-pattern
   * `Rag\Embeddings::searchFulltext()` a fulltext search currently only in [natural language mode](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/full-text-indexes/full-text-index-overview#in-natural-language-mode)
   * `Rag\Embeddings::search()` hybrid search combining semantic and fulltext search
   * the primitives return an array with ID => distance or relevance score of the embeddings or fulltext index

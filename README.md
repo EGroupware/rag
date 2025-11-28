@@ -34,6 +34,8 @@
   - on OpenAI compatible endpoint and API key to access bge-m3 e.g. via IONOS AI Hub
 * RAG application repo must be cloned into the EGroupware source directory (`/usr/share/egroupware` in an onpremis installation)
 > You currently need an account of or a deployment token for the EGroupwareGmbH organisation, as `rag` is currently (still) a private repo their!
+* RAG app then need to be installed via Setup (`https://egw.example.org/egroupware/setup/`)
+* the RAG app then needs to be configured: Admin > Applications > RAG > App Configuration
 
 ## App Configuration
 ### General Configuration
@@ -48,3 +50,8 @@
 - [ ] configure which type of index (RAG/Embeddings or Fulltext) to create and
 - [ ] for which (supported) apps to create or not create the indexes
 > Calculating and storing Embeddings, and to much lower extend also the Fulltext index, costs a not to diminishing amount of storage the tokes!
+
+## Usage
+* RAG does not (yet) has it's own UI!
+* use InfoLog or Tracker's search-field prefixed with an ampersand `&` e.g. `&mariadb high cpu load`
+> Clicking on the RAG icon gives currently gives an error!

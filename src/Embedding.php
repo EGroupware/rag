@@ -213,80 +213,85 @@ class Embedding
 					{
 						break;
 					}
-					$id = array_shift($entry);
-					$title = array_shift($entry);
-					$description = array_shift($entry);
 					$extra = $entry;
-					// fulltext index or rag/embeddings
-					if ($fulltext)
+					$id = array_shift($extra);
+					$title = array_shift($extra);
+					$description = array_shift($extra);
+					try
 					{
-						$extra = array_values(array_filter(array_map('trim', $extra), static function ($v)
+						// fulltext index or RAG/embeddings
+						if ($fulltext)
 						{
-							return $v && strlen((string)$v) > 3;
-						}));
-						if (count($extra) <= 1)
+							$extra = array_values(array_filter(array_map('trim', $extra), static function ($v) {
+								return $v && strlen((string)$v) > 3;
+							}));
+							if (count($extra) <= 1)
+							{
+								$extra = $extra ? $extra[0] : null;
+							}
+							else
+							{
+								$extra = json_encode($extra,
+									JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+							}
+							$this->db->insert(self::FULLTEXT_TABLE, [
+								self::FULLTEXT_APP => $app,
+								self::FULLTEXT_APP_ID => $id,
+								self::FULLTEXT_TITLE => $title ?: null,
+								self::FULLTEXT_DESCRIPTION => $description ?: null,
+								self::FULLTEXT_EXTRA => $extra,
+							], false, __LINE__, __FILE__, self::APP);
+							continue;
+						}
+						if (self::$minimize_chunks)
 						{
-							$extra = $extra ? $extra[0] : null;
+							$chunks = self::chunkSplit($title . "\n" . $description .
+								($extra ? "\n" . implode("\n", $extra) : ""));
 						}
 						else
 						{
-							$extra = json_encode($extra,
-								JSON_UNESCAPED_SLASHES|JSON_INVALID_UTF8_IGNORE|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_LINE_TERMINATORS);
-						}
-						$this->db->insert(self::FULLTEXT_TABLE, [
-							self::FULLTEXT_APP => $app,
-							self::FULLTEXT_APP_ID => $id,
-							self::FULLTEXT_TITLE => $title ?: null,
-							self::FULLTEXT_DESCRIPTION => $description ?: null,
-							self::FULLTEXT_EXTRA => $extra,
-						], false, __LINE__, __FILE__, self::APP);
-						continue;
-					}
-					if (self::$minimize_chunks)
-					{
-						$chunks = self::chunkSplit($title . "\n" . $description .
-							($extra ? "\n" . implode("\n", $extra) : ""));
-					}
-					else
-					{
-						$chunks = self::chunkSplit($description, [$title]);
-						// embed each reply or $cfs on its own
-						foreach ($extra as $field)
-						{
-							$chunks = self::chunkSplit($field, $chunks);
-						}
-					}
-
-					try
-					{
-						$response = $this->client->embeddings()->create([
-							'model' => self::$model,
-							'input' => $chunks,
-						]);
-					} catch (InvalidArgumentException $e)
-					{
-						// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
-						if ($e->getMessage() === 'json_encode error: Malformed UTF-8 characters, possibly incorrectly encoded')
-						{
-							try
+							$chunks = self::chunkSplit($description, [$title]);
+							// embed each reply or $cfs on its own
+							foreach ($extra as $field)
 							{
-								$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
-								$response = $this->client->embeddings()->create([
-									'model' => self::$model,
-									'input' => $chunks,
-								]);
-								unset($e);
-							} catch (\Exception $e)
-							{
+								$chunks = self::chunkSplit($field, $chunks);
 							}
 						}
-					} catch (\Exception $e)
+
+						try
+						{
+							$response = $this->client->embeddings()->create([
+								'model' => self::$model,
+								'input' => $chunks,
+							]);
+						}
+						catch (InvalidArgumentException $e)
+						{
+							// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
+							if ($e->getMessage() === 'json_encode error: Malformed UTF-8 characters, possibly incorrectly encoded')
+							{
+								try
+								{
+									$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
+									$response = $this->client->embeddings()->create([
+										'model' => self::$model,
+										'input' => $chunks,
+									]);
+									unset($e);
+								}
+								catch (\Exception $e)
+								{
+								}
+							}
+						}
+					}
+					catch (\Throwable $e)
 					{
 					}
 					// handle all exceptions by logging them to PHP error-log and continuing with the next entry
 					if (isset($e))
 					{
-						error_log(__METHOD__ . "() row=" . json_encode($entry, JSON_INVALID_UTF8_IGNORE));
+						error_log(__METHOD__ . "() fulltext=$fulltext, app=$app, row=" . json_encode($entry, JSON_INVALID_UTF8_IGNORE));
 						_egw_log_exception($e);
 						unset($e);
 						continue;

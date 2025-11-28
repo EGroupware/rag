@@ -56,7 +56,6 @@ class Tracker extends Base
 				{
 					$row[self::DESCRIPTION] = trim(strip_tags($row[self::DESCRIPTION]));
 				}
-				$row['replies'] = [];
 				foreach($this->db->select(self::REPLIES_TABLE, [self::REPLY_ID, self::REPLY_MESSAGE], [
 					self::ID => $row[self::ID],
 				], __LINE__, __FILE__, 0, 'ORDER BY '.self::REPLY_ID, self::APP) as $reply)
@@ -65,7 +64,7 @@ class Tracker extends Base
 					{
 						$reply[self::REPLY_MESSAGE] = trim(strip_tags($reply[self::REPLY_MESSAGE]));
 					}
-					$row['r'.$row[self::REPLY_ID]] = $reply[self::REPLY_MESSAGE];
+					$row['r'.$reply[self::REPLY_ID]] = $reply[self::REPLY_MESSAGE];
 				}
 				unset($row['tr_edit_mode']);
 				$row = $this->getExtraTexts($row[self::ID], $row);

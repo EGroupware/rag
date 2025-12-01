@@ -12,11 +12,6 @@
 namespace EGroupware\Rag;
 
 use EGroupware\Api;
-use EGroupware\Api\Link;
-use EGroupware\Api\Framework;
-use EGroupware\Api\Egw;
-use EGroupware\Api\Acl;
-use EGroupware\Timesheet\Events;
 
 
 /**
@@ -45,7 +40,7 @@ class Hooks
 		if ($GLOBALS['egw_info']['user']['apps']['admin'])
 		{
 			$file = Array(
-				'Site Configuration' => Egw::link('/index.php','menuaction=admin.admin_config.index&appname=' . $appname,'&ajax=true'),
+				'Site Configuration' => Api\Egw::link('/index.php','menuaction=admin.admin_config.index&appname=' . $appname,'&ajax=true'),
 			);
 			if ($location == 'admin')
 			{
@@ -55,6 +50,23 @@ class Hooks
 			{
 				//$GLOBALS['egw']->framework->sidebox($appname, lang('Configuration'), $file);
 			}
+		}
+	}
+
+	/**
+	 * Hook to overwrite config and/or set "sel_options"
+	 *
+	 * @param array $data
+	 */
+	public static function config($data)
+	{
+		if (($errors = Api\Config::read(self::APP)[Embedding::RAG_LAST_ERRORS] ?? []))
+		{
+			$last_error = current($errors);
+			return [
+				'rag_last_error_time' => Api\DateTime::to($last_error['date']).': '.$last_error['message'],
+				'rag_last_errors' => json_encode($errors, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE),
+			];
 		}
 	}
 }

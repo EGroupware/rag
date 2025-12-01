@@ -21,8 +21,8 @@
 ## Supported applications
 - [x] InfoLog
 - [x] Tracker
+- [x] allow app-plugins in apps namespace `EGroupware\<application>\Rag` instead directly in RAG's `EGroupware\Rag\Embeddings\<application>`
 - [ ] all other egroupware applications
-- [ ] move plugins to apps namespace `<application>\Rag` instead current `Rag\Embeddings\<application>` and detecting/finding them here
 
 ## Requirements and installation
 * MariaDB 11.8 for the required vector type to store and search for embeddings
@@ -39,8 +39,8 @@
 
 ## App Configuration
 ### General Configuration
-* URL and optional API key for the OpenAI compatible endpoint
-> Ollama you can NOT use the default localhost in an other container, use e.g. the docker0 address 172.17.0.1!
+* URL and optional API key for the OpenAI compatible endpoint (optional, without RAG just uses/creates the fulltext index)
+> Ollama: you can NOT use the default localhost in an other container, use e.g. the docker0 address 172.17.0.1!
 ### Embedding Configuration
 * name of an embedding model to use, defaults to `bge-m3`
 > Currently 1024 dimensions are hard-coded in the schema, you need to change the schema manually for a different value!

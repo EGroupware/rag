@@ -12,7 +12,6 @@
 namespace EGroupware\Rag;
 
 use EGroupware\Api;
-use GuzzleHttp\Exception\InvalidArgumentException;
 use OpenAI;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -35,6 +34,11 @@ class Embedding
 	const FULLTEXT_EXTRA = 'ft_extra';
 
 	/**
+	 * Name of config storing the last errors of RAG's async-job
+	 */
+	const RAG_LAST_ERRORS = 'rag-last-errors';
+
+	/**
 	 * Stop calculating embeddings after this time: 5min - 15sec
 	 *
 	 * So the async job stops before the next one starts.
@@ -42,9 +46,9 @@ class Embedding
 	const MAX_RUNTIME = 285;
 
 	/**
-	 * @var OpenAI\Client
+	 * @var ?OpenAI\Client
 	 */
-	protected $client;
+	protected ?OpenAI\Client $client;
 
 	/**
 	 * @var Api\Db;
@@ -69,20 +73,22 @@ class Embedding
 	public static bool $minimize_chunks = true;
 
 	/**
-	 * @var string base-url of OpenAI compatible api:
+	 * @var string base-url of OpenAI compatible api (you can NOT use localhost!):
 	 * - Ollama: http://172.17.0.1:11434/v1/v1
 	 * - IONOS:  ...
 	 */
-	protected static string $url = 'http://172.17.0.1:11434/v1';
+	protected static ?string $url = null;
 	protected static ?string $api_key = null;
 
 	public function __construct()
 	{
-		$factory = Openai::factory();
-		if (self::$url) $factory->withBaseUri(self::$url);
-		if (self::$api_key) $factory->withApiKey(self::$api_key);
-		$this->client = $factory->make();
-
+		if (self::$url)
+		{
+			$factory = Openai::factory();
+			if (self::$url) $factory->withBaseUri(self::$url);
+			if (self::$api_key) $factory->withApiKey(self::$api_key);
+			$this->client = $factory->make();
+		}
 		$this->db = $GLOBALS['egw']->db;
 	}
 
@@ -93,7 +99,7 @@ class Embedding
 	{
 		$config = Api\Config::read(self::APP);
 
-		self::$url = $config['url'] ?? 'http://172.17.0.1:11434/v1';
+		self::$url = $config['url'] ?? null;
 		self::$api_key = $config['url'] ?? null;
 
 		self::$chunk_size = $config['chunk_size'] ?? 500;
@@ -133,55 +139,65 @@ class Embedding
 	/**
 	 * Callback for hook "notify-all" to enable embedding (on new/updated entries) and remove embeddings of deleted entries
 	 *
-	 * @param array $location
+	 * @param array $data
 	 * @return void
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public static function notify($location)
+	public static function notify($data)
 	{
 		// check if we're interested in the given app
-		if (empty($location['app']) || !isset(self::plugins()[$location['app']]))
+		if (empty($data['app']) || !isset(self::plugins()[$data['app']]))
 		{
 			return;
 		}
 		// delete embeddings of deleted entries
-		if ($location['type'] === 'delete' && !empty($location['hold_for_purge']) && !empty($location['id']))
+		if ($data['type'] === 'delete' && !empty($data['hold_for_purge']) && !empty($data['id']))
 		{
 			/** @var Api\Db $db */
 			$db = $GLOBALS['egw']->db;
 			$db->delete(self::TABLE, [
-				self::EMBEDDING_APP => $location['app'],
-				self::EMBEDDING_APP_ID => $location['id'],
+				self::EMBEDDING_APP => $data['app'],
+				self::EMBEDDING_APP_ID => $data['id'],
 			], __LINE__, __FILE__, self::APP);
 			$db->delete(self::FULLTEXT_TABLE, [
-				self::FULLTEXT_APP => $location['app'],
-				self::FULLTEXT_APP_ID => $location['id'],
+				self::FULLTEXT_APP => $data['app'],
+				self::FULLTEXT_APP_ID => $data['id'],
 			], __LINE__, __FILE__, self::APP);
 		}
-		// install the async job for added or updated entries to embed
-		elseif ($location['type'] !== 'delete')
+		// install the async job for added or updated entries, if directly adding them failed
+		elseif ($data['type'] !== 'delete')
 		{
-			self::installAsyncJob();
+			try {
+				$rag = new self;
+				$rag->embed($data);
+			}
+			catch (\Exception $e) {
+				self::installAsyncJob();
+			}
 		}
 	}
 
 	/**
-	 * Get all embedding plugins
+	 * Get all embedding plugins, searching installed apps for a class named:
+	 * - EGroupware\Rag\Embedding\<App-name>
+	 * - EGroupware\<App-name>\Rag
 	 *
 	 * @return array app-name => class-name pairs
 	 */
 	public static function plugins() : array
 	{
-		return Api\Cache::getTree(self::APP, 'plugins', static function()
+		return Api\Cache::getTree(self::APP, 'app_plugins', static function()
 		{
 			$plugins = [];
-			foreach(scandir(__DIR__.'/Embedding') as $class)
+			foreach(array_keys($GLOBALS['egw_info']['apps'] ?? []) as $app)
 			{
-				if (in_array($class, ['.', '..', 'Base.php'])) continue;
-				$app = strtolower($class = basename($class, '.php'));
-				$class = __CLASS__ . '\\' . $class;
-				$plugins[$app] = $class;
+				$app_class = ucfirst($app);
+				if (class_exists($class="EGroupware\\Rag\\Embedding\\$app_class") ||
+					class_exists($class="EGroupware\\$app_class\\Rag"))
+				{
+					$plugins[$app] = $class;
+				}
 			}
 			return $plugins;
 		}, [], 86400);
@@ -190,24 +206,28 @@ class Embedding
 	/**
 	 * Run all embedding plugins and embed all not yet or updated entries
 	 *
+	 * @param ?array $hook_data null or data from notify-all hook, to just embed this entry
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 * @throws Api\Exception\WrongParameter
 	 */
-	public function embed()
+	public function embed(?array $hook_data=null)
 	{
 		$start = microtime(true);
 		foreach(self::plugins() as $app => $class)
 		{
+			if ($hook_data && $hook_data['app'] !== $app) continue;
+
 			/** @var Embedding\Base $plugin */
 			$plugin = new $class();
 
 			foreach([
 				'fulltext' => true,
+			]+($this->client ? [    // only add RAG/embeddings, if configured
 				'rag' => false,
-			] as $fulltext)
+			]:[]) as $rag_or_fulltext => $fulltext)
 			{
-				foreach ($plugin->getUpdated($fulltext) as $entry)
+				foreach ($plugin->getUpdated($fulltext, $hook_data) as $entry)
 				{
 					if (microtime(true) - $start > self::MAX_RUNTIME)
 					{
@@ -235,12 +255,13 @@ class Embedding
 									JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
 							}
 							$this->db->insert(self::FULLTEXT_TABLE, [
-								self::FULLTEXT_APP => $app,
-								self::FULLTEXT_APP_ID => $id,
 								self::FULLTEXT_TITLE => $title ?: null,
 								self::FULLTEXT_DESCRIPTION => $description ?: null,
 								self::FULLTEXT_EXTRA => $extra,
-							], false, __LINE__, __FILE__, self::APP);
+							], [
+								self::FULLTEXT_APP => $app,
+								self::FULLTEXT_APP_ID => $id,
+							], __LINE__, __FILE__, self::APP);
 							continue;
 						}
 						if (self::$minimize_chunks)
@@ -265,57 +286,68 @@ class Embedding
 								'input' => $chunks,
 							]);
 						}
-						catch (InvalidArgumentException $e)
+						catch (\Exception $e)   // JsonException of unsure namespace, therefore catch them all
 						{
 							// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
-							if ($e->getMessage() === 'json_encode error: Malformed UTF-8 characters, possibly incorrectly encoded')
+							if (str_starts_with($e->getMessage(), 'Malformed UTF-8 characters, possibly incorrectly encoded'))
 							{
-								try
-								{
-									$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
-									$response = $this->client->embeddings()->create([
-										'model' => self::$model,
-										'input' => $chunks,
-									]);
-									unset($e);
-								}
-								catch (\Exception $e)
-								{
-								}
+								$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
+								$response = $this->client->embeddings()->create([
+									'model' => self::$model,
+									'input' => $chunks,
+								]);
+								unset($e);
 							}
 						}
 					}
 					catch (\Throwable $e)
 					{
 					}
-					// handle all exceptions by logging them to PHP error-log and continuing with the next entry
+					// handle all exceptions by logging them to RAG-config and PHP error-log, and then continuing with the next entry
 					if (isset($e))
 					{
 						error_log(__METHOD__ . "() fulltext=$fulltext, app=$app, row=" . json_encode($entry, JSON_INVALID_UTF8_IGNORE));
 						_egw_log_exception($e);
+						// store the last N errors to display in RAG config
+						$errors = Api\Config::read(self::APP)[self::RAG_LAST_ERRORS] ?? [];
+						array_unshift($errors, [
+							'date' => new Api\DateTime(),
+							'message' => $e->getMessage(),
+							'app' => $app,
+							'rag-or-fulltext' => $rag_or_fulltext,
+							'entry' => $entry,
+							'code' => $e->getCode(),
+							'class' => get_class($e),
+							'trace' => $e->getTrace(),
+						]);
+						Api\Config::save_value(self::RAG_LAST_ERRORS, array_slice($errors, 0, 5), self::APP);
+						// if called in hook, throw the error
+						if ($hook_data) throw $e;
 						unset($e);
 						continue;
 					}
-
-					$this->db->delete(self::TABLE, [
-						self::EMBEDDING_APP => $app,
-						self::EMBEDDING_APP_ID => $id,
-					], __LINE__, __FILE__, self::APP);
-
+					$n = -1;
 					foreach ($response->embeddings as $n => $embedding)
 					{
 						$this->db->insert(self::TABLE, [
+							self::EMBEDDING => $embedding->embedding,
+						], [
 							self::EMBEDDING_APP => $app,
 							self::EMBEDDING_APP_ID => $id,
 							self::EMBEDDING_CHUNK => $n,
-							self::EMBEDDING => $embedding->embedding,
-						], false, __LINE__, __FILE__, self::APP);
+						], __LINE__, __FILE__, self::APP);
 					}
+					// delete excess old chunks, if there are any
+					$this->db->delete(self::TABLE, [
+						self::EMBEDDING_APP => $app,
+						self::EMBEDDING_APP_ID => $id,
+						self::EMBEDDING_CHUNK.'>'.$n,
+					], __LINE__, __FILE__, self::APP);
 				}
 			}
 		}
 		// if we finished, we can remove the job (gets readded for new entries via notify hook)
-		if (microtime(true) - $start < self::MAX_RUNTIME)
+		if (!$hook_data && microtime(true) - $start < self::MAX_RUNTIME)
 		{
 			self::removeAsyncJob();
 		}
@@ -342,7 +374,7 @@ class Embedding
 	public function search(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
 	{
 		return array_slice(
-			$this->searchEmbeddings($pattern, $app, $offset, $num_rows)+
+			($this->client ? $this->searchEmbeddings($pattern, $app, $offset, $num_rows) : []) +
 			$this->searchFulltext($pattern, $app, $offset, $num_rows), $offset, $num_rows, true);
 	}
 

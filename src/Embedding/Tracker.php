@@ -35,20 +35,28 @@ class Tracker extends Base
 	 * Get updated entries
 	 *
 	 * @param bool $fulltext false: check the rag, true: check fulltext index
+	 * @param ?array $hook_data null or data from notify-all hook, to just emit this entry
 	 * @return \Generator<array>
 	 * @throws \EGroupware\Api\Db\Exception
 	 * @throws \EGroupware\Api\Db\Exception\InvalidSql
 	 */
-	public function getUpdated(bool $fulltext=false)
+	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
 	{
 		$where = [
 			self::NOT_DELETED, // no need to embed deleted entries
 		];
+		$cols = [self::ID, self::TITLE, self::DESCRIPTION, 'info_location'];
+		// check / process hook-data to not query entry again, if already contained
+		if ($hook_data && $hook_data['app'] === self::APP && !empty($hook_data['id']))
+		{
+			$where[self::ID] = $hook_data['id'];
+			$entries = self::getRowFromNotifyHookData($hook_data, $cols);
+		}
 		$join = $this->getJoin('int', $where, $fulltext);
 		do
 		{
 			$r = 0;
-			foreach ($this->db->select(self::TABLE, [self::ID, self::TITLE, self::DESCRIPTION, 'tr_edit_mode'],
+			foreach ($entries ?? $this->db->select(self::TABLE, $cols,
 				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . self::MODIFIED . ' ASC', '',
 				self::CHUNK_SIZE, $join) as $row)
 			{
@@ -67,7 +75,7 @@ class Tracker extends Base
 					$row['r'.$reply[self::REPLY_ID]] = $reply[self::REPLY_MESSAGE];
 				}
 				unset($row['tr_edit_mode']);
-				$row = $this->getExtraTexts($row[self::ID], $row);
+				$row = $this->getExtraTexts($row[self::ID], $row, $hook_data['data']??null);
 				++$r;
 				yield $row;
 			}

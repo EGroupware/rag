@@ -41,6 +41,15 @@
 						<option value="no">No</option>
 					</et2-select>
 				</row>
+				<row>
+					<et2-description  value="Last errors of RAG's async job" span="all" class="subHeader"></et2-description>
+				</row>
+				<row>
+					<!-- hack to get summary="@newsettings[rag_last_error_time]" working/propagated: id="newsettings[rag_last_error_time]" -->
+					<et2-details summary="@newsettings[rag_last_error_time]" span="all">
+						<et2-description id="newsettings[rag_last_errors]"></et2-description>
+					</et2-details>
+				</row>
 			</rows>
 		</grid>
 	</template>

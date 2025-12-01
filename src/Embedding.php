@@ -228,6 +228,7 @@ class Embedding
 					'rag' => false,
 				] : []) as $fulltext)
 				{
+					$entry = null;
 					foreach ($plugin->getUpdated($fulltext, $hook_data) as $entry)
 					{
 						if (microtime(true) - $start > self::MAX_RUNTIME)
@@ -335,7 +336,7 @@ class Embedding
 			}
 			catch (\Throwable $e) {
 				// catch and log all errors, also the ones in the app-plugins
-				self::logError($e, $app, $fulltext??null);
+				self::logError($e, $app, $fulltext??null, $entry??null);
 				continue;   // with next plugin/app
 			}
 		}

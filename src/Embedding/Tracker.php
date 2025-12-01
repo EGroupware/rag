@@ -45,7 +45,7 @@ class Tracker extends Base
 		$where = [
 			self::NOT_DELETED, // no need to embed deleted entries
 		];
-		$cols = [self::ID, self::TITLE, self::DESCRIPTION, 'info_location'];
+		$cols = [self::ID, self::TITLE, self::DESCRIPTION, 'tr_cc', 'tr_edit_mode'];
 		// check / process hook-data to not query entry again, if already contained
 		if ($hook_data && $hook_data['app'] === self::APP && !empty($hook_data['id']))
 		{
@@ -75,6 +75,7 @@ class Tracker extends Base
 					$row['r'.$reply[self::REPLY_ID]] = $reply[self::REPLY_MESSAGE];
 				}
 				unset($row['tr_edit_mode']);
+				if (!$fulltext) unset($row['tr_cc']);   // only makes sense for fulltext index, not RAG/embeddings
 				$row = $this->getExtraTexts($row[self::ID], $row, $hook_data['data']??null);
 				++$r;
 				yield $row;

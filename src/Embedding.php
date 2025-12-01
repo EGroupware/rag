@@ -218,132 +218,125 @@ class Embedding
 		{
 			if ($hook_data && $hook_data['app'] !== $app) continue;
 
-			/** @var Embedding\Base $plugin */
-			$plugin = new $class();
+			try {
+				/** @var Embedding\Base $plugin */
+				$plugin = new $class();
 
-			foreach([
-				'fulltext' => true,
-			]+($this->client ? [    // only add RAG/embeddings, if configured
-				'rag' => false,
-			]:[]) as $rag_or_fulltext => $fulltext)
-			{
-				foreach ($plugin->getUpdated($fulltext, $hook_data) as $entry)
+				foreach([
+			         'fulltext' => true,
+		         ] + ($this->client ? [    // only add RAG/embeddings, if configured
+					'rag' => false,
+				] : []) as $fulltext)
 				{
-					if (microtime(true) - $start > self::MAX_RUNTIME)
+					foreach ($plugin->getUpdated($fulltext, $hook_data) as $entry)
 					{
-						break;
-					}
-					$extra = $entry;
-					$id = array_shift($extra);
-					$title = array_shift($extra);
-					$description = array_shift($extra);
-					try
-					{
-						// fulltext index or RAG/embeddings
-						if ($fulltext)
+						if (microtime(true) - $start > self::MAX_RUNTIME)
 						{
-							$extra = array_values(array_filter(array_map('trim', $extra), static function ($v) {
-								return $v && strlen((string)$v) > 3;
-							}));
-							if (count($extra) <= 1)
+							break;
+						}
+						$extra = $entry;
+						$id = array_shift($extra);
+						$title = array_shift($extra);
+						$description = array_shift($extra);
+						try
+						{
+							// fulltext index or RAG/embeddings
+							if ($fulltext)
 							{
-								$extra = $extra ? $extra[0] : null;
+								$extra = array_values(array_filter(array_map('trim', $extra), static function ($v) {
+									return $v && strlen((string)$v) > 3;
+								}));
+								if (count($extra) <= 1)
+								{
+									$extra = $extra ? $extra[0] : null;
+								}
+								else
+								{
+									$extra = json_encode($extra,
+										JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+								}
+								$this->db->insert(self::FULLTEXT_TABLE, [
+									self::FULLTEXT_TITLE => $title ?: null,
+									self::FULLTEXT_DESCRIPTION => $description ?: null,
+									self::FULLTEXT_EXTRA => $extra,
+								], [
+									self::FULLTEXT_APP => $app,
+									self::FULLTEXT_APP_ID => $id,
+								], __LINE__, __FILE__, self::APP);
+								continue;
+							}
+							if (self::$minimize_chunks)
+							{
+								$chunks = self::chunkSplit($title . "\n" . $description .
+									($extra ? "\n" . implode("\n", $extra) : ""));
 							}
 							else
 							{
-								$extra = json_encode($extra,
-									JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
+								$chunks = self::chunkSplit($description, [$title]);
+								// embed each reply or $cfs on its own
+								foreach ($extra as $field)
+								{
+									$chunks = self::chunkSplit($field, $chunks);
+								}
 							}
-							$this->db->insert(self::FULLTEXT_TABLE, [
-								self::FULLTEXT_TITLE => $title ?: null,
-								self::FULLTEXT_DESCRIPTION => $description ?: null,
-								self::FULLTEXT_EXTRA => $extra,
-							], [
-								self::FULLTEXT_APP => $app,
-								self::FULLTEXT_APP_ID => $id,
-							], __LINE__, __FILE__, self::APP);
-							continue;
-						}
-						if (self::$minimize_chunks)
-						{
-							$chunks = self::chunkSplit($title . "\n" . $description .
-								($extra ? "\n" . implode("\n", $extra) : ""));
-						}
-						else
-						{
-							$chunks = self::chunkSplit($description, [$title]);
-							// embed each reply or $cfs on its own
-							foreach ($extra as $field)
-							{
-								$chunks = self::chunkSplit($field, $chunks);
-							}
-						}
 
-						try
-						{
-							$response = $this->client->embeddings()->create([
-								'model' => self::$model,
-								'input' => $chunks,
-							]);
-						}
-						catch (\Exception $e)   // JsonException of unsure namespace, therefore catch them all
-						{
-							// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
-							if (str_starts_with($e->getMessage(), 'Malformed UTF-8 characters, possibly incorrectly encoded'))
+							try
 							{
-								$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
 								$response = $this->client->embeddings()->create([
 									'model' => self::$model,
 									'input' => $chunks,
 								]);
-								unset($e);
+							}
+							catch (\Exception $e)   // JsonException of unsure namespace, therefore catch them all
+							{
+								// fix invalid utf-8 characters by replacing them BEFORE calculating the embeddings
+								if (str_starts_with($e->getMessage(), 'Malformed UTF-8 characters, possibly incorrectly encoded'))
+								{
+									$chunks = json_decode(json_encode($chunks, JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR), true);
+									$response = $this->client->embeddings()->create([
+										'model' => self::$model,
+										'input' => $chunks,
+									]);
+									unset($e);
+								}
 							}
 						}
-					}
-					catch (\Throwable $e)
-					{
-					}
-					// handle all exceptions by logging them to RAG-config and PHP error-log, and then continuing with the next entry
-					if (isset($e))
-					{
-						error_log(__METHOD__ . "() fulltext=$fulltext, app=$app, row=" . json_encode($entry, JSON_INVALID_UTF8_IGNORE));
-						_egw_log_exception($e);
-						// store the last N errors to display in RAG config
-						$errors = Api\Config::read(self::APP)[self::RAG_LAST_ERRORS] ?? [];
-						array_unshift($errors, [
-							'date' => new Api\DateTime(),
-							'message' => $e->getMessage(),
-							'app' => $app,
-							'rag-or-fulltext' => $rag_or_fulltext,
-							'entry' => $entry,
-							'code' => $e->getCode(),
-							'class' => get_class($e),
-							'trace' => $e->getTrace(),
-						]);
-						Api\Config::save_value(self::RAG_LAST_ERRORS, array_slice($errors, 0, 5), self::APP);
-						// if called in hook, throw the error
-						if ($hook_data) throw $e;
-						unset($e);
-						continue;
-					}
-					$n = -1;
-					foreach ($response->embeddings as $n => $embedding)
-					{
-						$this->db->insert(self::TABLE, [
-							self::EMBEDDING => $embedding->embedding,
-						], [
+						catch (\Throwable $e)
+						{
+						}
+						// handle all exceptions by logging them to RAG-config and PHP error-log, and then continuing with the next entry
+						if (isset($e))
+						{
+							self::logError($e, $app, $fulltext, $entry);
+							// if called in hook, don't continue
+							if ($hook_data) return;
+							unset($e);
+							continue;
+						}
+						$n = -1;
+						foreach ($response->embeddings as $n => $embedding)
+						{
+							$this->db->insert(self::TABLE, [
+								self::EMBEDDING => $embedding->embedding,
+							], [
+								self::EMBEDDING_APP => $app,
+								self::EMBEDDING_APP_ID => $id,
+								self::EMBEDDING_CHUNK => $n,
+							], __LINE__, __FILE__, self::APP);
+						}
+						// delete excess old chunks, if there are any
+						$this->db->delete(self::TABLE, [
 							self::EMBEDDING_APP => $app,
 							self::EMBEDDING_APP_ID => $id,
-							self::EMBEDDING_CHUNK => $n,
+							self::EMBEDDING_CHUNK . '>' . $n,
 						], __LINE__, __FILE__, self::APP);
 					}
-					// delete excess old chunks, if there are any
-					$this->db->delete(self::TABLE, [
-						self::EMBEDDING_APP => $app,
-						self::EMBEDDING_APP_ID => $id,
-						self::EMBEDDING_CHUNK.'>'.$n,
-					], __LINE__, __FILE__, self::APP);
 				}
+			}
+			catch (\Throwable $e) {
+				// catch and log all errors, also the ones in the app-plugins
+				self::logError($e, $app, $fulltext??null);
+				continue;   // with next plugin/app
 			}
 		}
 		// if we finished, we can remove the job (gets readded for new entries via notify hook)
@@ -351,6 +344,34 @@ class Embedding
 		{
 			self::removeAsyncJob();
 		}
+	}
+
+	/**
+	 * Log an exception to RAG configuration to display
+	 *
+	 * @param \Throwable $e
+	 * @param ?string $fulltext
+	 * @param ?string $app
+	 * @param ?array $entry
+	 * @throws Api\Exception\WrongParameter
+	 */
+	public static function logError(\Throwable $e, $app=null, $fulltext=null, $entry=null)
+	{
+		error_log(__METHOD__ . "() app=$app, fulltext=$fulltext, entry=".json_encode($entry, JSON_INVALID_UTF8_IGNORE));
+		_egw_log_exception($e);
+		// store the last N errors to display in RAG config
+		$errors = Api\Config::read(self::APP)[self::RAG_LAST_ERRORS] ?? [];
+		array_unshift($errors, [
+			'date' => new Api\DateTime(),
+			'message' => $e->getMessage(),
+			'app' => $app,
+			'rag-or-fulltext' => $fulltext ? 'fulltext' : 'rag',
+			'entry' => $entry,
+			'code' => $e->getCode(),
+			'class' => get_class($e),
+			'trace' => $e->getTrace(),
+		]);
+		Api\Config::save_value(self::RAG_LAST_ERRORS, array_slice($errors, 0, 5), self::APP);
 	}
 
 	/**

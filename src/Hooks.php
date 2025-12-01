@@ -63,6 +63,16 @@ class Hooks
 		if (($errors = Api\Config::read(self::APP)[Embedding::RAG_LAST_ERRORS] ?? []))
 		{
 			$last_error = current($errors);
+			// shorten long error-messages, specially SQL errors contain
+			if (strlen($last_error['message']) > 100)
+			{
+				[$message, $message2] = explode("\n", $last_error['message'], 2)+[null,null];
+				$last_error['message'] = substr($message, 0, 100).(strlen($message) > 100 ? '...' : '');
+				if (!empty($message2))
+				{
+					$last_error['message'] .= "\n".substr($message2, 0, 100).(strlen($message2) > 100 ? '...' : '');
+				}
+			}
 			return [
 				'rag_last_error_time' => Api\DateTime::to($last_error['date']).': '.$last_error['message'],
 				'rag_last_errors' => json_encode($errors, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE),

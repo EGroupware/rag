@@ -48,7 +48,7 @@ class Embedding
 	/**
 	 * @var ?OpenAI\Client
 	 */
-	protected ?OpenAI\Client $client;
+	protected ?OpenAI\Client $client=null;
 
 	/**
 	 * @var Api\Db;
@@ -79,6 +79,13 @@ class Embedding
 	 */
 	protected static ?string $url = null;
 	protected static ?string $api_key = null;
+
+	/**
+	 * Total number of rows of last search*() call
+	 *
+	 * @var int|null
+	 */
+	public ?int $total;
 
 	public function __construct()
 	{
@@ -384,8 +391,8 @@ class Embedding
 	 *
 	 * @ToDo: better way to merge fulltext and embedding searches
 	 * @param string $pattern
-	 * @param string $app app-name of '' for searching all apps
-	 * @param int $offset default 0
+	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
+	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
@@ -393,11 +400,25 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function search(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
+	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, float $max_distance=.4) : array
 	{
-		return array_slice(
-			($this->client ? $this->searchEmbeddings($pattern, $app, $offset, $num_rows) : []) +
-			$this->searchFulltext($pattern, $app, $offset, $num_rows), $offset, $num_rows, true);
+		if (!$this->client)
+		{
+			return $this->searchFulltext($pattern, $app, $start, $num_rows, $max_distance);
+		}
+		// quick/dump approach for merging: always query from start=0, $start+$num_rows rows, and then slice
+		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $max_distance);
+		$total_embeddings = $this->total ?? 0;
+
+		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows);
+
+		// + makes sure to return every entry only once, with the embeddings first
+		$both = $embedding_matches+$fulltext_matches;
+
+		// we can only subtract the entries found in both returned sets, but there might be more in common ...
+		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
+
+		return array_slice($both, $start, $num_rows, true);
 	}
 
 	/**
@@ -406,8 +427,8 @@ class Embedding
 	 * Returns found IDs and their distance ordered by the smallest distance / the best match first.
 	 *
 	 * @param string $pattern
-	 * @param string $app app-name of '' for searching all apps
-	 * @param int $offset default 0
+	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
+	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
@@ -415,20 +436,21 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchEmbeddings(string $pattern, string $app, int $offset=0, int $num_rows=50, float $max_distance=.4) : array
+	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, float $max_distance=.4) : array
 	{
 		$response = $this->client->embeddings()->create([
 			'model' => self::$model,
 			'input' => [$pattern],
 		]);
-		$id_distance = [];
-		foreach($this->db->select(self::TABLE, [
+		$cols = [
 			self::EMBEDDING_APP,
 			self::EMBEDDING_APP_ID,
 			'VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($response->embeddings[0]->embedding, 'vector').') as distance',
-		], [
+		];
+		$id_distance = [];
+		foreach($this->db->select(self::TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols), $app ? [
 			self::EMBEDDING_APP => $app,
-		], __LINE__, __FILE__, $offset, 'HAVING distance<'.$max_distance.' ORDER BY distance', self::APP, $num_rows) as $row)
+		] : false, __LINE__, __FILE__, $start, 'HAVING distance<'.$max_distance.' ORDER BY distance', self::APP, $num_rows) as $row)
 		{
 			$id = $app ? (int)$row[self::EMBEDDING_APP_ID] : $row[self::EMBEDDING_APP].':'.$row[self::EMBEDDING_APP_ID];
 			// only insert the first / best match, as multiple chunks could match
@@ -437,6 +459,8 @@ class Embedding
 				$id_distance[$id] = (float)$row['distance'];
 			}
 		}
+		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
+
 		return $id_distance ?: [0 => 1.0];
 	}
 
@@ -444,8 +468,8 @@ class Embedding
 	 * Run a fulltext search for $pattern
 	 *
 	 * @param string $pattern
-	 * @param string $app app-name of '' for searching all apps
-	 * @param int $offset default 0
+	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
+	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param float $min_relevance default 0
 	 * @return float[] int id => float relevance pairs, for $app === '' we return string "$app:$id"
@@ -453,18 +477,18 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchFulltext(string $pattern, string $app, int $offset=0, int $num_rows=50, float $min_relevance=0) : array
+	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, float $min_relevance=0) : array
 	{
 		$id_relevance = [];
 		$match = 'MATCH('.self::FULLTEXT_TITLE.','.self::FULLTEXT_DESCRIPTION.','.self::FULLTEXT_EXTRA.') AGAINST('.$this->db->quote($pattern).')';
-		foreach($this->db->select(self::FULLTEXT_TABLE, [
+		$cols = [
 			self::FULLTEXT_APP,
 			self::FULLTEXT_APP_ID,
 			$match.' AS relevance',
-		], [
-			self::FULLTEXT_APP => $app,
-			$match
-		], __LINE__, __FILE__, $offset, 'ORDER BY relevance DESC', self::APP, $num_rows) as $row)
+		];
+		foreach($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols) ,
+			($app ? [self::FULLTEXT_APP => $app] : [])+[$match],
+			__LINE__, __FILE__, $start, 'ORDER BY relevance DESC', self::APP, $num_rows) as $row)
 		{
 			if ($row['relevance'] < $min_relevance)
 			{
@@ -473,6 +497,8 @@ class Embedding
 			$id = $app ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
 			$id_relevance[$id] = (float)$row['relevance'];
 		}
+		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
+
 		return $id_relevance ?: [0 => 0.0];
 	}
 

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2.0//EN" "https://www.egroupware.org/etemplate2.0.dtd">
+<overlay>
+	<et2-template id="rag.index.rows" template="" lang="" group="0" version="26.1">
+		<grid width="100%">
+			<columns>
+				<column width="150"/> <!-- ID -->
+				<column width="100"/> <!-- app-icon -->
+				<column width="100"/> <!-- app-ID -->
+				<column width="40%"/> <!-- link-title -->
+				<column width="150"/> <!-- distance/relevance -->
+			</columns>
+			<rows>
+				<row class="th">
+					<nextmatch-header id="id" label="ID"></nextmatch-header>
+					<nextmatch-header id="app" label="App"></nextmatch-header>
+					<nextmatch-header id="app_id" label="App ID"></nextmatch-header>
+					<nextmatch-header id="title" label="Title"></nextmatch-header>
+					<nextmatch-header id="dist_relevance" label="Distance/Relevance"></nextmatch-header>
+				</row>
+				<row class="row">
+					<et2-description id="${row}[id]"></et2-description>
+					<et2-appicon src="$row_cont[app]" align="center" statustext="$row_cont[app]"></et2-appicon>
+					<et2-description id="${row}[app_id]"></et2-description>
+					<et2-description id="${row}[title]"></et2-description>
+					<et2-description id="${row}[dist_relevance]"></et2-description>
+				</row>
+			</rows>
+		</grid>
+	</et2-template>
+	<et2-template id="rag.index.header" template="" lang="" group="0" version="26.1">
+		<et2-hbox>
+			<et2-groupbox summary="Query">
+				<et2-searchbox id="search" placeholder="Enter your search query here..." autofocus="true" onchange="app.rag.search"></et2-searchbox>
+			</et2-groupbox>
+			<et2-groupbox summary="Type of search" width="250px">
+				<et2-vbox>
+					<radio id="col_filter[type]" set_value="hybrid" label="Hybrid search: RAG+Fulltext" onchange="app.rag.search"></radio>
+					<radio id="col_filter[type]" set_value="rag" label="RAG search only" onchange="app.rag.search"></radio>
+					<radio id="col_filter[type]" set_value="fulltext" label="Fulltext search only" onchange="app.rag.search"></radio>
+					<!-- et2-button label="Search..." noSubmit="true" onclick="app.rag.search"></et2-button -->
+				</et2-vbox>
+			</et2-groupbox>
+			<et2-groupbox summary="Search in which applications">
+				<et2-select id="col_filter[apps]" multiple="true" placeholder="All supported" onchange="app.rag.search"></et2-select>
+			</et2-groupbox>
+		</et2-hbox>
+	</et2-template>
+	<et2-template id="rag.index" template="" lang="" group="0" version="26.1">
+		<et2-template template="rag.index.header" content="nm"></et2-template>
+		<nextmatch id="nm" template="rag.index.rows"></nextmatch>
+	</et2-template>
+</overlay>

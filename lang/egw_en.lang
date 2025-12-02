@@ -1,9 +1,21 @@
+all supported	rag	en	All supported
 api key	rag	en	API Key
+app	rag	en	App
+app id	rag	en	App ID
 chunk overlap	rag	en	Chunk overlap
 chunk size	rag	en	Chunk size
+distance/relevance	rag	en	Distance/Relevance
 embedding configuration	rag	en	Embedding configuration
+enter your search query here...	rag	en	Enter your search query here...
+fulltext search only	rag	en	Fulltext search only
 general configuration	rag	en	General configuration
+hybrid search: rag+fulltext	rag	en	Hybrid search: RAG+Fulltext
+last errors of rag's async job	rag	en	Last errors of RAG's async job
 minimize chunks e.g. concatenate title and description	rag	en	Minimize chunks e.g. concatenate title and description
 model to use	rag	en	Model to use
+query	rag	en	Query
 rag	common	en	RAG
+rag search only	rag	en	RAG search only
+search in which applications	rag	en	Search in which applications
+type of search	rag	en	Type of search
 url of openai compatible api	rag	en	URL of OpenAI compatible API

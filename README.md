@@ -32,6 +32,8 @@
 * [bge-m3](https://ollama.com/library/bge-m3) Embedding Model via either:
   - an [Ollama installation](https://ollama.com/blog/ollama-is-now-available-as-an-official-docker-image) with bge-m3 installed: `ollama pull bge-m3:latest`
   - or an OpenAI compatible endpoint and API key to access bge-m3 e.g. via IONOS AI Hub
+* Make sure ollama is [reachable](https://docs.ollama.com/faq#how-can-i-expose-ollama-on-my-network) from the RAG
+  container, by default it binds to 127.0.0.1:11434
 * RAG application repo must be cloned into the EGroupware source directory (`/usr/share/egroupware` in an onpremis installation)
 > You currently need an account of or a deployment token for the EGroupwareGmbH organisation, as `rag` is currently (still) a private repo their!
 * RAG app then need to be installed via Setup (`https://egw.example.org/egroupware/setup/`)
@@ -39,7 +41,10 @@
 
 ## App Configuration
 ### General Configuration
-* URL and optional API key for the OpenAI compatible endpoint (optional, without RAG just uses/creates the fulltext index)
+
+* URL and optional API key for the [OpenAI compatible endpoint](https://docs.ollama.com/api/openai-compatibility)
+* Add "/v1/" to your Ollama URL to access the OpenAI compatible endpoint
+* (optional, without RAG just uses/creates the fulltext index)
 > Ollama: you can NOT use the default localhost in an other container, use e.g. the docker0 address 172.17.0.1!
 ### Embedding Configuration
 * name of an embedding model to use, defaults to `bge-m3`

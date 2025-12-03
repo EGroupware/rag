@@ -74,8 +74,9 @@ class Embedding
 
 	/**
 	 * @var string base-url of OpenAI compatible api (you can NOT use localhost!):
-	 * - Ollama: http://172.17.0.1:11434/v1/v1
-	 * - IONOS:  ...
+	 * - IONOS:  https://openai.inference.de-txl.ionos.com/v1
+	 * - Ollama: http://172.17.0.1:11434/v1/v1  requires Ollama be bound on all interfaces / 0.0.0.0 (not just localhost!)
+	 * - Ralf's Ollama: http://10.44.253.3:11434/v1
 	 */
 	protected static ?string $url = null;
 	protected static ?string $api_key = null;
@@ -107,7 +108,7 @@ class Embedding
 		$config = Api\Config::read(self::APP);
 
 		self::$url = $config['url'] ?? null;
-		self::$api_key = $config['url'] ?? null;
+		self::$api_key = $config['api_key'] ?? null;
 
 		self::$chunk_size = $config['chunk_size'] ?? 500;
 		self::$chunk_overlap = $config['chunk_overlap'] ?? 50;
@@ -438,10 +439,16 @@ class Embedding
 	 */
 	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, float $max_distance=.4) : array
 	{
-		$response = $this->client->embeddings()->create([
-			'model' => self::$model,
-			'input' => [$pattern],
-		]);
+		try {
+			$response = $this->client->embeddings()->create([
+				'model' => self::$model,
+				'input' => [$pattern],
+			]);
+		}
+		catch (\Exception $e) {
+			_egw_log_exception($e);
+			throw $e;
+		}
 		$cols = [
 			self::EMBEDDING_APP,
 			self::EMBEDDING_APP_ID,

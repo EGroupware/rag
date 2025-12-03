@@ -2,18 +2,27 @@ all supported	rag	de	Alle unterstützten
 api key	rag	de	API Key
 chunk overlap	rag	de	Chunk Überlappung
 chunk size	rag	de	Größe der Chunks
+distance	rag	de	Distanz
 distance/relevance	rag	de	Distanz/Relevanz
 embedding configuration	rag	de	Embedding Konfiguration
 enter your search query here...	rag	de	Geben Sie Ihre Suchanfrage hier ein...
+fulltext	rag	de	Volltext
 fulltext search only	rag	de	Volltextsuche ausschließlich
 general configuration	rag	de	Allgemeine Konfiguration
+higher is better	rag	de	größer ist besser
 hybrid search: rag+fulltext	rag	de	Hybride Suche: RAG+Volltext
+identical	rag	de	identisch
 last errors of rag's async job	rag	de	Letzte Fehler des asynchronen Jobs des RAG's
+leave empty to disable rag	rag	de	Leer lassen um das RAG auszuschalten
 minimize chunks e.g. concatenate title and description	rag	de	Minimiere die Chunks z.B. durch aneinander hängen von Titel und Beschreibung
 model to use	rag	de	Benutztes Model
+no match	rag	de	kein Treffer
+opposite	rag	de	Gegenteil
+please note: ollama must be bound to all interfaces, not just localhost!	rag	de	Bitte beachten: Ollama muss auf allen Schnittstellen gebunden sein, NICHT nur auf localhost!
 query	rag	de	Suchanfrage
 rag	common	de	RAG
 rag search only	rag	de	RAG Suche ausschließlich
+relevance	rag	de	Relevanz
 search in which applications	rag	de	In welchen Anwendungen suchen
 type of search	rag	de	Art der Suche
 url of openai compatible api	rag	de	URL der OpenAI kompatiblen API

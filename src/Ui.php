@@ -23,6 +23,11 @@ class Ui
 	const APP = 'rag';
 
 	/**
+	 * @var int log-level: 0: errors only, 1: result of search/get_rows() methods
+	 */
+	protected int $log_level = 0;
+
+	/**
 	 * Methods callable via menuaction GET parameter
 	 *
 	 * @var array
@@ -44,7 +49,7 @@ class Ui
 	 */
 	public function __construct()
 	{
-		$this->embedding = new Embedding();
+		$this->embedding = new Embedding($this->log_level);
 	}
 
 	/**
@@ -130,8 +135,9 @@ class Ui
 			$total -= count($ids);
 		}
 		// return only wanted number of rows
-		$rows = array_values(empty($query['num_rows']) ? $rows : array_slice($rows, $query['start']??0, $query['num_rows']));
-
+		$rows = empty($query['num_rows']) ? $rows : array_slice($rows, $query['start']??0, $query['num_rows']);
+		error_log(__METHOD__."(".json_encode(array_intersect_key($query, array_flip(['search', 'col_filter', 'start', 'num_rows']))).",...) rows=".json_encode(array_keys($rows)).' returning '.$total);
+		$rows = array_values($rows);
 		return $total;
 	}
 

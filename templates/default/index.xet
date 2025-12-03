@@ -23,7 +23,7 @@
 					<et2-appicon src="$row_cont[app]" align="center" statustext="$row_cont[app]"></et2-appicon>
 					<et2-description id="${row}[app_id]"></et2-description>
 					<et2-description id="${row}[title]"></et2-description>
-					<et2-description id="${row}[dist_relevance]"></et2-description>
+					<et2-number id="${row}[dist_relevance]" readonly="true" precision="2"></et2-number>
 				</row>
 			</rows>
 		</grid>
@@ -41,9 +41,13 @@
 					<!-- et2-button label="Search..." noSubmit="true" onclick="app.rag.search"></et2-button -->
 				</et2-vbox>
 			</et2-groupbox>
-			<et2-groupbox summary="Search in which applications">
-				<et2-select id="col_filter[apps]" multiple="true" placeholder="All supported" onchange="app.rag.search"></et2-select>
-			</et2-groupbox>
+			<et2-vbox width="fit-content">
+				<et2-groupbox summary="Search in which applications">
+					<et2-select id="col_filter[apps]" multiple="true" placeholder="All supported" onchange="app.rag.search"></et2-select>
+				</et2-groupbox>
+				<et2-description label="RAG {Distance}: 0={identical}, 1={no match}, -1={opposite}, {Fulltext} {Relevance}: 0={none}, >0={higher is better}"
+					align="right"></et2-description>
+			</et2-vbox>
 		</et2-hbox>
 	</et2-template>
 	<et2-template id="rag.index" template="" lang="" group="0" version="26.1">

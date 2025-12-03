@@ -73,9 +73,14 @@ class Embedding
 	public static bool $minimize_chunks = true;
 
 	/**
+	 * @var int log-level: 0: errors only, 1: result of search*() methods
+	 */
+	protected int $log_level = 0;
+
+	/**
 	 * @var string base-url of OpenAI compatible api (you can NOT use localhost!):
 	 * - IONOS:  https://openai.inference.de-txl.ionos.com/v1
-	 * - Ollama: http://172.17.0.1:11434/v1/v1  requires Ollama be bound on all interfaces / 0.0.0.0 (not just localhost!)
+	 * - Ollama: http://172.17.0.1:11434/v1  requires Ollama to be bound on all interfaces / 0.0.0.0 (not just localhost!)
 	 * - Ralf's Ollama: http://10.44.253.3:11434/v1
 	 */
 	protected static ?string $url = null;
@@ -88,7 +93,7 @@ class Embedding
 	 */
 	public ?int $total;
 
-	public function __construct()
+	public function __construct(int $log_level = 0)
 	{
 		if (self::$url)
 		{
@@ -98,6 +103,7 @@ class Embedding
 			$this->client = $factory->make();
 		}
 		$this->db = $GLOBALS['egw']->db;
+		$this->log_level = $log_level;
 	}
 
 	/**
@@ -418,8 +424,13 @@ class Embedding
 
 		// we can only subtract the entries found in both returned sets, but there might be more in common ...
 		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
-
-		return array_slice($both, $start, $num_rows, true);
+		$both = array_slice($both, $start, $num_rows, true);
+		if ($this->log_level)
+		{
+			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
+				json_encode($both));
+		}
+		return $both;
 	}
 
 	/**
@@ -467,7 +478,11 @@ class Embedding
 			}
 		}
 		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
-
+		if ($this->log_level)
+		{
+			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
+				json_encode($id_distance));
+		}
 		return $id_distance ?: [0 => 1.0];
 	}
 
@@ -505,7 +520,11 @@ class Embedding
 			$id_relevance[$id] = (float)$row['relevance'];
 		}
 		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
-
+		if ($this->log_level)
+		{
+			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, min_relevance=$min_relevance) total=$this->total returning ".
+				json_encode($id_relevance));
+		}
 		return $id_relevance ?: [0 => 0.0];
 	}
 

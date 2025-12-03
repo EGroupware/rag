@@ -136,7 +136,7 @@ class Ui
 		}
 		// return only wanted number of rows
 		$rows = empty($query['num_rows']) ? $rows : array_slice($rows, $query['start']??0, $query['num_rows']);
-		error_log(__METHOD__."(".json_encode(array_intersect_key($query, array_flip(['search', 'col_filter', 'start', 'num_rows']))).",...) rows=".json_encode(array_keys($rows)).' returning '.$total);
+		if ($this->log_level) error_log(__METHOD__."(".json_encode(array_intersect_key($query, array_flip(['search', 'col_filter', 'start', 'num_rows']))).",...) rows=".json_encode(array_keys($rows)).' returning '.$total);
 		$rows = array_values($rows);
 		return $total;
 	}

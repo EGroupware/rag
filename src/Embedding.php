@@ -411,7 +411,7 @@ class Embedding
 	{
 		if (!$this->client)
 		{
-			return $this->searchFulltext($pattern, $app, $start, $num_rows, $max_distance);
+			return $this->searchFulltext($pattern, $app, $start, $num_rows, $max_distance) ?: [0=>1.0];
 		}
 		// quick/dump approach for merging: always query from start=0, $start+$num_rows rows, and then slice
 		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $max_distance);
@@ -424,7 +424,7 @@ class Embedding
 
 		// we can only subtract the entries found in both returned sets, but there might be more in common ...
 		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
-		$both = array_slice($both, $start, $num_rows, true);
+		$both = array_slice($both, $start, $num_rows, true) ?: [0 => 1.0];
 		if ($this->log_level)
 		{
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
@@ -444,7 +444,6 @@ class Embedding
 	 * @param int $num_rows default 50
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
-	 *  If there is no result, we return [0 => 1.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -483,7 +482,7 @@ class Embedding
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
 				json_encode($id_distance));
 		}
-		return $id_distance ?: [0 => 1.0];
+		return $id_distance;
 	}
 
 	/**
@@ -495,7 +494,6 @@ class Embedding
 	 * @param int $num_rows default 50
 	 * @param float $min_relevance default 0
 	 * @return float[] int id => float relevance pairs, for $app === '' we return string "$app:$id"
-	 *  If there is no result, we return [0 => 0.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -525,7 +523,7 @@ class Embedding
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, min_relevance=$min_relevance) total=$this->total returning ".
 				json_encode($id_relevance));
 		}
-		return $id_relevance ?: [0 => 0.0];
+		return $id_relevance;
 	}
 
 	/**

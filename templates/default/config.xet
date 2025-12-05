@@ -12,6 +12,14 @@
 					<et2-description  value="General configuration" span="all" class="subHeader"></et2-description>
 				</row>
 				<row>
+					<et2-description value="Applications to add to fulltext-index"></et2-description>
+					<et2-select id="newsettings[fulltext_apps]" multiple="true" placeholder="All supported"></et2-select>
+				</row>
+				<row>
+					<et2-description value="Applications for RAG / to calculate embeddings for"></et2-description>
+					<et2-select id="newsettings[rag_apps]" multiple="true" placeholder="All supported"></et2-select>
+				</row>
+				<row>
 					<et2-description  value="URL of OpenAI compatible API"></et2-description>
 					<et2-url id="newsettings[url]" class="et2_required" placeholder="http://172.17.0.1:11434/v1 {leave empty to disable RAG}"
 						validator="/^https?:\/\/.*\/v1$/" trailingSlash="false"></et2-url>

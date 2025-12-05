@@ -78,6 +78,15 @@ class Embedding
 	protected int $log_level = 0;
 
 	/**
+	 * @var array|null limit RAG to the following apps, default all
+	 */
+	protected static ?array $rag_apps = null;
+	/**
+	 * @var array|null limit fulltext index to the following apps, default all
+	 */
+	protected static ?array $fulltext_apps   = null;
+
+	/**
 	 * @var string base-url of OpenAI compatible api (you can NOT use localhost!):
 	 * - IONOS:  https://openai.inference.de-txl.ionos.com/v1
 	 * - Ollama: http://172.17.0.1:11434/v1  requires Ollama to be bound on all interfaces / 0.0.0.0 (not just localhost!)
@@ -112,6 +121,9 @@ class Embedding
 	public static function initStatic()
 	{
 		$config = Api\Config::read(self::APP);
+
+		self::$rag_apps = $config['rag_apps'] ?? null;
+		self::$fulltext_apps = $config['fulltext_apps'] ?? null;
 
 		self::$url = $config['url'] ?? null;
 		self::$api_key = $config['api_key'] ?? null;
@@ -237,20 +249,26 @@ class Embedding
 	public function embed(?array $hook_data=null)
 	{
 		$start = microtime(true);
-		foreach(self::plugins() as $app => $class)
+		foreach([
+		        true => self::$fulltext_apps,
+	        ] + ($this->client ? [    // only add RAG/embeddings, if configured
+				false => self::$rag_apps,
+			] : []) as $fulltext => $apps)
 		{
-			if ($hook_data && $hook_data['app'] !== $app) continue;
+			foreach($apps ?: self::plugins() as $app => $class)
+			{
+				if ($hook_data && $hook_data['app'] !== $app) continue;
 
-			try {
-				/** @var Embedding\Base $plugin */
-				$plugin = new $class();
+				try {
+					/** @var Embedding\Base $plugin */
+					$plugin = new $class();
 
-				foreach([
-			         'fulltext' => true,
-		         ] + ($this->client ? [    // only add RAG/embeddings, if configured
-					'rag' => false,
-				] : []) as $fulltext)
-				{
+					// check if only certain apps are enabled for RAG or fulltext
+					if ($fulltext && !empty(self::$fulltext_apps) && !in_array($app, self::$fulltext_apps) ||
+						!$fulltext && !empty(self::$rag_apps) && !in_array($app, self::$rag_apps))
+					{
+						continue;
+					}
 					$entry = null;
 					foreach ($plugin->getUpdated($fulltext, $hook_data) as $entry)
 					{
@@ -331,6 +349,7 @@ class Embedding
 						// handle all exceptions by logging them to RAG-config and PHP error-log, and then continuing with the next entry
 						if (isset($e))
 						{
+
 							self::logError($e, $app, $fulltext, $entry);
 							// if called in hook, don't continue
 							if ($hook_data) return;
@@ -356,11 +375,11 @@ class Embedding
 						], __LINE__, __FILE__, self::APP);
 					}
 				}
-			}
-			catch (\Throwable $e) {
-				// catch and log all errors, also the ones in the app-plugins
-				self::logError($e, $app, $fulltext??null, $entry??null);
-				continue;   // with next plugin/app
+				catch (\Throwable $e) {
+					// catch and log all errors, also the ones in the app-plugins
+					self::logError($e, $app, $fulltext??null, $entry??null);
+					continue;   // with next plugin/app
+				}
 			}
 		}
 		// if we finished, we can remove the job (gets readded for new entries via notify hook)

@@ -15,8 +15,76 @@ use EGroupware\Api;
 use JMS\Serializer\Exception\InvalidArgumentException;
 use EGroupware\Rag\Embedding;
 
+/**
+ * Base class for app-specific RAG plugins
+ *
+ * In almost all cases, you only want to set the constants at the top, and maybe reimplement processRow().
+ */
 abstract class Base
 {
+	/**
+	 * v-- need to be overwritten in plugin class
+	 */
+	/**
+	 * App-name
+	 */
+	const APP = '';
+	/**
+	 * Main table
+	 */
+	const TABLE = '';
+	/**
+	 * Auto-ID column of main-table
+	 */
+	const ID = '';
+	/**
+	 * Modification time column
+	 */
+	const MODIFIED = '';
+	/**
+	 * Type of modified column: 'int' or 'timestamp'
+	 */
+	const MODIFIED_TYPE = 'int';
+	/**
+	 * Title column
+	 */
+	const TITLE = '';
+	/**
+	 * Description column
+	 */
+	const DESCRIPTION = '';
+	/**
+	 * @var string[] additional cols to index
+	 */
+	protected static $additional_cols = [];
+	/**
+	 * SQL fragment to exclude deleted entries e.g. 'deleted IS NOT NULL'
+	 */
+	const NOT_DELETED = '';
+	/**
+	 * SQL fragment to exclude entries from being indexed by the AG, e.g. based on their length
+	 */
+	const RAG_EXTRA_CONDITION = '';
+	/**
+	 * Custom fields table
+	 */
+	const EXTRA_TABLE = '';
+	/**
+	 * Should be identical to ID
+	 */
+	const EXTRA_ID = '';
+	/**
+	 * Name of CF
+	 */
+	const EXTRA_NAME = '';
+	/**
+	 * Value of CF
+	 */
+	const EXTRA_VALUE = '';
+	/**
+	 * ^-- need to be overwritten in plugin class
+	 */
+
 	/**
 	 * Number of entries queried from the DB
 	 */
@@ -36,13 +104,59 @@ abstract class Base
 	}
 
 	/**
+	 * Allows row-specific modifications without overwriting getUpdated()
+	 *
+	 * @param array|null $row
+	 * @param bool $fulltext
+	 * @return void
+	 */
+	protected function processRow(array &$row=null, bool $fulltext=false)
+	{
+
+	}
+
+	/**
 	 * Get updated / not yet indexed app-entries
+	 *
+	 * Should only be overwritten in plugin classes if processRow is not sufficient!.
 	 *
 	 * @param bool $fulltext false: check the rag, true: check fulltext index
 	 * @param ?array $hook_data null or data from notify-all hook, to just emit this entry
-	 * @return Generator<array>
+	 * @return \Generator<array>
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	abstract public function getUpdated(bool $fulltext=false, ?array $hook_data=null);
+	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
+	{
+		$where = [
+			static::NOT_DELETED, // no need to embed deleted entries
+		];
+		$cols = array_merge([static::ID, static::TITLE, static::DESCRIPTION], static::$additional_cols);
+		// check / process hook-data to not query entry again, if already contained
+		if ($hook_data && $hook_data['app'] === static::APP && !empty($hook_data['id']))
+		{
+			$where[static::ID] = $hook_data['id'];
+			$entries = self::getRowFromNotifyHookData($hook_data, $cols);
+		}
+		if (!$fulltext && static::RAG_EXTRA_CONDITION)
+		{
+			$where[] = static::RAG_EXTRA_CONDITION;
+		}
+		$join = $this->getJoin(static::MODIFIED_TYPE, $where, $fulltext);
+		do
+		{
+			$r = 0;
+			foreach ($entries ?? $this->db->select(static::TABLE, $cols,
+				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . static::MODIFIED . ' ASC', '',
+				static::CHUNK_SIZE, $join) as $row)
+			{
+				$this->processRow($row, $fulltext);
+				$row = $this->getExtraTexts($row[static::ID], $row, $hook_data['data']??null);
+				++$r;
+				yield $row;
+			}
+		} while ($r === static::CHUNK_SIZE);
+	}
 
 	/**
 	 * Return SQL fragment to search entries similar to the given embedding
@@ -55,12 +169,6 @@ abstract class Base
 		$join = ' JOIN '.Embedding::TABLE.' ON '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).
 			' AND '.Embedding::EMBEDDING_APP_ID.'='.static::TABLE.'.'.static::ID;
 		return '(SELECT MIN(VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($embedding, 'vector').')))';
-
-		return static::TABLE.'.'.static::ID.' IN (SELECT DISTINCT '.Embedding::EMBEDDING_APP_ID.
-			' FROM '.Embedding::TABLE.
-			' WHERE '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).
-			' ORDER BY VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($embedding, 'vector').'))';
-			// MariaDB 11.8 does NOT support LIMIT in subquery :( ' LIMIT 10)';
 	}
 
 	/**

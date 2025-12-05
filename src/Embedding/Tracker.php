@@ -22,7 +22,8 @@ class Tracker extends Base
 	const MODIFIED = 'tr_modified';
 	const TITLE = 'tr_summary';
 	const DESCRIPTION = 'tr_description';
-	const NOT_DELETED = "tr_status<>".\tracker_so::STATUS_DELETED;
+	protected static $additional_cols = ['tr_cc', 'tr_edit_mode'];
+	const NOT_DELETED = 'tr_status<>'.\tracker_so::STATUS_DELETED;
 	const REPLIES_TABLE = 'egw_tracker_replies';
 	const REPLY_ID = 'reply_id';
 	const REPLY_MESSAGE = 'reply_message';
@@ -32,54 +33,31 @@ class Tracker extends Base
 	const EXTRA_VALUE = 'tr_extra_value';
 
 	/**
-	 * Get updated entries
+	 * Allows row-specific modifications without overwriting getUpdated()
+	 * - add replies
+	 * - transform html --> plaintext depending on tr_edit_mode
 	 *
-	 * @param bool $fulltext false: check the rag, true: check fulltext index
-	 * @param ?array $hook_data null or data from notify-all hook, to just emit this entry
-	 * @return \Generator<array>
-	 * @throws \EGroupware\Api\Db\Exception
-	 * @throws \EGroupware\Api\Db\Exception\InvalidSql
+	 * @param array|null $row
+	 * @param bool $fulltext
+	 * @return void
 	 */
-	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
+	protected function processRow(array &$row=null, bool $fulltext=false)
 	{
-		$where = [
-			self::NOT_DELETED, // no need to embed deleted entries
-		];
-		$cols = [self::ID, self::TITLE, self::DESCRIPTION, 'tr_cc', 'tr_edit_mode'];
-		// check / process hook-data to not query entry again, if already contained
-		if ($hook_data && $hook_data['app'] === self::APP && !empty($hook_data['id']))
+		if ($row['tr_edit_mode'] === 'html')
 		{
-			$where[self::ID] = $hook_data['id'];
-			$entries = self::getRowFromNotifyHookData($hook_data, $cols);
+			$row[self::DESCRIPTION] = trim(strip_tags($row[self::DESCRIPTION]));
 		}
-		$join = $this->getJoin('int', $where, $fulltext);
-		do
+		foreach($this->db->select(self::REPLIES_TABLE, [self::REPLY_ID, self::REPLY_MESSAGE], [
+			self::ID => $row[self::ID],
+		], __LINE__, __FILE__, 0, 'ORDER BY '.self::REPLY_ID, self::APP) as $reply)
 		{
-			$r = 0;
-			foreach ($entries ?? $this->db->select(self::TABLE, $cols,
-				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . self::MODIFIED . ' ASC', '',
-				self::CHUNK_SIZE, $join) as $row)
+			if ($row['tr_edit_mode'] === 'html')
 			{
-				if ($row['tr_edit_mode'] === 'html')
-				{
-					$row[self::DESCRIPTION] = trim(strip_tags($row[self::DESCRIPTION]));
-				}
-				foreach($this->db->select(self::REPLIES_TABLE, [self::REPLY_ID, self::REPLY_MESSAGE], [
-					self::ID => $row[self::ID],
-				], __LINE__, __FILE__, 0, 'ORDER BY '.self::REPLY_ID, self::APP) as $reply)
-				{
-					if ($row['tr_edit_mode'] === 'html')
-					{
-						$reply[self::REPLY_MESSAGE] = trim(strip_tags($reply[self::REPLY_MESSAGE]));
-					}
-					$row['r'.$reply[self::REPLY_ID]] = $reply[self::REPLY_MESSAGE];
-				}
-				unset($row['tr_edit_mode']);
-				if (!$fulltext) unset($row['tr_cc']);   // only makes sense for fulltext index, not RAG/embeddings
-				$row = $this->getExtraTexts($row[self::ID], $row, $hook_data['data']??null);
-				++$r;
-				yield $row;
+				$reply[self::REPLY_MESSAGE] = trim(strip_tags($reply[self::REPLY_MESSAGE]));
 			}
-		} while ($r === self::CHUNK_SIZE);
+			$row['r'.$reply[self::REPLY_ID]] = $reply[self::REPLY_MESSAGE];
+		}
+		unset($row['tr_edit_mode']);
+		if (!$fulltext) unset($row['tr_cc']);   // only makes sense for fulltext index, not RAG/embeddings
 	}
 }

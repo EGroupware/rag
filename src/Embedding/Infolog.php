@@ -22,8 +22,10 @@ class Infolog extends Base
 	const TABLE = 'egw_infolog';
 	const ID = 'info_id';
 	const MODIFIED = 'info_datemodified';
+	const MODIFIED_TYPE = 'int';
 	const TITLE = 'info_subject';
 	const DESCRIPTION = 'info_des';
+	protected static $additional_cols = ['info_location','info_from'];
 	const NOT_DELETED = "info_status<>'deleted'";
 	const EXTRA_TABLE = 'egw_infolog_extra';
 	const EXTRA_ID = 'info_id';
@@ -31,43 +33,19 @@ class Infolog extends Base
 	const EXTRA_VALUE = 'info_extra_value';
 
 	/**
-	 * Get updated entries
+	 * Allows row-specific modifications without overwriting getUpdated()
+	 * - do NOT index description, if PGP encrypted
 	 *
-	 * @param bool $fulltext false: check the rag, true: check fulltext index
-	 * @param ?array $hook_data null or data from notify-all hook, to just emit this entry
-	 * @return \Generator<array>
-	 * @throws Api\Db\Exception
-	 * @throws Api\Db\Exception\InvalidSql
+	 * @param array|null $row
+	 * @param bool $fulltext
+	 * @return void
 	 */
-	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
+	protected function processRow(array &$row=null, bool $fulltext=false)
 	{
-		$where = [
-			self::NOT_DELETED, // no need to embed deleted entries
-		];
-		$cols = [self::ID, self::TITLE, self::DESCRIPTION, 'info_location', 'info_from'];
-		// check / process hook-data to not query entry again, if already contained
-		if ($hook_data && $hook_data['app'] === self::APP && !empty($hook_data['id']))
+		// makes no sense to calculate embeddings for PGP encrypted descriptions
+		if (str_starts_with($row[self::DESCRIPTION], '-----BEGIN PGP MESSAGE-----'))
 		{
-			$where[self::ID] = $hook_data['id'];
-			$entries = self::getRowFromNotifyHookData($hook_data, $cols);
+			$row[self::DESCRIPTION]='';
 		}
-		$join = $this->getJoin('int', $where, $fulltext);
-		do
-		{
-			$r = 0;
-			foreach ($entries ?? $this->db->select(self::TABLE, $cols,
-				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . self::MODIFIED . ' ASC', '',
-				self::CHUNK_SIZE, $join) as $row)
-			{
-				// makes no sense to calculate embeddings for PGP encrypted descriptions
-				if (str_starts_with($row[self::DESCRIPTION], '-----BEGIN PGP MESSAGE-----'))
-				{
-					$row[self::DESCRIPTION]='';
-				}
-				$row = $this->getExtraTexts($row[self::ID], $row, $hook_data['data']??null);
-				++$r;
-				yield $row;
-			}
-		} while ($r === self::CHUNK_SIZE);
 	}
 }

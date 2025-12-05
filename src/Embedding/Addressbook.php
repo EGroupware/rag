@@ -26,16 +26,19 @@ class Rag extends Base
 	const MODIFIED = 'contact_modified';
 	const TITLE = 'n_fileas';
 	const DESCRIPTION = 'contact_note';
+	protected static $additional_cols = [];
 	const NOT_DELETED = "contact_tid<>'D'";
 	const EXTRA_TABLE = 'egw_addressbook_extra';
 	const EXTRA_ID = 'contact_id';
 	const EXTRA_NAME = 'contact_name';
 	const EXTRA_VALUE = 'contact_value';
-
-	static ?array $text_cols=[];
+	// RAG makes only sense for a long note
+	const RAG_EXTRA_CONDITION = 'LENGTH(contact_note)>50';
 
 	/**
-	 * Get all text-fields with content to fulltext-index
+	 * Get all text-fields with meaningful content to fulltext-index
+	 *
+	 * Ignoring telephone number, for with we already have a good/better search.
 	 */
 	public static function initStatic()
 	{
@@ -46,51 +49,28 @@ class Rag extends Base
 				!in_array($col, [self::TITLE, self::DESCRIPTION, 'contact_uid', 'carddav_name', 'contact_pubkey',
 					'contact_freebusy_uri', 'contact_calendar_uri', 'contact_tz', 'contact_geo']))
 			{
-				self::$text_cols[] = $col;
+				self::$additional_cols[] = $col;
 			}
 		}
 	}
 
 	/**
-	 * Get updated entries
+	 * Allows row-specific modifications without overwriting getUpdated()
 	 *
-	 * @param bool $fulltext false: check the rag, true: check fulltext index
-	 * @param ?array $hook_data null or data from notify-all hook, to just emit this entry
-	 * @return \Generator<array>
-	 * @throws Api\Db\Exception
-	 * @throws Api\Db\Exception\InvalidSql
+	 * @param array|null $row
+	 * @param bool $fulltext
+	 * @return void
 	 */
-	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
+	protected function processRow(array &$row=null, bool $fulltext=false)
 	{
-		$where = [
-			self::NOT_DELETED, // no need to embed deleted entries
-		];
-		$cols = array_merge([self::ID, self::TITLE, self::DESCRIPTION], self::$text_cols);
-		// RAG makes only sense for a long note
 		if (!$fulltext)
 		{
-			$where[] = 'LENGTH(contact_note)>50';
-			$cols = [self::ID, 'contact_note'];
+			// only index description/note for RAG
+			$row = [
+				self::ID => $row[self::ID],
+				self::DESCRIPTION => $row[self::DESCRIPTION],
+			];
 		}
-		// check / process hook-data to not query entry again, if already contained
-		if ($hook_data && $hook_data['app'] === self::APP && !empty($hook_data['id']))
-		{
-			$where[self::ID] = $hook_data['id'];
-			$entries = self::getRowFromNotifyHookData($hook_data, $cols);
-		}
-		$join = $this->getJoin('int', $where, $fulltext);
-		do
-		{
-			$r = 0;
-			foreach ($entries ?? $this->db->select(self::TABLE, $cols,
-				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . self::MODIFIED . ' ASC', '',
-				self::CHUNK_SIZE, $join) as $row)
-			{
-				$row = $this->getExtraTexts($row[self::ID], $row, $hook_data['data']??null);
-				++$r;
-				yield $row;
-			}
-		} while ($r === self::CHUNK_SIZE);
 	}
 }
 Rag::initStatic();

@@ -197,11 +197,12 @@ class Embedding
 	 * - EGroupware\Rag\Embedding\<App-name>
 	 * - EGroupware\<App-name>\Rag
 	 *
+	 * @param ?string $check_app check if the newest plugin is registered and if not, flush the cache once
 	 * @return array app-name => class-name pairs
 	 */
-	public static function plugins() : array
+	public static function plugins(?string $check_app='addressbook') : array
 	{
-		return Api\Cache::getTree(self::APP, 'app_plugins', static function()
+		$plugins = Api\Cache::getTree(self::APP, 'app_plugins', static function()
 		{
 			$plugins = [];
 			foreach(array_keys($GLOBALS['egw_info']['apps'] ?? []) as $app)
@@ -215,6 +216,14 @@ class Embedding
 			}
 			return $plugins;
 		}, [], 86400);
+
+		// check if our newest plugin is returned, if not remove cache and try again
+		if ($check_app && !isset($plugins[$check_app]))
+		{
+			Api\Cache::unsetTree(self::APP, 'app_plugins');
+			$plugins = self::plugins(null);
+		}
+		return $plugins;
 	}
 
 	/**

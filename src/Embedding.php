@@ -258,10 +258,10 @@ class Embedding
 							// fulltext index or RAG/embeddings
 							if ($fulltext)
 							{
-								$extra = array_values(array_filter(array_map('trim', $extra), static function ($v) {
+								$extra = $extra ? array_values(array_filter(array_map('trim', $extra), static function ($v) {
 									return $v && strlen((string)$v) > 3;
-								}));
-								if (count($extra) <= 1)
+								})) : null;
+								if (!$extra || count($extra) <= 1)
 								{
 									$extra = $extra ? $extra[0] : null;
 								}

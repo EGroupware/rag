@@ -79,4 +79,33 @@ class Hooks
 			];
 		}
 	}
+
+	/**
+	 * Hook to validate app configuration
+	 *
+	 * @param array $data
+	 * @todo check url & api_key by e.g. querying the available models
+	 */
+	public static function configValidate($data)
+	{
+		$error = null;
+		if (!empty($data['url']))
+		{
+			try {
+				// todo
+			}
+			catch (\Exception $e) {
+				$error = $e->getMessage();
+			}
+		}
+		if ($error)
+		{
+			Api\Etemplate::set_validation_error('url', $error, 'newsettings');
+			$GLOBALS['config_error'] = implode("\n", $error);
+		}
+		else
+		{
+			Embedding::installAsyncJob();
+		}
+	}
 }

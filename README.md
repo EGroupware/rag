@@ -10,11 +10,19 @@
   * `Rag\Embeddings::search()` hybrid search combining semantic and fulltext search
   * the primitives return an array with ID => distance or relevance score of the embeddings or fulltext index
   * [InfoLog](https://github.com/EGroupware/egroupware/blob/28ac42ddf4cac584b1efded8bad5f787ae644e76/infolog/inc/class.infolog_bo.inc.php#L1427-L1439) and [Tracker](https://github.com/EGroupware/tracker/blob/f11e70ce7a6646bd3923ff5a25d52e6e05cca47b/inc/class.tracker_so.inc.php#L303-L310) uses these for a simple integration by prefixing the search pattern with `&` (an ampersand character) in the regular search
-- [ ] improve search box `et2-search` allowing to specify what type of search to use in a nicer form, the prefixing the search-pattern with a `&`, and storing the decision in an implizit preference
-- [ ] UI for an application independent search 
+- [x] UI for an application independent search 
   * show a (bigger) search-field
   * show a (multiple) application selection, default all supported apps
-  * show a NM list with link-title, appname and ID and onclick action to edit the entry
+  * show a NM list with link-title, app-name and ID and onclick action to edit the entry
+- [ ] replace old EPL search in avatar-menu with RAG, if available
+- [ ] new RAG preference what to use in default search, if RAG is available (implementation in Api\Storage):
+  * hybrid search (default, if RAGEmbedding is configured, otherwise fulltext search)
+  * fulltext search only
+  * semantic search / RAG only
+  * legacy search of the apps
+  * search will still support #<number> to find the ID
+  * apps can prefer/overwrite the above, e.g. Addressbook to use its own phone-number search 
+- [ ] improve search box `et2-search` allowing to specify what type of search to use in a nicer form, the prefixing the search-pattern with a `&`, and storing the decision in an implizit preference
 - [ ] support other embedding models AND modify schema to support its number of dimensions (the latter is not yet implemented!)
 - [ ] make the results of the above searches available to AI agents / integrate with them
 
@@ -22,7 +30,8 @@
 - [x] InfoLog
 - [x] Tracker
 - [x] allow app-plugins in apps namespace `EGroupware\<application>\Rag` instead directly in RAG's `EGroupware\Rag\Embeddings\<application>`
-- [ ] all other egroupware applications
+- [x] Addressbook, Calendar, Timesheet, ProjectManager and Phpbrain (aka KnowledgeBase), no integration in their own search yet!
+- [ ] other egroupware applications: Invoices, Resources, Records, ViDoTeach, ...
 
 ## Requirements and installation
 * MariaDB 11.8 for the required vector type to store and search for embeddings

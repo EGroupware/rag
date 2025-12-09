@@ -471,7 +471,7 @@ class Embedding
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param float $max_distance default .4
-	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
+	 * @return float[] int id => float distance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -497,7 +497,7 @@ class Embedding
 			self::EMBEDDING_APP => $app,
 		] : false, __LINE__, __FILE__, $start, 'HAVING distance<'.$max_distance.' ORDER BY distance', self::APP, $num_rows) as $row)
 		{
-			$id = $app ? (int)$row[self::EMBEDDING_APP_ID] : $row[self::EMBEDDING_APP].':'.$row[self::EMBEDDING_APP_ID];
+			$id = $app && is_string($app) ? (int)$row[self::EMBEDDING_APP_ID] : $row[self::EMBEDDING_APP].':'.$row[self::EMBEDDING_APP_ID];
 			// only insert the first / best match, as multiple chunks could match
 			if (!isset($id_distance[$id]))
 			{
@@ -521,7 +521,7 @@ class Embedding
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param float $min_relevance default 0
-	 * @return float[] int id => float relevance pairs, for $app === '' we return string "$app:$id"
+	 * @return float[] int id => float relevance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
@@ -542,7 +542,7 @@ class Embedding
 			{
 				break;
 			}
-			$id = $app ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
+			$id = $app && is_string($app) ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
 			$id_relevance[$id] = (float)$row['relevance'];
 		}
 		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();

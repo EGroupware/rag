@@ -103,7 +103,7 @@ class Ui
 			{
 				[$app, $app_id] = explode(':', $id, 2);
 			}
-			$rows[$id] = $dist_relevance;
+			$rows[$app.':'.$app_id] = $dist_relevance;
 			$apps_ids[$app][] = $app_id;
 		}
 		$total = $this->embedding->total ?? 0;
@@ -111,7 +111,7 @@ class Ui
 		{
 			foreach(Api\Link::titles($app, $ids) as $id => $title)
 			{
-				if (isset($rows[$row_id=$id]) || isset($rows[$row_id=$app.':'.$id]))
+				if (isset($rows[$row_id=$app.':'.$id]))
 				{
 					$rows[$row_id] = [
 						'id' => $row_id,

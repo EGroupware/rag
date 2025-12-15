@@ -18,7 +18,7 @@ use EGroupware\Rag\Embedding\Base;
 /**
  * Plugin for Addressbook
  */
-class Rag extends Base
+class Addressbook extends Base
 {
 	const APP = 'addressbook';
 	const TABLE = 'egw_addressbook';
@@ -73,4 +73,4 @@ class Rag extends Base
 		}
 	}
 }
-Rag::initStatic();
+Addressbook::initStatic();

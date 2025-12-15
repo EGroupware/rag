@@ -2,6 +2,8 @@ all supported	rag	en	All supported
 api key	rag	en	API Key
 app	rag	en	App
 app id	rag	en	App ID
+applications for rag / to calculate embeddings for	rag	en	Applications for RAG / to calculate embeddings for
+applications to add to fulltext-index	rag	en	Applications to add to fulltext-index
 chunk overlap	rag	en	Chunk overlap
 chunk size	rag	en	Chunk size
 distance	rag	en	Distance
@@ -16,6 +18,7 @@ hybrid search: rag+fulltext	rag	en	Hybrid search: RAG+Fulltext
 identical	rag	en	identical
 last errors of rag's async job	rag	en	Last errors of RAG's async job
 leave empty to disable rag	rag	en	leave empty to disable RAG
+legacy search, as used before	rag	en	Legacy search, as used before
 minimize chunks e.g. concatenate title and description	rag	en	Minimize chunks e.g. concatenate title and description
 model to use	rag	en	Model to use
 no match	rag	en	no match
@@ -28,3 +31,4 @@ relevance	rag	en	Relevance
 search in which applications	rag	en	Search in which applications
 type of search	rag	en	Type of search
 url of openai compatible api	rag	en	URL of OpenAI compatible API
+what type of search to use for search in the apps	rag	en	What type of search to use for search in the apps

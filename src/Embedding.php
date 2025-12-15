@@ -286,6 +286,7 @@ class Embedding
 	 */
 	public static function plugins(?string $check_app='addressbook') : array
 	{
+		// Api\Cache::unsetTree(self::APP, 'app_plugins');
 		$plugins = Api\Cache::getTree(self::APP, 'app_plugins', static function()
 		{
 			$plugins = [];
@@ -524,7 +525,7 @@ class Embedding
 
 		// we can only subtract the entries found in both returned sets, but there might be more in common ...
 		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
-		$both = array_slice($both, $start, $num_rows, true) ?: [0 => 1.0];
+		$both = array_slice($both, $start, $num_rows, true);
 		if ($this->log_level)
 		{
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
@@ -635,6 +636,11 @@ class Embedding
 	 */
 	public static function distanceById(array $id_distance, string $id_column) : string
 	{
+		// if there is no result, we need to add something giving no result and not an sql error
+		if (!$id_distance)
+		{
+			$id_distance[0] = 1;
+		}
 		$sql = "CASE $id_column ";
 		foreach ($id_distance as $id => $distance)
 		{

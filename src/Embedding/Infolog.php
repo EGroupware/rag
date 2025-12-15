@@ -48,4 +48,14 @@ class Infolog extends Base
 			$row[self::DESCRIPTION]='';
 		}
 	}
+
+	/**
+	 * Reimplemented as InfoLog aliases egw_infolog as main
+	 *
+	 * @return string table-name
+	 */
+	public function table()
+	{
+		return 'main';
+	}
 }

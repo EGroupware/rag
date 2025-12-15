@@ -280,4 +280,20 @@ abstract class Base
 		}
 		return [$row];
 	}
+
+	/**
+	 * @return string ID column without table-prefix
+	 */
+	public function id()
+	{
+		return static::ID;
+	}
+
+	/**
+	 * @return string table-name
+	 */
+	public function table()
+	{
+		return static::TABLE;
+	}
 }

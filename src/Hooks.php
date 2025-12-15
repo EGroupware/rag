@@ -108,4 +108,25 @@ class Hooks
 			Embedding::installAsyncJob();
 		}
 	}
+
+	public static function settings(array $data) : array
+	{
+		return [
+			'default_search' => [
+				'type'    => 'select',
+				'label'   => 'What type of search to use for search in the apps',
+				'name'    => 'default_search',
+				'values'  => [
+					'hybrid'  => lang('Hybrid search: RAG+Fulltext'),
+					'rag' => lang('RAG search only'),
+					'fulltext' => lang('Fulltext search only'),
+					'legacy' => lang('Legacy search, as used before'),
+				],
+				'help'    => '',
+				'xmlrpc'  => false,
+				'admin'   => false,
+				'default' => 'hybrid',
+			],
+		];
+	}
 }

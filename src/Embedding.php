@@ -135,6 +135,78 @@ class Embedding
 	}
 
 	/**
+	 * Check if RAG is available for $app and what default-search is allowed by config and preferred by the user
+	 *
+	 * - if no plugin for $app --> RAG is not available
+	 * - if default_search preference is "legacy" --> RAG is not available / swithed off
+	 * - if no URL configured --> only fulltext is available, if NOT configured to be off
+	 *
+	 * @param string $app app-name
+	 * @return string|null null=not available, "hybrid", "rag" or "fulltext" search to use for $app
+	 */
+	public static function available(string $app) : ?string
+	{
+		// no plugin for $app --> not available
+		if (empty(self::plugins()[$app]))
+		{
+			return null;
+		}
+		// check default search not switched to legacy --> not available
+		if (($pref = $GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'hybrid') === 'legacy')
+		{
+			return null;
+		}
+		// only fulltext possible, because RAG not configured or turned off for $app --> use fulltext
+		if (empty(self::$url) || !(empty(self::$rag_apps) || in_array($app, self::$rag_apps)))
+		{
+			$pref = 'fulltext';
+		}
+		// if we're to use fulltext, check if it's not turned off for $app
+		if ($pref === 'fulltext')
+		{
+			return !(empty(self::$fulltext_apps) || in_array($app, self::$fulltext_apps)) ? null : 'fulltext';
+		}
+		return $pref;   // fulltext or rag
+	}
+
+	/**
+	 * Check if RAG assisted search is available and if yes, implement preferred search by modifying the parameters
+	 *
+	 * @param string $app app-name
+	 * @param string $criteria search
+	 * @param $order_by
+	 * @param $extra_cols
+	 * @param array $filter
+	 * @return bool false: search not available, or configured to be off, true: search available and implemented via changed parameters
+	 */
+	public static function search2criteria(string $app, string &$criteria, &$order_by, &$extra_cols, array &$filter) : bool
+	{
+		// Contacts class in API uses "api", but the app is / has to be "addressbook"
+		if ($app === 'api')
+		{
+			$app = 'addressbook';
+		}
+		if (!($search = self::available($app)))
+		{
+			return false;
+		}
+		/**
+		 * @var Api\Db $db
+		 */
+		$db = $GLOBALS['egw']->db;
+		$rag = new self();
+		$search = $search === 'hybrid' ? 'search' : 'search'.ucfirst($search);
+		$ids = $rag->$search($criteria, $app, 0, 200);
+		$plugin = new (self::plugins()[$app]);
+		$filter[] = $db->expression($plugin->table(), $plugin->table().'.', [$plugin->id() => array_keys($ids)]);
+		$order_by = self::orderByIds($ids, $plugin->table().'.'.$plugin->id());
+		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',', $extra_cols) : [];
+		$extra_cols[] = self::distanceById($ids, $plugin->table().'.'.$plugin->id()).' AS distance';
+		$criteria = null;
+		return true;
+	}
+
+	/**
 	 * run an async job to update the RAG
 	 *
 	 * @return void
@@ -570,6 +642,18 @@ class Embedding
 		}
 		$sql .= " END";
 		return $sql;
+	}
+
+	/**
+	 * Create SQL fragment to order by keys given in $id_distance
+	 *
+	 * @param array $id_distance
+	 * @param string $id_column
+	 * @return string
+	 */
+	public static function orderByIds(array $id_distance, string $id_column) : string
+	{
+		return self::distanceById(array_flip(array_keys($id_distance)), $id_column);
 	}
 
 	/**

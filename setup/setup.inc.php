@@ -32,6 +32,7 @@ $setup_info['rag']['hooks']['sidebox_menu'] = 'EGroupware\\Rag\\Hooks::allHooks'
 $setup_info['rag']['hooks']['notify-all'] = 'EGroupware\\Rag\\Embedding::notify';
 $setup_info['rag']['hooks']['config'] = 'EGroupware\Rag\Hooks::config';
 $setup_info['rag']['hooks']['config_validate'] = 'EGroupware\Rag\Hooks::configValidate';
+$setup_info['rag']['hooks']['settings'] = 'EGroupware\\Rag\\Hooks::settings';
 
 /* Dependencies for this app to work */
 $setup_info['rag']['depends'][] = array(

@@ -25,6 +25,7 @@ class Embedding
 	const EMBEDDING_APP_ID = 'rag_app_id';
 	const EMBEDDING_CHUNK = 'rag_chunk';
 	const EMBEDDING = 'rag_embedding';
+	const EMBEDDING_MODIFIED = 'rag_updated';
 	const FULLTEXT_TABLE = 'egw_rag_fulltext';
 	const FULLTEXT_UPDATED = 'ft_updated';
 	const FULLTEXT_APP = 'ft_app';
@@ -32,6 +33,7 @@ class Embedding
 	const FULLTEXT_TITLE = 'ft_title';
 	const FULLTEXT_DESCRIPTION = 'ft_description';
 	const FULLTEXT_EXTRA = 'ft_extra';
+	const FULLTEXT_MODIFIED = 'ft_updated';
 
 	/**
 	 * Name of config storing the last errors of RAG's async-job
@@ -502,33 +504,34 @@ class Embedding
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
+	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
 	 * @param float $max_distance default .4
-	 * @return float[] int id => float distance pairs, for $app === '' we return string "$app:$id"
+	 * @return float[]|array[] int id => float distance pairs, for $app === '' we return string "$app:$id"
 	 *  If there is no result, we return [0 => 1.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, float $max_distance=.4) : array
+	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $max_distance=.4) : array
 	{
 		if (!$this->client)
 		{
-			return $this->searchFulltext($pattern, $app, $start, $num_rows, $max_distance) ?: [0=>1.0];
+			return $this->searchFulltext($pattern, $app, $start, $num_rows, $return_modified) ?: [0=>1.0];
 		}
 		// quick/dump approach for merging: always query from start=0, $start+$num_rows rows, and then slice
-		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $max_distance);
+		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $return_modified, $max_distance);
 		$total_embeddings = $this->total ?? 0;
 
-		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows);
+		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_modified);
 
 		// + makes sure to return every entry only once, with the embeddings first
-		$both = $embedding_matches+$fulltext_matches;
+		$both = $return_modified ? array_merge_recursive($embedding_matches, $fulltext_matches) : $embedding_matches+$fulltext_matches;
 
 		// we can only subtract the entries found in both returned sets, but there might be more in common ...
 		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
 		$both = array_slice($both, $start, $num_rows, true);
 		if ($this->log_level)
 		{
-			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
+			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, return_modified=$return_modified, max_distance=$max_distance) total=$this->total returning ".
 				json_encode($both));
 		}
 		return $both;
@@ -543,13 +546,22 @@ class Embedding
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
+	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, float $max_distance=.4) : array
+	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $max_distance=.4) : array
 	{
+		// we remove boolean mode fulltext operators
+		if (preg_match(self::BOOLEAN_MODE_OPERATORS_PREG, $pattern))
+		{
+			// remove - operator incl. next word from embedding
+			$pattern = preg_replace('/(^| )-([^ ]+)/', ' ', $pattern);
+			// remove all other boolean mode operators
+			$pattern = preg_replace(self::BOOLEAN_MODE_OPERATORS_PREG, ' ', $pattern);
+		}
 		try {
 			$response = $this->client->embeddings()->create([
 				'model' => self::$model,
@@ -564,6 +576,7 @@ class Embedding
 			self::EMBEDDING_APP,
 			self::EMBEDDING_APP_ID,
 			'VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($response->embeddings[0]->embedding, 'vector').') as distance',
+			self::EMBEDDING_MODIFIED.' AS modified',
 		];
 		$id_distance = [];
 		foreach($this->db->select(self::TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols), $app ? [
@@ -574,7 +587,10 @@ class Embedding
 			// only insert the first / best match, as multiple chunks could match
 			if (!isset($id_distance[$id]))
 			{
-				$id_distance[$id] = (float)$row['distance'];
+				$id_distance[$id] = $return_modified ? [
+					'distance' => (float)$row['distance'],
+					'modified' => new Api\DateTime($row['modified'], Api\DateTime::$server_timezone),
+				] : (float)$row['distance'];
 			}
 		}
 		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
@@ -587,25 +603,44 @@ class Embedding
 	}
 
 	/**
+	 * Boolean mode operators from MariaDB fulltext search
+	 */
+	const BOOLEAN_MODE_OPERATORS_PREG = '/[+<>()~*"-]+/';
+
+	/**
 	 * Run a fulltext search for $pattern
 	 *
 	 * @param string $pattern
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
+	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
 	 * @param float $min_relevance default 0
+	 * @param ?string $mode default null, check for BOOLEAN mode operators in $pattern: +-<>()~*",
+	 *  or 'IN BOOLEAN MODE', 'IN NATURAL LANGUAGE MODE', 'WITH QUERY EXPANSION'
 	 * @return float[] int id => float relevance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, float $min_relevance=0) : array
+	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $min_relevance=0, ?string $mode=null) : array
 	{
 		$id_relevance = [];
-		$match = 'MATCH('.self::FULLTEXT_TITLE.','.self::FULLTEXT_DESCRIPTION.','.self::FULLTEXT_EXTRA.') AGAINST('.$this->db->quote($pattern).')';
+		switch(strtolower($mode??''))
+		{
+			case 'IN BOOLEAN MODE':
+			case 'IN NATURAL LANGUAGE MODE':
+			case 'WITH QUERY EXPANSION':
+				break;
+			default:
+				$mode = preg_match(self::BOOLEAN_MODE_OPERATORS_PREG, $pattern) ? 'IN BOOLEAN MODE' : 'IN NATURAL LANGUAGE MODE';
+				break;
+		}
+		$match = 'MATCH('.self::FULLTEXT_TITLE.','.self::FULLTEXT_DESCRIPTION.','.self::FULLTEXT_EXTRA.') AGAINST('.$this->db->quote($pattern).' '.$mode.')';
 		$cols = [
 			self::FULLTEXT_APP,
 			self::FULLTEXT_APP_ID,
 			$match.' AS relevance',
+			self::FULLTEXT_MODIFIED.' AS modified',
 		];
 		foreach($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols) ,
 			($app ? [self::FULLTEXT_APP => $app] : [])+[$match],
@@ -616,7 +651,10 @@ class Embedding
 				break;
 			}
 			$id = $app && is_string($app) ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
-			$id_relevance[$id] = (float)$row['relevance'];
+			$id_relevance[$id] = $return_modified ? [
+				'relevance' => (float)$row['relevance'],
+				'modified'  => new Api\DateTime($row['modified'], Api\DateTime::$server_timezone),
+			] : (float)$row['relevance'];
 		}
 		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		if ($this->log_level)

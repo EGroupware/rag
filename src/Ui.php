@@ -90,7 +90,7 @@ class Ui
 		}
 		foreach($this->embedding->$search($query['search'], $query['col_filter']['apps']??'', $query['start']??0,
 			// query twice as many entries requested, as user might not have access to all of them
-			2*($query['num_rows']??50)) as $id => $dist_relevance)
+			2*($query['num_rows']??50), true) as $id => $row)
 		{
 			if (!$id) continue; // $id===0 is used to signal nothing found, to not generate an SQL error
 
@@ -103,7 +103,7 @@ class Ui
 			{
 				[$app, $app_id] = explode(':', $id, 2);
 			}
-			$rows[$app.':'.$app_id] = $dist_relevance;
+			$rows[$app.':'.$app_id] = $row;
 			$apps_ids[$app][] = $app_id;
 		}
 		$total = $this->embedding->total ?? 0;
@@ -113,12 +113,11 @@ class Ui
 			{
 				if (isset($rows[$row_id=$app.':'.$id]))
 				{
-					$rows[$row_id] = [
+					$rows[$row_id] = $rows[$row_id]+[
 						'id' => $row_id,
 						'app' => $app,
 						'app_id' => $id,
 						'title' => $title ?: '*** '.lang('Deleted').' ***',
-						'dist_relevance' => $rows[$row_id],
 					];
 					unset($ids[array_search($id, $ids)]);
 				}
@@ -165,6 +164,20 @@ class Ui
 						'type' => $GLOBALS['egw_info']['user']['preferences']['rag']['searchType'] ?? 'hybrid',
 						'apps' => $GLOBALS['egw_info']['user']['preferences']['rag']['searchType'] ?? [],
 					],
+					'operators' => implode(' ', str_split('+-<>()~*"')),
+					'operator_help' => implode("\n", array_map(static function($label, $operator)
+					{
+						return " $operator\t$label";
+					}, $operators=[
+						'+' => lang('The word is mandatory in all rows returned.'),
+						'-' => lang('The word cannot appear in any row returned.'),
+						'<' => lang('The word that follows has a lower relevance than other words, although rows containing it will still match.'),
+						'>' => lang('The word that follows has a higher relevance than other words.'),
+						'()' => lang('Used to group words into subexpressions.'),
+						'~' => lang('The word following contributes negatively to the relevance of the row.'),
+						'*' => lang('The wildcard, indicating zero or more characters. It can only appear at the end of a word.'),
+						'"' => lang('Anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).'),
+					], array_keys($operators))),
 				],
 			];
 		}

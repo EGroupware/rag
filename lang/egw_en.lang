@@ -1,4 +1,5 @@
 all supported	rag	en	All supported
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	en	Anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).
 api key	rag	en	API Key
 app	rag	en	App
 app id	rag	en	App ID
@@ -29,6 +30,14 @@ rag	common	en	RAG
 rag search only	rag	en	RAG search only
 relevance	rag	en	Relevance
 search in which applications	rag	en	Search in which applications
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	en	The wildcard, indicating zero or more characters. It can only appear at the end of a word.
+the word cannot appear in any row returned.	rag	en	The word cannot appear in any row returned.
+the word following contributes negatively to the relevance of the row.	rag	en	The word following contributes negatively to the relevance of the row.
+the word is mandatory in all rows returned.	rag	en	The word is mandatory in all rows returned.
+the word that follows has a higher relevance than other words.	rag	en	The word that follows has a higher relevance than other words.
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	en	The word that follows has a lower relevance than other words, although rows containing it will still match.
 type of search	rag	en	Type of search
 url of openai compatible api	rag	en	URL of OpenAI compatible API
+use operators:	rag	en	Use operators:
+used to group words into subexpressions.	rag	en	Used to group words into subexpressions.
 what type of search to use for search in the apps	rag	en	What type of search to use for search in the apps

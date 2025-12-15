@@ -5,10 +5,12 @@
 		<grid width="100%">
 			<columns>
 				<column width="150"/> <!-- ID -->
-				<column width="100"/> <!-- app-icon -->
+				<column width="80"/> <!-- app-icon -->
 				<column width="100"/> <!-- app-ID -->
 				<column width="40%"/> <!-- link-title -->
-				<column width="150"/> <!-- distance/relevance -->
+				<column width="120"/> <!-- modified -->
+				<column width="50"/> <!-- distance -->
+				<column width="50"/> <!-- relevance -->
 			</columns>
 			<rows>
 				<row class="th">
@@ -16,23 +18,30 @@
 					<nextmatch-header id="app" label="App"></nextmatch-header>
 					<nextmatch-header id="app_id" label="App ID"></nextmatch-header>
 					<nextmatch-header id="title" label="Title"></nextmatch-header>
-					<nextmatch-header id="dist_relevance" label="Distance/Relevance"></nextmatch-header>
+					<nextmatch-header id="modified" label="Modified"></nextmatch-header>
+					<nextmatch-header id="distance" label="Distance"></nextmatch-header>
+					<nextmatch-header id="relevance" label="Relevance"></nextmatch-header>
 				</row>
 				<row class="row">
 					<et2-description id="${row}[id]"></et2-description>
 					<et2-appicon src="$row_cont[app]" align="center" statustext="$row_cont[app]"></et2-appicon>
 					<et2-description id="${row}[app_id]"></et2-description>
 					<et2-description id="${row}[title]"></et2-description>
-					<et2-number id="${row}[dist_relevance]" readonly="true" precision="2"></et2-number>
+					<et2-date-time id="${row}[modified]" readonly="true"></et2-date-time>
+					<et2-number id="${row}[distance]" readonly="true" precision="2"></et2-number>
+					<et2-number id="${row}[relevance]" readonly="true" precision="2"></et2-number>
 				</row>
 			</rows>
 		</grid>
 	</et2-template>
 	<et2-template id="rag.index.header" template="" lang="" group="0" version="26.1">
 		<et2-hbox>
-			<et2-groupbox summary="Query">
-				<et2-searchbox id="search" placeholder="Enter your search query here..." autofocus="true" onchange="app.rag.search"></et2-searchbox>
-			</et2-groupbox>
+			<et2-vbox>
+				<et2-groupbox summary="Query">
+					<et2-searchbox id="search" placeholder="Enter your search query here..." autofocus="true" onchange="app.rag.search"></et2-searchbox>
+				</et2-groupbox>
+				<et2-description label="Use operators:" id="operators" statustext="@operator_help"></et2-description>
+			</et2-vbox>
 			<et2-groupbox summary="Type of search" width="250px">
 				<et2-vbox>
 					<radio id="col_filter[type]" set_value="hybrid" label="Hybrid search: RAG+Fulltext" onchange="app.rag.search"></radio>

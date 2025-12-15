@@ -1,4 +1,5 @@
 all supported	rag	de	Alle unterstützten
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	de	Alles, was in doppelten Anführungszeichen steht, wird als Ganzes betrachtet (so können Sie beispielsweise Phrasen abgleichen).
 api key	rag	de	API Key
 applications for rag / to calculate embeddings for	rag	de	Anwendungen für das RAG / um Embeddings zu berechnet
 applications to add to fulltext-index	rag	de	Anwendungen für den Volltext Index
@@ -27,6 +28,14 @@ rag	common	de	RAG
 rag search only	rag	de	RAG Suche ausschließlich
 relevance	rag	de	Relevanz
 search in which applications	rag	de	In welchen Anwendungen suchen
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	de	Der Platzhalter, der null oder mehr Zeichen angibt. Er kann nur am Ende eines Wortes stehen.
+the word cannot appear in any row returned.	rag	de	Das Wort darf in keiner Zeile der Rückgabe vorkommen.
+the word following contributes negatively to the relevance of the row.	rag	de	Das folgende Wort trägt negativ zur Relevanz der Zeile bei.
+the word is mandatory in all rows returned.	rag	de	Das Wort ist in allen zurückgegebenen Zeilen obligatorisch.
+the word that follows has a higher relevance than other words.	rag	de	Das folgende Wort hat eine höhere Relevanz als andere Wörter.
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	de	Das folgende Wort hat eine geringere Relevanz als andere Wörter, obwohl Zeilen, die es enthalten, weiterhin übereinstimmen.
 type of search	rag	de	Art der Suche
 url of openai compatible api	rag	de	URL der OpenAI kompatiblen API
+use operators:	rag	de	Operatoren verwenden:
+used to group words into subexpressions.	rag	de	Wird verwendet, um Wörter zu Unterausdrücken zu gruppieren.
 what type of search to use for search in the apps	rag	de	Welche Art der Suche soll zum Suchen in den Anwendungen verwendet werden

@@ -148,6 +148,11 @@ class Embedding
 	 */
 	public static function available(string $app) : ?string
 	{
+		// check RAG is installed, we don't check/care if the individual user has run-rights
+		if (empty($GLOBALS['egw_info']['apps']['rag']))
+		{
+			return null;
+		}
 		// no plugin for $app --> not available
 		if (empty(self::plugins()[$app]))
 		{

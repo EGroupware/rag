@@ -14,8 +14,8 @@
   * show a (bigger) search-field
   * show a (multiple) application selection, default all supported apps
   * show a NM list with link-title, app-name and ID and onclick action to edit the entry
-- [ ] replace old EPL search in avatar-menu with RAG, if available
-- [ ] new RAG preference what to use in default search, if RAG is available (implementation in Api\Storage):
+- [x] replace old EPL search in avatar-menu with RAG, if available
+- [x] new RAG preference what to use in default search, if RAG is available (implementation in Api\Storage):
   * hybrid search (default, if RAGEmbedding is configured, otherwise fulltext search)
   * fulltext search only
   * semantic search / RAG only

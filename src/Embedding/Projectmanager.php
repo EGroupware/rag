@@ -22,6 +22,7 @@ class Projectmanager extends Base
 	const TABLE = 'egw_pm_projects';
 	const ID = 'pm_id';
 	const MODIFIED = 'pm_modified';
+	const CREATED = 'pm_created';
 	const TITLE = 'pm_title';
 	const DESCRIPTION = 'pm_description';
 	protected static $additional_cols = ['pm_number'];

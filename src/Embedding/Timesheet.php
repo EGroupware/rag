@@ -22,6 +22,7 @@ class Timesheet extends Base
 	const TABLE = 'egw_timesheet';
 	const ID = 'ts_id';
 	const MODIFIED = 'ts_modified';
+	const CREATED = 'ts_created';
 	const TITLE = 'ts_title';
 	const DESCRIPTION = 'ts_description';
 	protected static $additional_cols = [];

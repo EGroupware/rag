@@ -12,7 +12,6 @@
 namespace EGroupware\Rag\Embedding;
 
 use EGroupware\Api;
-use JMS\Serializer\Exception\InvalidArgumentException;
 use EGroupware\Rag\Embedding;
 
 /**
@@ -41,6 +40,10 @@ abstract class Base
 	 * Modification time column
 	 */
 	const MODIFIED = '';
+	/**
+	 * Creation time column, only needed if modification time is initially NULL
+	 */
+	const CREATED = '';
 	/**
 	 * Type of modified column: 'int' or 'timestamp'
 	 */
@@ -131,7 +134,7 @@ abstract class Base
 		$where = [
 			static::NOT_DELETED, // no need to embed deleted entries
 		];
-		$cols = array_merge([static::ID, static::TITLE, static::DESCRIPTION], static::$additional_cols);
+		$cols = array_merge([static::ID, static::MODIFIED, static::TITLE, static::DESCRIPTION], static::$additional_cols);
 		// check / process hook-data to not query entry again, if already contained
 		if ($hook_data && $hook_data['app'] === static::APP && !empty($hook_data['id']))
 		{
@@ -142,7 +145,7 @@ abstract class Base
 		{
 			$where[] = static::RAG_EXTRA_CONDITION;
 		}
-		$join = $this->getJoin(static::MODIFIED_TYPE, $where, $fulltext);
+		$join = $this->getJoin($where, $fulltext);
 		do
 		{
 			$r = 0;
@@ -150,6 +153,12 @@ abstract class Base
 				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . static::MODIFIED . ' ASC', '',
 				static::CHUNK_SIZE, $join) as $row)
 			{
+				if (!empty($row[static::MODIFIED]) && !is_object($row[static::MODIFIED]))
+				{
+					// hook-data is in user-timezone, while queried data is in server-timezone
+					$row[static::MODIFIED] = new Api\DateTime(static::MODIFIED_TYPE === 'int' && is_numeric($row[static::MODIFIED]) ?
+						(int)$row[static::MODIFIED] : $row[static::ID], $entries ? Api\DateTime::$user_timezone : Api\DateTime::$server_timezone);
+				}
 				$this->processRow($row, $fulltext);
 				$row = $this->getExtraTexts($row[static::ID], $row, $hook_data['data']??null);
 				++$r;
@@ -174,32 +183,20 @@ abstract class Base
 	/**
 	 * Get join for egw_rag(_fulltext) table to check of not yet updated/created embeddings/fulltext index
 	 *
-	 * @param string $timestamp
 	 * @param array &$where
 	 * @param bool $fulltext false: check the rag, true: check fulltext index
 	 * @return string
 	 */
-	protected function getJoin(string $timestamp='timestamp', array &$where=[], bool $fulltext=false)
+	protected function getJoin(array &$where=[], bool $fulltext=false)
 	{
-		switch ($timestamp)
-		{
-			case 'timestamp':
-				$modified = static::MODIFIED;
-				break;
-			case 'int':
-				$modified = $this->db->from_unixtime(static::MODIFIED);
-				break;
-			default:
-				throw new InvalidArgumentException("Invalid / not implemented timestamp type='$timestamp'!");
-		}
 		if (!$fulltext)
 		{
-			$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$modified.')';
+			$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$this->modified().')';
 
 			return 'LEFT JOIN '.Embedding::TABLE.' ON '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
 				Embedding::EMBEDDING_APP_ID.'='.static::ID.' AND '.Embedding::EMBEDDING_CHUNK.'=0';
 		}
-		$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$modified.')';
+		$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$this->modified().')';
 
 		return 'LEFT JOIN '.Embedding::FULLTEXT_TABLE.' ON '.Embedding::FULLTEXT_APP.'='.$this->db->quote(static::APP).' AND '.
 			Embedding::FULLTEXT_APP_ID.'='.static::ID;
@@ -277,6 +274,11 @@ abstract class Base
 				return null;
 			}
 			$row[$col] = $data['data'][$col];
+			// if modified time is not set, used created time
+			if ($col === static::MODIFIED && empty($row[$col]) && static::CREATED)
+			{
+				$row[$col] = $row[static::CREATED] ?? null;
+			}
 		}
 		return [$row];
 	}
@@ -284,16 +286,30 @@ abstract class Base
 	/**
 	 * @return string ID column without table-prefix
 	 */
-	public function id()
+	public function id() : string
 	{
 		return static::ID;
 	}
 
 	/**
-	 * @return string table-name
+	 * @param bool $alias true: return alias used, false: return alias used in search
+	 * @return string table-name or -alias
 	 */
-	public function table()
+	public function table(bool $alias=true) : string
 	{
 		return static::TABLE;
+	}
+
+	/**
+	 * @return string SQL fragment to get modified timestamp
+	 */
+	public function modified() : string
+	{
+		$col = static::MODIFIED;
+		if (static::CREATED)
+		{
+			$col = 'COALESCE('.$col.','.static::CREATED.')';
+		}
+		return static::MODIFIED_TYPE === 'int' ? $this->db->from_unixtime($col) : $col;
 	}
 }

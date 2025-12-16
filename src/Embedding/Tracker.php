@@ -20,6 +20,7 @@ class Tracker extends Base
 	const TABLE = 'egw_tracker';
 	const ID = 'tr_id';
 	const MODIFIED = 'tr_modified';
+	const CREATED = 'tr_created';
 	const TITLE = 'tr_summary';
 	const DESCRIPTION = 'tr_description';
 	protected static $additional_cols = ['tr_cc', 'tr_edit_mode'];

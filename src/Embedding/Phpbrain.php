@@ -22,6 +22,7 @@ class Phpbrain extends Base
 	const TABLE = 'egw_kb_articles';
 	const ID = 'art_id';
 	const MODIFIED = 'modified';
+	const CREATED = 'created';
 	const TITLE = 'title';
 	const DESCRIPTION = 'text';
 	protected static $additional_cols = ['topic'];

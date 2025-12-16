@@ -292,7 +292,10 @@ class Embedding
 		$plugins = Api\Cache::getTree(self::APP, 'app_plugins', static function()
 		{
 			$plugins = [];
-			foreach(array_keys($GLOBALS['egw_info']['apps'] ?? []) as $app)
+			$apps = array_keys($GLOBALS['egw_info']['apps'] ??
+				array_flip(array_filter(scandir(EGW_SERVER_ROOT),
+					fn($file) => $file[0] !== '.' && is_dir(EGW_SERVER_ROOT.'/'.$file))));
+			foreach($apps as $app)
 			{
 				$app_class = ucfirst($app);
 				if (class_exists($class="EGroupware\\Rag\\Embedding\\$app_class") ||
@@ -353,6 +356,7 @@ class Embedding
 						}
 						$extra = $entry;
 						$id = array_shift($extra);
+						$modified = array_shift($extra);
 						$title = array_shift($extra);
 						$description = array_shift($extra);
 						try
@@ -376,6 +380,7 @@ class Embedding
 									self::FULLTEXT_TITLE => $title ?: null,
 									self::FULLTEXT_DESCRIPTION => $description ?: null,
 									self::FULLTEXT_EXTRA => $extra,
+									self::FULLTEXT_MODIFIED => $modified,
 								], [
 									self::FULLTEXT_APP => $app,
 									self::FULLTEXT_APP_ID => $id,
@@ -436,6 +441,7 @@ class Embedding
 						{
 							$this->db->insert(self::TABLE, [
 								self::EMBEDDING => $embedding->embedding,
+								self::EMBEDDING_MODIFIED => $modified,
 							], [
 								self::EMBEDDING_APP => $app,
 								self::EMBEDDING_APP_ID => $id,

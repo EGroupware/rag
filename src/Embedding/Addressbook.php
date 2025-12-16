@@ -10,7 +10,7 @@
  * @license https://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
-namespace EGroupware\Addressbook;
+namespace EGroupware\Rag\Embedding;
 
 use EGroupware\Api;
 use EGroupware\Rag\Embedding\Base;
@@ -24,6 +24,7 @@ class Addressbook extends Base
 	const TABLE = 'egw_addressbook';
 	const ID = 'contact_id';
 	const MODIFIED = 'contact_modified';
+	const CREATED = 'contact_created';
 	const TITLE = 'n_fileas';
 	const DESCRIPTION = 'contact_note';
 	protected static $additional_cols = [];

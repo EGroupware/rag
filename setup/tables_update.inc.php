@@ -9,7 +9,14 @@
  * @subpackage setup
  */
 
+use EGroupware\Api;
+use EGroupware\Rag;
 
+/**
+ * Create fulltext index table
+ *
+ * @return string
+ */
 function rag_upgrade0_1_001()
 {
 	$GLOBALS['egw_setup']->oProc->CreateTable('egw_rag_fulltext',array(
@@ -29,4 +36,31 @@ function rag_upgrade0_1_001()
 	));
 
 	return $GLOBALS['setup_info']['rag']['currentver'] = '0.1.002';
+}
+
+/**
+ * Set (rag|ft)_updated to the exact modification timestamp of the entry, not the creation time of the embedding or fulltext index
+ *
+ * @return string
+ * @throws Api\Db\Exception
+ * @throws Api\Db\Exception\InvalidSql
+ */
+function rag_upgrade0_1_002()
+{
+	/** @var Api\Db $db */
+	$db = $GLOBALS['egw_setup']->db;
+	foreach(Rag\Embedding::plugins() as $app => $class)
+	{
+		/** @var Rag\Embedding\Base $plugin */
+		$plugin = new $class;
+		$db->query('UPDATE egw_rag_fulltext' .
+			' JOIN ' . $plugin->table(false) . ' ON ft_app_id=' . $plugin->id() .
+			' SET ft_updated=' . $plugin->modified() .
+			' WHERE ft_app=' . $db->quote($app), __LINE__, __FILE__);
+		$db->query('UPDATE egw_rag' .
+			' JOIN ' . $plugin->table(false) . ' ON rag_app_id=' . $plugin->id() .
+			' SET rag_updated=' . $plugin->modified() .
+			' WHERE rag_app=' . $db->quote($app), __LINE__, __FILE__);
+	}
+	return $GLOBALS['setup_info']['rag']['currentver'] = '0.1.003';
 }

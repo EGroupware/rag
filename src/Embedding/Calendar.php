@@ -22,6 +22,7 @@ class Calendar extends Base
 	const TABLE = 'egw_cal';
 	const ID = 'cal_id';
 	const MODIFIED = 'cal_modified';
+	const CREATED = 'cal_created';
 	const MODIFIED_TYPE = 'int';
 	const TITLE = 'cal_title';
 	const DESCRIPTION = 'cal_description';

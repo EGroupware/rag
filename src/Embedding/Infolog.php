@@ -52,10 +52,11 @@ class Infolog extends Base
 	/**
 	 * Reimplemented as InfoLog aliases egw_infolog as main
 	 *
-	 * @return string table-name
+	 * @param bool $alias true: return alias used, false: return alias used in search
+	 * @return string table-name or -alias
 	 */
-	public function table()
+	public function table(bool $alias=true) : string
 	{
-		return 'main';
+		return $alias ? 'main' : parent::table($alias);
 	}
 }

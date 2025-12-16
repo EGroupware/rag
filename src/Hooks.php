@@ -129,4 +129,24 @@ class Hooks
 			],
 		];
 	}
+	/**
+	 * Add search to topmenu
+	 *
+	 * @param string|array $data hook-data
+	 */
+	public static function topMenuInfo($data)
+	{
+		/** @var \kdots_framework $framework */
+		$framework = $GLOBALS['egw']->framework;
+		if (!empty($GLOBALS['egw_info']['user']['apps']['rag']))
+		{
+			$framework->add_topmenu_item(
+				'rag',
+				Api\Egw::link('/index.php', ['menuaction' => 'rag.EGroupware\\Rag\\Ui.index', 'ajax' => 'true']),
+				lang('Search'),
+				'rag',
+				'search',
+			);
+		}
+	}
 }

@@ -141,9 +141,9 @@ class Hooks
 				'default' => 'app',
 			],
 			'fulltext_match_wordstart' => [
-				'type'    => 'checkbox',
+				'type'    => 'select',
 				'label'   => 'Change fulltext search pattern to match words starting with pattern',
-				'name'    => 'default_search',
+				'name'    => 'fulltext_match_wordstart',
 				'values'  => [
 					'yes'  => lang('Yes').', '.lang('Default'),
 					'no' => lang('No'),

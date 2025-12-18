@@ -35,6 +35,7 @@ rag search only	rag	en	RAG search only
 relevance	rag	en	Relevance
 search in which applications	rag	en	Search in which applications
 should search in apps be ordered by relevance	rag	en	Should search in apps be ordered by relevance
+syntax error in fulltext search-pattern	common	en	Syntax error in fulltext search-pattern
 the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	en	The wildcard, indicating zero or more characters. It can only appear at the end of a word.
 the word cannot appear in any row returned.	rag	en	The word cannot appear in any row returned.
 the word following contributes negatively to the relevance of the row.	rag	en	The word following contributes negatively to the relevance of the row.
@@ -42,6 +43,7 @@ the word is mandatory in all rows returned.	rag	en	The word is mandatory in all 
 the word that follows has a higher relevance than other words.	rag	en	The word that follows has a higher relevance than other words.
 the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	en	The word that follows has a lower relevance than other words, although rows containing it will still match.
 type of search	rag	en	Type of search
+unexpected	common	en	unexpected
 url of openai compatible api	rag	en	URL of OpenAI compatible API
 use operators:	rag	en	Use operators:
 used to group words into subexpressions.	rag	en	Used to group words into subexpressions.

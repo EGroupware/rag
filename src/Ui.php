@@ -88,25 +88,32 @@ class Ui
 				$search = 'searchEmbeddings';
 				break;
 		}
-		foreach($this->embedding->$search($query['search'], $query['col_filter']['apps']??'',
-			// simple approach without storing a state:
-			0,  // we always start at 0, as we don't know how many rows the acl-filter will throw out
-			// we query twice as many entries requested, as user might not have access to all of them
-			2*(($query['start']??0)+($query['num_rows']??50)), true) as $id => $row)
+		try
 		{
-			if (!$id) continue; // $id===0 is used to signal nothing found, to not generate an SQL error
+			foreach ($this->embedding->$search($query['search'], $query['col_filter']['apps'] ?? '',
+				// simple approach without storing a state:
+				0,  // we always start at 0, as we don't know how many rows the acl-filter will throw out
+				// we query twice as many entries requested, as user might not have access to all of them
+				2 * (($query['start'] ?? 0) + ($query['num_rows'] ?? 50)), true) as $id => $row)
+			{
+				if (!$id) continue; // $id===0 is used to signal nothing found, to not generate an SQL error
 
-			if (is_numeric($id))
-			{
-				$app = current($query['col_filter']['apps']);
-				$app_id = $id;
+				if (is_numeric($id))
+				{
+					$app = current($query['col_filter']['apps']);
+					$app_id = $id;
+				}
+				else
+				{
+					[$app, $app_id] = explode(':', $id, 2);
+				}
+				$rows[$app . ':' . $app_id] = $row;
+				$apps_ids[$app][] = $app_id;
 			}
-			else
-			{
-				[$app, $app_id] = explode(':', $id, 2);
-			}
-			$rows[$app.':'.$app_id] = $row;
-			$apps_ids[$app][] = $app_id;
+		}
+		catch (InvalidFulltextSyntax $e) {
+			Api\Json\Response::get()->message($e->getMessage(), 'error');
+			return 0;
 		}
 		$total = $this->embedding->total ?? 0;
 		foreach($apps_ids as $app => $ids)

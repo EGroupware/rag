@@ -15,10 +15,18 @@ use EGroupware\Api\Db\Exception\InvalidSql;
 
 class InvalidFulltextSyntax extends InvalidSql
 {
-	public readonly $pattern;
+	public readonly string $pattern;
 	public function __construct(?string $msg, $code = 1064, ?\Exception $previous = null, ?string $pattern = null)
 	{
-		parent::__construct($msg, $code, $previous);
 		$this->pattern = $pattern;
+		if (preg_match('/^syntax error, (.*) \(1064\)/mi', $msg, $matches))
+		{
+			$msg = lang('Syntax error in fulltext search-pattern').": '".$pattern."' ".str_replace('unexpected', lang('unexpected'), $matches[1]);
+		}
+		else
+		{
+			$msg = lang('Syntax error in fulltext search-pattern').": '".$pattern."'\n".$msg;
+		}
+		parent::__construct($msg, $code, $previous);
 	}
 }

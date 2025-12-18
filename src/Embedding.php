@@ -204,7 +204,14 @@ class Embedding
 		$db = $GLOBALS['egw']->db;
 		$rag = new self();
 		$search = $search === 'hybrid' ? 'search' : 'search'.ucfirst($search);
-		$ids = $rag->$search($criteria, $app, 0, 200);
+		try {
+			$ids = $rag->$search($criteria, $app, 0, 200);
+		}
+		catch (InvalidFulltextSyntax $e) {
+			Api\Json\Response::get()->message($e->getMessage(), 'error');
+			$filter[] = '0=1';  // never true --> finds nothing
+			return true;
+		}
 		$plugin = new (self::plugins()[$app]);
 		$filter[] = $db->expression($plugin->table(), $plugin->table().'.', [$plugin->id() => array_keys($ids)]);
 		// should we order by relevance, or keep order chosen in the app

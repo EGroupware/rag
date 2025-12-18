@@ -88,9 +88,11 @@ class Ui
 				$search = 'searchEmbeddings';
 				break;
 		}
-		foreach($this->embedding->$search($query['search'], $query['col_filter']['apps']??'', $query['start']??0,
-			// query twice as many entries requested, as user might not have access to all of them
-			2*($query['num_rows']??50), true) as $id => $row)
+		foreach($this->embedding->$search($query['search'], $query['col_filter']['apps']??'',
+			// simple approach without storing a state:
+			0,  // we always start at 0, as we don't know how many rows the acl-filter will throw out
+			// we query twice as many entries requested, as user might not have access to all of them
+			2*(($query['start']??0)+($query['num_rows']??50)), true) as $id => $row)
 		{
 			if (!$id) continue; // $id===0 is used to signal nothing found, to not generate an SQL error
 

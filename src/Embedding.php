@@ -12,6 +12,7 @@
 namespace EGroupware\Rag;
 
 use EGroupware\Api;
+use EGroupware\Api\Db\Exception\InvalidSql;
 use OpenAI;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -206,7 +207,11 @@ class Embedding
 		$ids = $rag->$search($criteria, $app, 0, 200);
 		$plugin = new (self::plugins()[$app]);
 		$filter[] = $db->expression($plugin->table(), $plugin->table().'.', [$plugin->id() => array_keys($ids)]);
-		$order_by = self::orderByIds($ids, $plugin->table().'.'.$plugin->id());
+		// should we order by relevance, or keep order chosen in the app
+		if (($GLOBALS['egw_info']['user']['preferences']['rag']['default_search_order'] ?? 'app') === 'relevance')
+		{
+			$order_by = self::orderByIds($ids, $plugin->table() . '.' . $plugin->id());
+		}
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',', $extra_cols) : [];
 		$extra_cols[] = self::distanceById($ids, $plugin->table().'.'.$plugin->id()).' AS distance';
 		$criteria = null;
@@ -635,7 +640,15 @@ class Embedding
 	 */
 	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $min_relevance=0, ?string $mode=null) : array
 	{
-		$id_relevance = [];
+		// should we add an asterisk ("*") after each pattern/word NOT enclosed in quotes
+		if (($GLOBALS['egw_info']['user']['preferences']['rag']['fulltext_match_wordstart'] ?? 'yes') === 'yes')
+		{
+			static $word = '[\\pL\\pN-]+';    // \pL = unicode letters, \pN = unicode numbers
+			$pattern = preg_replace('/\*+/', '*',   // in case user already used an asterisk, two give a syntax error :(
+				preg_replace_callback('/("([^"]+)"|'.$word.')/i',
+					fn($m) => $m[1][0] === '"' ? $m[1] : preg_replace('/('.$word.')( |$|\))/ui', '$1*$2', $m[1]),
+					$pattern));
+		}
 		switch(strtolower($mode??''))
 		{
 			case 'IN BOOLEAN MODE':
@@ -653,21 +666,32 @@ class Embedding
 			$match.' AS relevance',
 			self::FULLTEXT_MODIFIED.' AS modified',
 		];
-		foreach($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols) ,
-			($app ? [self::FULLTEXT_APP => $app] : [])+[$match],
-			__LINE__, __FILE__, $start, 'ORDER BY relevance DESC', self::APP, $num_rows) as $row)
-		{
-			if ($row['relevance'] < $min_relevance)
+		try {
+			$id_relevance = [];
+			foreach ($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS ' . implode(',', $cols),
+				($app ? [self::FULLTEXT_APP => $app] : []) + [$match],
+				__LINE__, __FILE__, $start, 'ORDER BY relevance DESC', self::APP, $num_rows) as $row)
 			{
-				break;
+				if ($row['relevance'] < $min_relevance)
+				{
+					break;
+				}
+				$id = $app && is_string($app) ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP] . ':' . $row[self::FULLTEXT_APP_ID];
+				$id_relevance[$id] = $return_modified ? [
+					'relevance' => (float)$row['relevance'],
+					'modified' => new Api\DateTime($row['modified'], Api\DateTime::$server_timezone),
+				] : (float)$row['relevance'];
 			}
-			$id = $app && is_string($app) ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP].':'.$row[self::FULLTEXT_APP_ID];
-			$id_relevance[$id] = $return_modified ? [
-				'relevance' => (float)$row['relevance'],
-				'modified'  => new Api\DateTime($row['modified'], Api\DateTime::$server_timezone),
-			] : (float)$row['relevance'];
+			$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		}
-		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
+		catch (InvalidSql $e) {
+			_egw_log_exception($e);
+			if ($e->getCode() === 1064)
+			{
+				throw new InvalidFulltextSyntax($e->getMessage(), $e->getCode(), $e, $pattern);
+			}
+			throw $e;
+		}
 		if ($this->log_level)
 		{
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, min_relevance=$min_relevance) total=$this->total returning ".

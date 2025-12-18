@@ -1,10 +1,12 @@
 all supported	rag	en	All supported
+always use relevance	rag	en	Always use relevance
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	en	Anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).
 api key	rag	en	API Key
 app	rag	en	App
 app id	rag	en	App ID
 applications for rag / to calculate embeddings for	rag	en	Applications for RAG / to calculate embeddings for
 applications to add to fulltext-index	rag	en	Applications to add to fulltext-index
+change fulltext search pattern to match words starting with pattern	rag	en	Change fulltext search pattern to match words starting with pattern
 chunk overlap	rag	en	Chunk overlap
 chunk size	rag	en	Chunk size
 distance	rag	en	Distance
@@ -12,6 +14,7 @@ distance/relevance	rag	en	Distance/Relevance
 embedding configuration	rag	en	Embedding configuration
 enter your search query here...	rag	en	Enter your search query here...
 fulltext	rag	en	Fulltext
+fulltext search	rag	en	Fulltext search
 fulltext search only	rag	en	Fulltext search only
 general configuration	rag	en	General configuration
 higher is better	rag	en	higher is better
@@ -23,6 +26,7 @@ legacy search, as used before	rag	en	Legacy search, as used before
 minimize chunks e.g. concatenate title and description	rag	en	Minimize chunks e.g. concatenate title and description
 model to use	rag	en	Model to use
 no match	rag	en	no match
+no, use search-order chosen in app	rag	en	No, use search-order chosen in app
 opposite	rag	en	opposite
 please note: ollama must be bound to all interfaces, not just localhost!	rag	en	Please note: Ollama must be bound to all interfaces, NOT just localhost!
 query	rag	en	Query
@@ -30,6 +34,7 @@ rag	common	en	RAG
 rag search only	rag	en	RAG search only
 relevance	rag	en	Relevance
 search in which applications	rag	en	Search in which applications
+should search in apps be ordered by relevance	rag	en	Should search in apps be ordered by relevance
 the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	en	The wildcard, indicating zero or more characters. It can only appear at the end of a word.
 the word cannot appear in any row returned.	rag	en	The word cannot appear in any row returned.
 the word following contributes negatively to the relevance of the row.	rag	en	The word following contributes negatively to the relevance of the row.

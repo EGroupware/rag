@@ -9,6 +9,7 @@ applications to add to fulltext-index	rag	en	Applications to add to fulltext-ind
 change fulltext search pattern to match words starting with pattern	rag	en	Change fulltext search pattern to match words starting with pattern
 chunk overlap	rag	en	Chunk overlap
 chunk size	rag	en	Chunk size
+default sorting	rag	en	Default sorting
 distance	rag	en	Distance
 distance/relevance	rag	en	Distance/Relevance
 embedding configuration	rag	en	Embedding configuration

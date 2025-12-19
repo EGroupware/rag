@@ -17,10 +17,13 @@
 					<nextmatch-header id="id" label="ID"></nextmatch-header>
 					<nextmatch-header id="app" label="App"></nextmatch-header>
 					<nextmatch-header id="app_id" label="App ID"></nextmatch-header>
-					<nextmatch-header id="title" label="Title"></nextmatch-header>
-					<nextmatch-header id="modified" label="Modified"></nextmatch-header>
-					<nextmatch-header id="distance" label="Distance"></nextmatch-header>
-					<nextmatch-header id="relevance" label="Relevance"></nextmatch-header>
+					<et2-hbox width="100%">
+						<nextmatch-header id="title" label="Title" width="90%"></nextmatch-header>
+						<nextmatch-sortheader id="default" label="Default sorting" sortmode="ASC" align="right"></nextmatch-sortheader>
+					</et2-hbox>
+					<nextmatch-sortheader id="modified" label="Modified" sortmode="DESC"></nextmatch-sortheader>
+					<nextmatch-sortheader id="distance" label="Distance" sortmode="ASC"></nextmatch-sortheader>
+					<nextmatch-sortheader id="relevance" label="Relevance" sortmode="DESC"></nextmatch-sortheader>
 				</row>
 				<row class="row">
 					<et2-description id="${row}[id]"></et2-description>

@@ -94,7 +94,7 @@ class Ui
 				// simple approach without storing a state:
 				0,  // we always start at 0, as we don't know how many rows the acl-filter will throw out
 				// we query twice as many entries requested, as user might not have access to all of them
-				2 * (($query['start'] ?? 0) + ($query['num_rows'] ?? 50)), true) as $id => $row)
+				2 * (($query['start'] ?? 0) + ($query['num_rows'] ?? 50)), true, $query['order'].' '.($query['sort']??'ASC')) as $id => $row)
 			{
 				if (!$id) continue; // $id===0 is used to signal nothing found, to not generate an SQL error
 
@@ -114,6 +114,10 @@ class Ui
 		catch (InvalidFulltextSyntax $e) {
 			Api\Json\Response::get()->message($e->getMessage(), 'error');
 			return 0;
+		}
+		catch (\Exception $e) {
+			_egw_log_exception();
+			throw $e;
 		}
 		$total = $this->embedding->total ?? 0;
 		foreach($apps_ids as $app => $ids)
@@ -164,8 +168,8 @@ class Ui
 					'no_filter'      => true,	// disable the diverse filters we not (yet) use
 					'no_filter2'     => true,
 					'no_cat'         => true,
-					'order'          =>	'dist_relevance',// IO name of the column to sort after (optional for the sortheaders)
-					'sort'           =>	'DESC',// IO direction of the sort: 'ASC' or 'DESC'
+					'order'          =>	'default',// IO name of the column to sort after (optional for the sortheaders)
+					'sort'           =>	'ASC',// IO direction of the sort: 'ASC' or 'DESC'
 					'row_id'         => 'id',
 					'actions'        => $this->get_actions(),
 					'default_cols'   => '!id,app_id',

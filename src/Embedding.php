@@ -516,6 +516,34 @@ class Embedding
 	}
 
 	/**
+	 * Verify $sort
+	 *
+	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
+	 * @param ?string $not_modified what to return if sort is not "modified": "!?(relevance|distance|default)"
+	 * "!" prefix means to inverse the sort e.g. ASC should become DESC, unless given $order is identical to $not_modified (without prefix)
+	 * @return string $order or "default", if $sort is invalid
+	 */
+	protected static function validateOrder(string $order, ?string $not_modified=null) : string
+	{
+		if (preg_match('/^(default|distance|relevance|modified)(\s(ASC|DESC))?$/i', $order, $matches))
+		{
+			$order = $matches[1];
+			$sort = strtoupper($matches[3] ?? 'ASC');
+		}
+		else
+		{
+			$order = 'default';
+			$sort = 'ASC';
+		}
+		if ($not_modified && $order !== 'modified' && !str_ends_with($not_modified, $order))
+		{
+			$order = $not_modified[0] === '!' ? substr($not_modified, 1) : $not_modified;
+			$sort = $not_modified[0] === '!' ? ($sort === 'ASC' ? 'DESC' : 'ASC') : $sort;
+		}
+		return $order.' '.$sort;
+	}
+
+	/**
 	 * Hybrid search in RAG and fulltext index for given app and $pattern
 	 *
 	 * Returns found IDs and their distance ordered by the smallest distance / the best match first,
@@ -528,36 +556,90 @@ class Embedding
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
+	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $max_distance default .4
 	 * @return float[]|array[] int id => float distance pairs, for $app === '' we return string "$app:$id"
 	 *  If there is no result, we return [0 => 1.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $max_distance=.4) : array
+	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
+	                       string $order='default', float $max_distance=.4) : array
 	{
 		if (!$this->client)
 		{
-			return $this->searchFulltext($pattern, $app, $start, $num_rows, $return_modified) ?: [0=>1.0];
+			return $this->searchFulltext($pattern, $app, $start, $num_rows, $return_modified, $order);
 		}
 		// quick/dump approach for merging: always query from start=0, $start+$num_rows rows, and then slice
-		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $return_modified, $max_distance);
+		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $return_modified, $order, $max_distance);
 		$total_embeddings = $this->total ?? 0;
 
-		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_modified);
+		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_modified, $order);
 
 		// + makes sure to return every entry only once, with the embeddings first
-		$both = $return_modified ? array_merge_recursive($embedding_matches, $fulltext_matches) : $embedding_matches+$fulltext_matches;
+		$both = $return_modified ? self::add_rows($embedding_matches, $fulltext_matches) : $embedding_matches+$fulltext_matches;
 
 		// we can only subtract the entries found in both returned sets, but there might be more in common ...
 		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
+
+		if ($order !== 'default ASC')
+		{
+			[$order, $sort] = explode(' ', self::validateOrder($order), 2);
+			// we can only order it by a different criteria if we got the data / $return_modified === true
+			if ($return_modified && $order !== 'default')
+			{
+				$sort_to_end = $sort === 'ASC' ? 1 : -1;
+				uasort($both, static function(array $a, array $b) use ($order, $sort_to_end)
+				{
+					if (!isset($a[$order]))
+					{
+						return !isset($b[$order]) ? 0 : $sort_to_end;
+					}
+					if (!isset($b[$order]))
+					{
+						return -$sort_to_end;
+					}
+					return $a[$order] <=> $b[$order];
+				});
+			}
+			if ($sort !== 'ASC')
+			{
+				$both = array_reverse($both, true);
+			}
+		}
 		$both = array_slice($both, $start, $num_rows, true);
 		if ($this->log_level)
 		{
-			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, return_modified=$return_modified, max_distance=$max_distance) total=$this->total returning ".
+			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, return_modified=$return_modified, order=$order, max_distance=$max_distance) total=$this->total returning ".
 				json_encode($both));
 		}
 		return $both;
+	}
+
+	/**
+	 * Merge search results from RAG and fulltext for hybrid search
+	 *
+	 * Works mostly like array_merge_recursive, but for attributes in both, only the first is used.
+	 * array_merge_recursive would create an array with all values, which would create invalid modified DateTime objects!
+	 *
+	 * @param array $rows
+	 * @param array $additional
+	 * @return array
+	 */
+	protected static function add_rows(array $rows, array $additional) : array
+	{
+		foreach($additional as $key => $row)
+		{
+			if (isset($rows[$key]))
+			{
+				$rows[$key] += $row;
+			}
+			else
+			{
+				$rows[$key] = $row;
+			}
+		}
+		return $rows;
 	}
 
 	/**
@@ -570,12 +652,14 @@ class Embedding
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
+	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $max_distance=.4) : array
+	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
+	                                 string $order='default', float $max_distance=.4) : array
 	{
 		// we remove boolean mode fulltext operators
 		if (preg_match(self::BOOLEAN_MODE_OPERATORS_PREG, $pattern))
@@ -601,10 +685,11 @@ class Embedding
 			'VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($response->embeddings[0]->embedding, 'vector').') as distance',
 			self::EMBEDDING_MODIFIED.' AS modified',
 		];
+		$order = self::validateOrder($order, 'distance');
 		$id_distance = [];
 		foreach($this->db->select(self::TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols), $app ? [
 			self::EMBEDDING_APP => $app,
-		] : false, __LINE__, __FILE__, $start, 'HAVING distance<'.$max_distance.' ORDER BY distance', self::APP, $num_rows) as $row)
+		] : false, __LINE__, __FILE__, $start, 'HAVING distance<'.$max_distance.' ORDER BY '.$order, self::APP, $num_rows) as $row)
 		{
 			$id = $app && is_string($app) ? (int)$row[self::EMBEDDING_APP_ID] : $row[self::EMBEDDING_APP].':'.$row[self::EMBEDDING_APP_ID];
 			// only insert the first / best match, as multiple chunks could match
@@ -638,6 +723,7 @@ class Embedding
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
 	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
+	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $min_relevance default 0
 	 * @param ?string $mode default null, check for BOOLEAN mode operators in $pattern: +-<>()~*",
 	 *  or 'IN BOOLEAN MODE', 'IN NATURAL LANGUAGE MODE', 'WITH QUERY EXPANSION'
@@ -645,7 +731,8 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false, float $min_relevance=0, ?string $mode=null) : array
+	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
+	                               string $order='default', float $min_relevance=0, ?string $mode=null) : array
 	{
 		// should we add an asterisk ("*") after each pattern/word NOT enclosed in quotes
 		if (($GLOBALS['egw_info']['user']['preferences']['rag']['fulltext_match_wordstart'] ?? 'yes') === 'yes')
@@ -673,15 +760,23 @@ class Embedding
 			$match.' AS relevance',
 			self::FULLTEXT_MODIFIED.' AS modified',
 		];
+		$order = self::validateOrder($order, '!relevance');
 		try {
 			$id_relevance = [];
 			foreach ($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS ' . implode(',', $cols),
 				($app ? [self::FULLTEXT_APP => $app] : []) + [$match],
-				__LINE__, __FILE__, $start, 'ORDER BY relevance DESC', self::APP, $num_rows) as $row)
+				__LINE__, __FILE__, $start, 'ORDER BY '.$order, self::APP, $num_rows) as $row)
 			{
 				if ($row['relevance'] < $min_relevance)
 				{
-					break;
+					if ($order !== 'relevance DESC')
+					{
+						continue;
+					}
+					else
+					{
+						break;
+					}
 				}
 				$id = $app && is_string($app) ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP] . ':' . $row[self::FULLTEXT_APP_ID];
 				$id_relevance[$id] = $return_modified ? [

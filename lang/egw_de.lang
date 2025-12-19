@@ -7,6 +7,7 @@ applications to add to fulltext-index	rag	de	Anwendungen für den Volltext Index
 change fulltext search pattern to match words starting with pattern	rag	de	Ändere das Suchmuster der Volltextsuche um auch Worte zu finden die damit beginnen
 chunk overlap	rag	de	Chunk Überlappung
 chunk size	rag	de	Größe der Chunks
+default sorting	rag	de	Normale Sortierung
 distance	rag	de	Distanz
 distance/relevance	rag	de	Distanz/Relevanz
 embedding configuration	rag	de	Embedding Konfiguration

@@ -16,13 +16,21 @@
   * show a NM list with link-title, app-name and ID and onclick action to edit the entry
 - [x] replace old EPL search in avatar-menu with RAG, if available
 - [x] new RAG preference what to use in default search, if RAG is available (implementation in Api\Storage):
-  * hybrid search (default, if RAGEmbedding is configured, otherwise fulltext search)
-  * fulltext search only
+  * fulltext search (default)
+  * hybrid search (if RAG/Embedding is configured)
   * semantic search / RAG only
   * legacy search of the apps
   * search will still support #<number> to find the ID
-  * apps can prefer/overwrite the above, e.g. Addressbook to use its own phone-number search 
-- [ ] improve search box `et2-search` allowing to specify what type of search to use in a nicer form, the prefixing the search-pattern with a `&`, and storing the decision in an implizit preference
+  * apps can prefer/overwrite the above, e.g. Addressbook to use its own phone-number search
+- [x] fulltext search supports [boolean search operators](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/full-text-indexes/full-text-index-overview#in-boolean-mode)
+- [x] preference to automatically append an asterisk (*) after each search pattern, which is not enclosed in quotes ("), to also match words beginning with the pattern
+- [x] preference to keep sort-order from apps (default), or use relevance from RAG/fulltext search, when search in the apps
+- [x] UI of RAG allows sorting the search result by distance&relevance (default), modification date, distance or relevance alone
+- [ ] change search in filterbox, to include:
+  * selection which search-type to use incl. legacy search
+  * fulltext operator help (like in RAG UI)
+- [ ] cache embeddings of the search-pattern to not always have to request them again
+- [ ] store md5 or sha1 of chunks, to not regenerate embeddings of unchanged chunks
 - [ ] support other embedding models AND modify schema to support its number of dimensions (the latter is not yet implemented!)
 - [ ] make the results of the above searches available to AI agents / integrate with them
 

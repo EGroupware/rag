@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2.0//EN" "https://www.egroupware.org/etemplate2.0.dtd">
+<overlay>
+    <template id="rag.search">
+        <et2-details summary="RAG Search" open="true">
+            <et2-searchbox id="searchbox" class="et2-label-fixed"></et2-searchbox>
+            <et2-select id="search_type" statustext="Operators: + - &lt; &gt; ( ) ~ * &quot; ">
+                <option value="fulltext">Fulltext search</option>
+                <option value="rag">RAG / Semantic search</option>
+                <option value="hybrid">Hybrid search (RAG+Fulltext)</option>
+                <option value="legacy">Legacy search</option>
+            </et2-select>
+        </et2-details>
+    </template>
+</overlay>

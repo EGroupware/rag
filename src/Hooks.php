@@ -175,4 +175,30 @@ class Hooks
 			);
 		}
 	}
+
+	/**
+	 * Add options for RAG search to app's index templates
+	 *
+	 * @param array $data content of request plus special keys "location_name" and "location_object" (=Etemplate object)
+	 * @return array Modifications to make to the response.  These changes are
+	 * made before any processing is done on the template exec().
+	 *  String[] 'data':		Changes to the content
+	 *  String[] 'readonlys':	Changes to the readonlys
+	 *	String[] 'preserve':	Changes to preserve
+	 */
+	public static function etemplate2_before_exec(array $data)
+	{
+		if (!preg_match('/^([^.]+).(index|list)$/', $data['location_name'], $matches) ||
+			!isset(Embedding::plugins()[$app=$matches[1]]) ||
+			$app === 'calendar')    // plugin, but no search-integration yet
+		{
+			return;
+		}
+		Api\Translation::add_app(self::APP);
+		return [
+			'data' => [
+				'nm' => Ui::fulltextOperatorHelp($app),
+			],
+		];
+	}
 }

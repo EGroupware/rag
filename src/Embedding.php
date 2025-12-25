@@ -145,9 +145,10 @@ class Embedding
 	 * - if no URL configured --> only fulltext is available, if NOT configured to be off
 	 *
 	 * @param string $app app-name
+	 * @param string|null $type search-type, defaults to RAG preference "search_type"
 	 * @return string|null null=not available, "hybrid", "rag" or "fulltext" search to use for $app
 	 */
-	public static function available(string $app) : ?string
+	public static function available(string $app, ?string $type=null) : ?string
 	{
 		// check RAG is installed, we don't check/care if the individual user has run-rights
 		if (empty($GLOBALS['egw_info']['apps']['rag']))
@@ -160,21 +161,21 @@ class Embedding
 			return null;
 		}
 		// check default search not switched to legacy --> not available
-		if (($pref = $GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'hybrid') === 'legacy')
+		if (($type = $type ?? $GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'hybrid') === 'legacy')
 		{
 			return null;
 		}
 		// only fulltext possible, because RAG not configured or turned off for $app --> use fulltext
 		if (empty(self::$url) || !(empty(self::$rag_apps) || in_array($app, self::$rag_apps)))
 		{
-			$pref = 'fulltext';
+			$type = 'fulltext';
 		}
 		// if we're to use fulltext, check if it's not turned off for $app
-		if ($pref === 'fulltext')
+		if ($type === 'fulltext')
 		{
 			return !(empty(self::$fulltext_apps) || in_array($app, self::$fulltext_apps)) ? null : 'fulltext';
 		}
-		return $pref;   // fulltext or rag
+		return $type;   // fulltext or rag
 	}
 
 	/**
@@ -194,7 +195,11 @@ class Embedding
 		{
 			$app = 'addressbook';
 		}
-		if (!($search = self::available($app)))
+		if (preg_match('/^(fulltext|hybrid|rag|legacy):(.*)$/', $criteria, $matches))
+		{
+			$criteria = $matches[2];
+		}
+		if (!($search = self::available($app, $matches[1]??null)))
 		{
 			return false;
 		}
@@ -203,7 +208,7 @@ class Embedding
 		 */
 		$db = $GLOBALS['egw']->db;
 		$rag = new self();
-		$search = $search === 'hybrid' ? 'search' : 'search'.ucfirst($search);
+		$search = $search === 'hybrid' ? 'search' : 'search'.ucfirst($search === 'rag' ? 'Embeddings' : $search);
 		try {
 			$ids = $rag->$search($criteria, $app, 0, 200);
 		}

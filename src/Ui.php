@@ -174,24 +174,10 @@ class Ui
 					'actions'        => $this->get_actions(),
 					'default_cols'   => '!id,app_id',
 					'col_filter'     => [
-						'type' => $GLOBALS['egw_info']['user']['preferences']['rag']['searchType'] ?? 'hybrid',
-						'apps' => $GLOBALS['egw_info']['user']['preferences']['rag']['searchType'] ?? [],
+						'type' => $GLOBALS['egw_info']['user']['preferences']['rag']['searchType'] ?? 'fulltext',
+						'apps' => [],
 					],
-					'operators' => implode(' ', str_split('+-<>()~*"')),
-					'operator_help' => implode("\n", array_map(static function($label, $operator)
-					{
-						return " $operator\t$label";
-					}, $operators=[
-						'+' => lang('The word is mandatory in all rows returned.'),
-						'-' => lang('The word cannot appear in any row returned.'),
-						'<' => lang('The word that follows has a lower relevance than other words, although rows containing it will still match.'),
-						'>' => lang('The word that follows has a higher relevance than other words.'),
-						'()' => lang('Used to group words into subexpressions.'),
-						'~' => lang('The word following contributes negatively to the relevance of the row.'),
-						'*' => lang('The wildcard, indicating zero or more characters. It can only appear at the end of a word.'),
-						'"' => lang('Anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).'),
-					], array_keys($operators))),
-				],
+				]+self::fulltextOperatorHelp(),
 			];
 		}
 		$sel_options['apps'] = array_combine($apps = array_keys(Embedding::plugins()),
@@ -199,6 +185,54 @@ class Ui
 
 		$tmpl = new Api\Etemplate(self::APP.'.index');
 		$tmpl->exec(self::APP.'.'.self::class.'.index', $content, $sel_options, [], ['nm' => $content['nm']]);
+	}
+
+	/**
+	 * Return fulltext operators and a help-text for them
+	 *
+	 * @param string|null $app app-name to use app-specific configuration for available search_type
+	 * @return array with values for keys "operators", "operator_help", "search_type" and "options-search_type"
+	 */
+	public static function fulltextOperatorHelp(?string $app=null) : array
+	{
+		static $config = null;
+		if (!isset($config)) $config = Api\Config::read(self::APP);
+		$search_types = [
+			"fulltext" => lang('Fulltext search'),
+            "rag"      => lang('RAG / Semantic search'),
+            "hybrid"   => lang('Hybrid search (RAG+Fulltext)'),
+            "legacy"   => lang('Legacy search'),
+		];
+		// RAG / embedding URL not configured or app NOT enabled
+		if (empty($config['url']) || isset($app) && !empty($config['rag_apps']) && !in_array($app, $config['rag_apps']))
+		{
+			unset($search_types['rag'], $search_types['hybrid']);
+		}
+		// fulltext search NOT enabled for given app
+		if (isset($app) && !empty($config['fulltext_apps']) && !in_array($app, $config['fulltext_apps']))
+		{
+			unset($search_types['fulltext'], $search_types['hybrid']);
+		}
+		return [
+			'operator_help' => implode("\n", array_map(static function($label, $operator)
+			{
+				return " $operator\t$label";
+			}, $operators=[
+				'+' => lang('The word is mandatory in all rows returned.'),
+				'-' => lang('The word cannot appear in any row returned.'),
+				'<' => lang('The word that follows has a lower relevance than other words, although rows containing it will still match.'),
+				'>' => lang('The word that follows has a higher relevance than other words.'),
+				'()' => lang('Used to group words into subexpressions.'),
+				'~' => lang('The word following contributes negatively to the relevance of the row.'),
+				'*' => lang('The wildcard, indicating zero or more characters. It can only appear at the end of a word.'),
+				'"' => lang('Anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).'),
+			], array_keys($operators))),
+
+			'operators' => implode(' ', str_split(implode('', array_keys($operators)))),
+
+			'search_type' => $GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'fulltext',
+			'options-search_type' => $search_types,
+		];
 	}
 
 	/**

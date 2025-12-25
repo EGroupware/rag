@@ -32,6 +32,7 @@ opposite	rag	en	opposite
 please note: ollama must be bound to all interfaces, not just localhost!	rag	en	Please note: Ollama must be bound to all interfaces, NOT just localhost!
 query	rag	en	Query
 rag	common	en	RAG
+rag search	rag	en	RAG Search
 rag search only	rag	en	RAG search only
 relevance	rag	en	Relevance
 search in which applications	rag	en	Search in which applications

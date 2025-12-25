@@ -30,6 +30,7 @@ opposite	rag	de	Gegenteil
 please note: ollama must be bound to all interfaces, not just localhost!	rag	de	Bitte beachten: Ollama muss auf allen Schnittstellen gebunden sein, NICHT nur auf localhost!
 query	rag	de	Suchanfrage
 rag	common	de	RAG
+rag search	rag	de	RAG Suche
 rag search only	rag	de	RAG Suche ausschließlich
 relevance	rag	de	Relevanz
 search in which applications	rag	de	In welchen Anwendungen suchen

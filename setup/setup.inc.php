@@ -34,6 +34,7 @@ $setup_info['rag']['hooks']['config'] = 'EGroupware\Rag\Hooks::config';
 $setup_info['rag']['hooks']['config_validate'] = 'EGroupware\Rag\Hooks::configValidate';
 $setup_info['rag']['hooks']['settings'] = 'EGroupware\\Rag\\Hooks::settings';
 $setup_info['rag']['hooks']['topmenu_info'] = 'EGroupware\\Rag\\Hooks::topMenuInfo';
+$setup_info['rag']['hooks']['etemplate2_before_exec'][] = 'EGroupware\\Rag\\Hooks::etemplate2_before_exec';
 
 /* Dependencies for this app to work */
 $setup_info['rag']['depends'][] = array(

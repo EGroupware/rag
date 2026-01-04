@@ -1,4 +1,4 @@
-/vendor/
+#/vendor/
 *.old
 *.old.xet
 *.old.lang

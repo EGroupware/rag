@@ -1,0 +1,21 @@
+{
+    "name": "egroupware/rag",
+    "description": "A RAG system for EGroupware.",
+    "type": "egroupware-app",
+    "authors": [
+        {
+            "name": "ralf",
+            "email": "rb@egroupware.org"
+        }
+    ],
+    "require": {
+        "openai-php/client": "^0.18.0",
+        "symfony/http-client": "^7.3",
+        "nyholm/psr7": "^1.8"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    }
+}

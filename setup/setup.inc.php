@@ -14,7 +14,8 @@ $setup_info['rag']['version']   = '0.1.003';
 $setup_info['rag']['app_order'] = 5;
 $setup_info['rag']['tables']    = ['egw_rag'];
 $setup_info['rag']['only_db']   = ['mysql' => 11.7]; // MariaDB 11.7+ required
-$setup_info['rag']['enable']    = 1;
+$setup_info['rag']['enable']    = 5;        // hidden from navbar, but framework app without index
+$setup_info['rag']['autoinstall'] = true;   // install automatic on update
 $setup_info['rag']['index']     = 'rag.EGroupware\\Rag\\Ui.index&ajax=true';
 
 $setup_info['rag']['author'] =

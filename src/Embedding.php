@@ -805,8 +805,15 @@ class Embedding
 	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
 	                               string $order='default', float $min_relevance=0, ?string $mode=null) : array
 	{
+		// To find word(s) with a dash inside e.g. domain-names, we must NOT use boolean mode, but natural language mode.
+		// Because in boolean mode it will never match because the dash before the 2nd word will exclude all matches with that word :(
+		// And we cam not add an asterisk after the word, as that requires boolean mode
+		if (!$mode && preg_match('/^(([\\pL\\pN][\\pL\\pN.-]+[\\pL\\pN]+)( |$))+$/i', $pattern))
+		{
+			$mode = 'IN NATURAL LANGUAGE MODE';
+		}
 		// should we add an asterisk ("*") after each pattern/word NOT enclosed in quotes
-		if (($GLOBALS['egw_info']['user']['preferences']['rag']['fulltext_match_wordstart'] ?? 'yes') === 'yes')
+		elseif (($GLOBALS['egw_info']['user']['preferences']['rag']['fulltext_match_wordstart'] ?? 'yes') === 'yes')
 		{
 			static $word = '[\\pL\\pN-]+';    // \pL = unicode letters, \pN = unicode numbers
 			$pattern = preg_replace('/\*+/', '*',   // in case user already used an asterisk, two give a syntax error :(
@@ -814,7 +821,7 @@ class Embedding
 					fn($m) => $m[1][0] === '"' ? $m[1] : preg_replace('/('.$word.')( |$|\))/ui', '$1*$2', $m[1]),
 					$pattern));
 		}
-		switch(strtolower($mode??''))
+		switch(strtoupper($mode??''))
 		{
 			case 'IN BOOLEAN MODE':
 			case 'IN NATURAL LANGUAGE MODE':

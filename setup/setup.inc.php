@@ -5,12 +5,12 @@
  * @package rag
  * @link https://www.egroupware.org
  * @author Ralf Becker <rb@egroupware.org>
- * @copyright 2025 by Ralf Becker <rb@egroupware.org>
+ * @copyright 2025-26 by Ralf Becker <rb@egroupware.org>
  * @license https://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
 $setup_info['rag']['name']      = 'rag';
-$setup_info['rag']['version']   = '0.1.003';
+$setup_info['rag']['version']   = '26.1.001';
 $setup_info['rag']['app_order'] = 5;
 $setup_info['rag']['tables']    = ['egw_rag'];
 $setup_info['rag']['only_db']   = ['mysql' => 11.7]; // MariaDB 11.7+ required

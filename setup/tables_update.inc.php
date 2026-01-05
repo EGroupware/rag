@@ -64,3 +64,15 @@ function rag_upgrade0_1_002()
 	}
 	return $GLOBALS['setup_info']['rag']['currentver'] = '0.1.003';
 }
+
+function rag_upgrade0_1_003()
+{
+	$GLOBALS['egw_setup']->oProc->AddColumn('egw_rag','rag_hash',array(
+		'type' => 'binary',
+		'precision' => '32',
+		'comment' => 'binary sha256 hash of chunk'
+	));
+	$GLOBALS['egw_setup']->oProc->CreateIndex('egw_rag', 'rag_hash');
+
+	return $GLOBALS['setup_info']['rag']['currentver'] = '26.1.001';
+}

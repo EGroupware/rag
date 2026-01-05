@@ -116,7 +116,7 @@ class Ui
 			return 0;
 		}
 		catch (\Exception $e) {
-			_egw_log_exception();
+			_egw_log_exception($e);
 			throw $e;
 		}
 		$total = $this->embedding->total ?? 0;

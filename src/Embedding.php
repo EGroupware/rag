@@ -190,7 +190,7 @@ class Embedding
 	 * @param array $filter
 	 * @return bool false: search not available, or configured to be off, true: search available and implemented via changed parameters
 	 */
-	public static function search2criteria(string $app, string &$criteria, &$order_by, &$extra_cols, array &$filter) : bool
+	public static function search2criteria(string $app, string &$criteria, &$order_by, &$extra_cols, ?array &$filter) : bool
 	{
 		// Contacts class in API uses "api", but the app is / has to be "addressbook"
 		if ($app === 'api')

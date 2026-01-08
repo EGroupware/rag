@@ -9,6 +9,11 @@
  * @license https://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
+use EGroupware\Rag;
+
 // give only Admins group rights for RAG app
-$defaultgroup = $GLOBALS['egw_setup']->add_account('Admins', 'Admins', 'Group', false, false);
-$GLOBALS['egw_setup']->add_acl('rag', 'run', $defaultgroup);
+$adminsgroup = $GLOBALS['egw_setup']->add_account('Admins', 'Admins', 'Group', false, false);
+$GLOBALS['egw_setup']->add_acl('rag', 'run', $adminsgroup);
+
+// install the async-job to build the fulltext index
+Rag\Embedding::installAsyncJob();

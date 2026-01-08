@@ -6,7 +6,7 @@
 - [x] create AND keep the above indexes up-to-date when entries are added, updated or deleted
 - [x] provides search primitives applications can use to provide:
   * `Rag\Embeddings::searchEmbeddings()` a semantic search by given search-pattern
-  * `Rag\Embeddings::searchFulltext()` a fulltext search currently only in [natural language mode](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/full-text-indexes/full-text-index-overview#in-natural-language-mode)
+  * `Rag\Embeddings::searchFulltext()` a fulltext search either in [natural language mode](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/full-text-indexes/full-text-index-overview#in-natural-language-mode) or in [boolean mode](https://mariadb.com/docs/server/ha-and-performance/optimization-and-tuning/optimization-and-indexes/full-text-indexes/full-text-index-overview#in-boolean-mode), if operators are used (the default preference to add an `*` after each word, also swiches automatically to boolean mode!)
   * `Rag\Embeddings::search()` hybrid search combining semantic and fulltext search
   * the primitives return an array with ID => distance or relevance score of the embeddings or fulltext index
  - [x] UI for an application independent search 
@@ -33,8 +33,8 @@
 - [x] change search in filterbox, to include:
   * selection which search-type to use incl. legacy search
   * fulltext operator help (like in RAG UI)
-- [ ] cache embeddings of the search-pattern to not always have to request them again
-- [ ] store md5 or sha1 of chunks, to not regenerate embeddings of unchanged chunks
+- [x] cache embeddings of the search-pattern to not always have to request them again
+- [x] store sha256 of chunks, to not regenerate embeddings of unchanged chunks
 - [ ] support other embedding models AND modify schema to support its number of dimensions (the latter is not yet implemented!)
 - [ ] make the results of the above searches available to AI agents / integrate with them
 

@@ -560,7 +560,7 @@ class Embedding
 		error_log(__METHOD__ . "() app=$app, fulltext=$fulltext, entry=".json_encode($entry, JSON_INVALID_UTF8_IGNORE));
 		_egw_log_exception($e);
 		// store the last N errors to display in RAG config
-		$errors = Api\Config::read(self::APP)[self::RAG_LAST_ERRORS] ?? [];
+		$errors = (array)(Api\Config::read(self::APP)[self::RAG_LAST_ERRORS] ?? []);
 		array_unshift($errors, [
 			'date' => new Api\DateTime(),
 			'message' => $e->getMessage(),

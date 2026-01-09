@@ -201,7 +201,8 @@ class Embedding
 		{
 			$criteria = $matches[2];
 		}
-		if (!($search = self::available($app, $matches[1]??null)))
+		if ($matches[1] === 'legacy' || preg_match('/^#?\d+$/', $criteria) ||
+			!($search = self::available($app, $matches[1]??null)))
 		{
 			return false;
 		}

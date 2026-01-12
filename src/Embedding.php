@@ -272,7 +272,7 @@ class Embedding
 	public static function notify($data)
 	{
 		// check if we're interested in the given app
-		if (empty($data['app']) || !isset(self::plugins()[$data['app']]))
+		if (empty($data['app']) || !isset(self::plugins()[$data['app']]) || empty($GLOBALS['egw_info']['apps']['rag']))
 		{
 			return;
 		}

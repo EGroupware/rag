@@ -364,8 +364,9 @@ class Embedding
 		// check if we already have an embedding for that chunk-content by comparing the sha256 hash
 		foreach($this->db->select(self::TABLE, '*', [
 			'rag_hash' => array_map(fn($v) => $v->sha256, $responses),
-		], __LINE__, __FILE__, false, '', self::APP) as $row)
+		], __LINE__, __FILE__, false, 'GROUP BY rag_hash', self::APP) as $row)
 		{
+			if (!isset($responses[$row->rag_hash])) continue;   // not sure how this can happen, but it does...
 			$responses[$row['rag_hash']]->embedding = array_values(unpack('g*', $row['rag_embedding']));
 			$responses[$row['rag_hash']]->app = $row['rag_app'];
 			$responses[$row['rag_hash']]->app_id = $row['rag_app_id'];

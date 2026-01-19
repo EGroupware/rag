@@ -107,8 +107,18 @@ class Embedding
 	 */
 	public ?int $total;
 
-	public function __construct(int $log_level = 0)
+	/**
+	 * Constructor
+	 *
+	 * @param int $log_level
+	 * @param array|null $config
+	 */
+	public function __construct(int $log_level = 0, ?array $config=null)
 	{
+		if ($config)
+		{
+			self::initStatic($config);
+		}
 		if (self::$url)
 		{
 			$factory = Openai::factory();
@@ -121,11 +131,53 @@ class Embedding
 	}
 
 	/**
-	 * Init our static variables from configuration
+	 * Test configuration
+	 *
+	 * @return void
+	 * @throws \Exception on error with codes between 1000 and 1004
 	 */
-	public static function initStatic()
+	public function testConfig()
 	{
-		$config = Api\Config::read(self::APP);
+		if ((float)$this->db->ServerInfo['version'] < 11.7)
+		{
+			throw new \Exception('MariaDB 11.7+ is currently the only supported vector database, you can NOT use the RAG without it!', 1000);
+		}
+
+		if (!$this->db->query('SHOW CREATE TABLE '.self::TABLE)->fetchColumn())
+		{
+			throw new \Exception(self::TABLE.' is NOT installed', 1001);
+		}
+
+		if (empty(self::$url))
+		{
+			throw new \Exception('OpenAI compatible endpoint is not configured', 1002);
+		}
+
+		try {
+			$models = $this->client->models()->list()->data ?? [];
+		}
+		catch (\Exception $e) {
+			throw new \Exception($e->getMessage(), 1003, $e);
+		}
+
+		if (!array_filter($models, static fn(object $model) => self::$model === $model->id ||
+			str_starts_with($model->id, self::$model.':') ||  str_ends_with($model->id, '/'.self::$model)))
+		{
+			throw new \Exception('Model '.self::$model.' is not supported by the endpoint!', 1004);
+		}
+	}
+
+	/**
+	 * Init our static variables from configuration
+	 *
+	 * @param ?array $config
+	 */
+	public static function initStatic(?array $config=null)
+	{
+		if (!$config)
+		{
+			$config = Api\Config::read(self::APP);
+		}
 
 		self::$rag_apps = $config['rag_apps'] ?? null;
 		self::$fulltext_apps = $config['fulltext_apps'] ?? null;
@@ -281,14 +333,19 @@ class Embedding
 		{
 			/** @var Api\Db $db */
 			$db = $GLOBALS['egw']->db;
-			$db->delete(self::TABLE, [
-				self::EMBEDDING_APP => $data['app'],
-				self::EMBEDDING_APP_ID => $data['id'],
-			], __LINE__, __FILE__, self::APP);
-			$db->delete(self::FULLTEXT_TABLE, [
-				self::FULLTEXT_APP => $data['app'],
-				self::FULLTEXT_APP_ID => $data['id'],
-			], __LINE__, __FILE__, self::APP);
+			try {
+				$db->delete(self::FULLTEXT_TABLE, [
+					self::FULLTEXT_APP => $data['app'],
+					self::FULLTEXT_APP_ID => $data['id'],
+				], __LINE__, __FILE__, self::APP);
+				$db->delete(self::TABLE, [
+					self::EMBEDDING_APP => $data['app'],
+					self::EMBEDDING_APP_ID => $data['id'],
+				], __LINE__, __FILE__, self::APP);
+			}
+			catch (Api\Db\InvalidSql $e) {
+				// ignore, MariaDB is probably not 11.8, or table not installed
+			}
 		}
 		// install the async job for added or updated entries, if directly adding them failed
 		elseif ($data['type'] !== 'delete')

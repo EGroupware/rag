@@ -60,6 +60,9 @@ class Hooks
 	 */
 	public static function config($data)
 	{
+		// show configuration errors, also when opening app configuration
+		self::configValidate($data);
+
 		if (($errors = Api\Config::read(self::APP)[Embedding::RAG_LAST_ERRORS] ?? []))
 		{
 			$last_error = current($errors);
@@ -92,20 +95,24 @@ class Hooks
 		if (!empty($data['url']))
 		{
 			try {
-				// todo
+				$embed = new Embedding(0, array_filter($data)); // array-filter removes empty fields
+				$embed->testConfig();
+				Embedding::installAsyncJob();
 			}
 			catch (\Exception $e) {
-				$error = $e->getMessage();
+				switch($e->getCode())
+				{
+					case 1002:
+					case 1003:
+						Api\Etemplate::set_validation_error('url', $error, 'newsettings');
+						break;
+					case 1004:
+						Api\Etemplate::set_validation_error('embedding_model', $error, 'newsettings');
+						break;
+					default:
+						Api\Json\Response::get()->message($e->getMessage(), empty($data['url']) ? 'info' : 'error');
+				}
 			}
-		}
-		if ($error)
-		{
-			Api\Etemplate::set_validation_error('url', $error, 'newsettings');
-			$GLOBALS['config_error'] = implode("\n", $error);
-		}
-		else
-		{
-			Embedding::installAsyncJob();
 		}
 	}
 
@@ -155,6 +162,7 @@ class Hooks
 			],
 		];
 	}
+
 	/**
 	 * Add search to topmenu
 	 *

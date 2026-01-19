@@ -36,6 +36,10 @@
 							<et2-description value="Please note: Ollama must be bound to all interfaces, NOT just localhost!"></et2-description>
 							<et2-description label="Model:" value="bge-m3"></et2-description>
 						</et2-details>
+						<et2-details summary="{General configuration}: EGroupware AI Proxy" accordionGroup="notes">
+							<et2-description label="URL:" value="https://ai-proxy.egroupware.org/v1"></et2-description>
+							<et2-description label="Model:" value="bge-m3"></et2-description>
+						</et2-details>
 						<et2-details summary="{General configuration}: IONOS AI Hub" accordionGroup="notes">
 							<et2-description label="URL:" value="https://openai.inference.de-txl.ionos.com/v1"></et2-description>
 							<et2-description label="Model:" value="BAAI/bge-m3"></et2-description>
@@ -47,7 +51,10 @@
 				</row>
 				<row>
 					<et2-description  value="Model to use"></et2-description>
-					<et2-textbox id="newsettings[embedding_model]" placeholder="bge-m3"></et2-textbox>
+					<et2-hbox>
+						<et2-textbox id="newsettings[embedding_model]" placeholder="bge-m3"></et2-textbox>
+						<et2-description label="Currently only embedding models with 1024 dimensions, like bge-m3 are supported!"></et2-description>
+					</et2-hbox>
 				</row>
 				<row>
 					<et2-description  value="Chunk size"></et2-description>

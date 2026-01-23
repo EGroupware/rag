@@ -878,7 +878,7 @@ class Embedding
 		{
 			static $word = '[\\pL\\pN-]+';    // \pL = unicode letters, \pN = unicode numbers
 			$pattern = preg_replace('/\*+/', '*',   // in case user already used an asterisk, two give a syntax error :(
-				preg_replace_callback('/("([^"]+)"|'.$word.')/i',
+				preg_replace_callback('/("([^"]+)"|'.$word.')/ui',
 					fn($m) => $m[1][0] === '"' ? $m[1] : preg_replace('/('.$word.')( |$|\))/ui', '$1*$2', $m[1]),
 					$pattern));
 		}

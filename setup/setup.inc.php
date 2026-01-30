@@ -23,6 +23,7 @@ $setup_info['rag']['maintainer'] = array(
 	'name'  => 'Ralf Becker',
 	'email' => 'rb@egroupware.org',
 );
+$setup_info['rag']['license']  = 'GPL';
 $setup_info['rag']['description'] = 'A RAG system for EGroupware';
 $setup_info['rag']['note'] = 'Requires MariaDB 11.7+!';
 

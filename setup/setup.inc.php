@@ -40,5 +40,5 @@ $setup_info['rag']['hooks']['etemplate2_before_exec'][] = 'EGroupware\\Rag\\Hook
 /* Dependencies for this app to work */
 $setup_info['rag']['depends'][] = array(
 	 'appname' => 'api',
-	 'versions' => Array('23.1')
+	 'versions' => Array('26.1')
 );

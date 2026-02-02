@@ -254,6 +254,11 @@ class Embedding
 			$criteria = $matches[2];
 		}
 		if ($matches[1] === 'legacy' || preg_match('/^#?\d+$/', $criteria) ||
+			// automatic switch to legacy search when using an asterisk at the beginning of a word
+			preg_match('/(^|\s)\*[\\pL\\pN.]+/', $criteria) &&
+				// remove the asterisk, when it's the only one in the pattern, to also find matches including the pattern, not just starting with
+				(count(explode('*', $criteria)) > 2 ||
+					($criteria = preg_replace('/(^|\s)\*([\\pL\\pN.]+)/', '$1$2', $criteria))) ||
 			!($search = self::available($app, $matches[1]??null)))
 		{
 			return false;

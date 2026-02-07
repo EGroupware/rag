@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	ko	따옴표로 묶인 모든 내용은 하나의 단위로 간주됩니다(예: 구문 일치 가능)
+app	rag	ko	앱
+app id	rag	ko	앱 ID
+change fulltext search pattern to match words starting with pattern	rag	ko	전체 텍스트 검색 패턴을 패턴으로 시작하는 단어 일치로 변경
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	ko	현재 bge-m3와 같이 1024차원 모델만 지원됩니다!
+default sorting	rag	ko	기본 정렬
+enter your search query here...	rag	ko	검색어를 여기에 입력하세요...
+fulltext search	rag	ko	전체 텍스트 검색
+hybrid search: rag+fulltext	rag	ko	하이브리드 검색: RAG + 전체 텍스트
+legacy search, as used before	rag	ko	기존 검색 방식 (이전과 동일)
+query	rag	ko	검색어 입력
+rag	common	ko	RAG
+rag / semantic search	rag	ko	RAG / 의미적 검색
+rag search	rag	ko	RAG 검색
+rag search only	rag	ko	RAG 검색 전용
+search in which applications	rag	ko	어떤 애플리케이션에서 검색할까요?
+should search in apps be ordered by relevance	rag	ko	앱 내 검색 결과를 관련성 순으로 정렬할까요
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	ko	와일드카드로, 0개 이상의 문자를 나타냅니다. 단어 끝에만 나타날 수 있습니다
+the word cannot appear in any row returned.	rag	ko	해당 단어는 반환된 어떤 행에도 나타나서는 안 됨
+the word following contributes negatively to the relevance of the row.	rag	ko	뒤따르는 단어는 행의 관련성에 부정적으로 기여합니다
+the word is mandatory in all rows returned.	rag	ko	해당 단어는 반환된 모든 행에 반드시 포함되어야 함
+the word that follows has a higher relevance than other words.	rag	ko	다음에 오는 단어는 다른 단어보다 관련성이 높음
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	ko	다음에 오는 단어는 다른 단어보다 관련성이 낮지만, 해당 단어가 포함된 행은 여전히 일치함
+type of search	rag	ko	검색 유형
+use operators:	rag	ko	연산자 사용:
+used to group words into subexpressions.	rag	ko	단어를 하위 표현식으로 그룹화하는 데 사용됩니다
+what type of search to use for search in the apps	rag	ko	앱 내 검색에 사용할 검색 유형

@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	pt	Tudo o que estiver entre aspas duplas é considerado como um todo (para que você possa corresponder frases, por exemplo)
+app	rag	pt	Aplicação
+app id	rag	pt	ID da aplicação
+change fulltext search pattern to match words starting with pattern	rag	pt	Alterar o padrão de pesquisa de texto completo para corresponder a palavras que começam com o padrão
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	pt	Atualmente, apenas modelos incorporados com 1024 dimensões, como bge-m3, são suportados!
+default sorting	rag	pt	Classificação padrão
+enter your search query here...	rag	pt	Insira aqui a sua consulta de pesquisa...
+fulltext search	rag	pt	Pesquisa de texto completo
+hybrid search: rag+fulltext	rag	pt	Pesquisa híbrida: RAG + Texto completo
+legacy search, as used before	rag	pt	Pesquisa legada, como usada anteriormente
+query	rag	pt	Consulta
+rag	common	pt	RAG
+rag / semantic search	rag	pt	RAG / Pesquisa semântica
+rag search	rag	pt	Pesquisa RAG
+rag search only	rag	pt	Apenas pesquisa RAG
+search in which applications	rag	pt	Pesquisar em quais aplicações
+should search in apps be ordered by relevance	rag	pt	A pesquisa nos aplicativos deve ser ordenada por relevância
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	pt	O curinga, indicando zero ou mais caracteres. Só pode aparecer no final de uma palavra
+the word cannot appear in any row returned.	rag	pt	A palavra não pode aparecer em nenhuma linha retornada
+the word following contributes negatively to the relevance of the row.	rag	pt	A palavra seguinte contribui negativamente para a relevância da linha
+the word is mandatory in all rows returned.	rag	pt	A palavra é obrigatória em todas as linhas retornadas
+the word that follows has a higher relevance than other words.	rag	pt	A palavra que se segue tem uma relevância maior do que outras palavras
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	pt	A palavra que se segue tem uma relevância menor do que outras palavras, embora as linhas que a contêm ainda correspondam
+type of search	rag	pt	Tipo de pesquisa
+use operators:	rag	pt	Usar operadores:
+used to group words into subexpressions.	rag	pt	Usado para agrupar palavras em subexpressões
+what type of search to use for search in the apps	rag	pt	Que tipo de pesquisa usar para pesquisar nos aplicativos

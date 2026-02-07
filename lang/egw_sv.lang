@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	sv	Allt som omges av dubbla citattecken betraktas som en helhet (så att du till exempel kan matcha fraser)
+app	rag	sv	App
+app id	rag	sv	App-ID
+change fulltext search pattern to match words starting with pattern	rag	sv	Ändra mönstret för fulltextsökning så att det matchar ord som börjar med mönstret
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	sv	För närvarande stöds endast inbäddade modeller med 1024 dimensioner, såsom bge-m3!
+default sorting	rag	sv	Standardsortering
+enter your search query here...	rag	sv	Ange din sökfråga här ...
+fulltext search	rag	sv	Fulltextsökning
+hybrid search: rag+fulltext	rag	sv	Hybridsökning: RAG + Fulltext
+legacy search, as used before	rag	sv	Äldre sökning, som användes tidigare
+query	rag	sv	Sökfråga
+rag	common	sv	RAG
+rag / semantic search	rag	sv	RAG / Semantisk sökning
+rag search	rag	sv	RAG-sökning
+rag search only	rag	sv	Endast RAG-sökning
+search in which applications	rag	sv	Sök i vilka applikationer
+should search in apps be ordered by relevance	rag	sv	Ska sökningen i apparna ordnas efter relevans
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	sv	Jokertecknet, som anger noll eller fler tecken. Det kan endast förekomma i slutet av ett ord
+the word cannot appear in any row returned.	rag	sv	Ordet får inte förekomma i någon av de rader som returneras
+the word following contributes negatively to the relevance of the row.	rag	sv	Ordet som följer bidrar negativt till radens relevans
+the word is mandatory in all rows returned.	rag	sv	Ordet är obligatoriskt i alla rader som returneras
+the word that follows has a higher relevance than other words.	rag	sv	Ordet som följer har högre relevans än andra ord
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	sv	Ordet som följer har lägre relevans än andra ord, men rader som innehåller det kommer ändå att matchas
+type of search	rag	sv	Typ av sökning
+use operators:	rag	sv	Använd operatorer:
+used to group words into subexpressions.	rag	sv	Används för att gruppera ord i underuttryck
+what type of search to use for search in the apps	rag	sv	Vilken typ av sökning ska användas för sökning i apparna

@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	lt	Viskas, kas yra tarp dvigubų kabučių, yra laikoma kaip visuma (todėl galite rasti, pavyzdžiui, frazes)
+app	rag	lt	Programėlė
+app id	rag	lt	Programėlės ID
+change fulltext search pattern to match words starting with pattern	rag	lt	Pakeisti visatekstės paieškos modelį, kad jis atitiktų žodžius, prasidedančius modeliu
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	lt	Šiuo metu palaikomi tik 1024 matmenų modeliai, pvz., bge-m3!
+default sorting	rag	lt	Numatytasis rūšiavimas
+enter your search query here...	rag	lt	Įveskite savo paieškos užklausą čia ...
+fulltext search	rag	lt	Visatekstė paieška
+hybrid search: rag+fulltext	rag	lt	Hibridinė paieška: RAG + visatekstė
+legacy search, as used before	rag	lt	Senasis paieškos modelis, naudotas anksčiau
+query	rag	lt	Užklausa
+rag	common	lt	RAG
+rag / semantic search	rag	lt	RAG / Semantinė paieška
+rag search	rag	lt	RAG paieška
+rag search only	rag	lt	Tik RAG paieška
+search in which applications	rag	lt	Paieška, kurioje programose
+should search in apps be ordered by relevance	rag	lt	Ar paieška programėlėse turėtų būti surūšiuota pagal aktualumą?
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	lt	Pakeitimo simbolis, reiškiantis nulį ar daugiau simbolių. Jis gali būti tik žodžio gale
+the word cannot appear in any row returned.	rag	lt	Žodis negali pasirodyti nė vienoje grąžintoje eilutėje
+the word following contributes negatively to the relevance of the row.	rag	lt	Po žodžio einantis žodis neigiamai veikia eilutės aktualumą
+the word is mandatory in all rows returned.	rag	lt	Žodis yra privalomas visose grąžintose eilutėse
+the word that follows has a higher relevance than other words.	rag	lt	Žodis, kuris eina po jo, yra svarbesnis nei kiti žodžiai
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	lt	Žodis, kuris eina po jo, yra mažiau svarbus nei kiti žodžiai, tačiau eilutės, kuriose jis yra, vis tiek bus atitiktos
+type of search	rag	lt	Paieškos tipas
+use operators:	rag	lt	Naudokite operatorius:
+used to group words into subexpressions.	rag	lt	Naudojamas žodžiams sugrupuoti į posakio dalis
+what type of search to use for search in the apps	rag	lt	Kokio tipo paiešką naudoti paieškai programėlėse?

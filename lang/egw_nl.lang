@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	nl	Alles wat tussen dubbele aanhalingstekens staat, wordt als geheel beschouwd (zodat u bijvoorbeeld zinsdelen kunt matchen)
+app	rag	nl	App
+app id	rag	nl	App ID
+change fulltext search pattern to match words starting with pattern	rag	nl	Wijzig het patroon voor zoeken in volledige tekst zodat woorden die met het patroon beginnen, worden gevonden
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	nl	Momenteel worden alleen modellen met 1024 dimensies, zoals bge-m3, ondersteund!
+default sorting	rag	nl	Standaardsortering
+enter your search query here...	rag	nl	Voer hier uw zoekopdracht in ...
+fulltext search	rag	nl	Zoeken in volledige tekst
+hybrid search: rag+fulltext	rag	nl	Hybride zoeken: RAG + volledige tekst
+legacy search, as used before	rag	nl	Oude zoekfunctie, zoals voorheen gebruikt
+query	rag	nl	Zoekopdracht
+rag	common	nl	RAG
+rag / semantic search	rag	nl	RAG / Semantisch zoeken
+rag search	rag	nl	RAG Zoeken
+rag search only	rag	nl	Alleen RAG-zoeken
+search in which applications	rag	nl	Zoeken in welke applicaties
+should search in apps be ordered by relevance	rag	nl	Moet zoeken in apps worden gesorteerd op relevantie
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	nl	De jokerteken, die nul of meer tekens aangeeft. Deze kan alleen aan het einde van een woord voorkomen
+the word cannot appear in any row returned.	rag	nl	Het woord mag in geen enkele geretourneerde rij voorkomen
+the word following contributes negatively to the relevance of the row.	rag	nl	Het volgende woord draagt negatief bij aan de relevantie van de rij
+the word is mandatory in all rows returned.	rag	nl	Het woord is verplicht in alle geretourneerde rijen
+the word that follows has a higher relevance than other words.	rag	nl	Het woord dat volgt heeft een hogere relevantie dan andere woorden
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	nl	Het woord dat volgt heeft een lagere relevantie dan andere woorden, hoewel rijen die het bevatten nog steeds overeenkomen
+type of search	rag	nl	Type zoekopdracht
+use operators:	rag	nl	Gebruik operatoren:
+used to group words into subexpressions.	rag	nl	Wordt gebruikt om woorden te groeperen in subexpressies
+what type of search to use for search in the apps	rag	nl	Welk type zoekopdracht moet worden gebruikt voor zoeken in de apps

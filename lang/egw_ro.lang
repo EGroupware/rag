@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	ro	Orice este inclus între ghilimele duble este luat ca un întreg (astfel încât să puteți potrivi fraze, de exemplu)
+app	rag	ro	Aplicație
+app id	rag	ro	ID aplicație
+change fulltext search pattern to match words starting with pattern	rag	ro	Modificați modelul de căutare fulltext pentru a potrivi cuvintele care încep cu modelul
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	ro	În prezent sunt acceptate numai modelele cu 1024 dimensiuni, cum ar fi bge-m3!
+default sorting	rag	ro	Sortare implicită
+enter your search query here...	rag	ro	Introduceți aici termenul de căutare ...
+fulltext search	rag	ro	Căutare fulltext
+hybrid search: rag+fulltext	rag	ro	Căutare hibridă: RAG + Fulltext
+legacy search, as used before	rag	ro	Căutare tradițională, așa cum se utiliza înainte
+query	rag	ro	Căutare
+rag	common	ro	RAG
+rag / semantic search	rag	ro	RAG / Căutare semantică
+rag search	rag	ro	Căutare RAG
+rag search only	rag	ro	Numai căutare RAG
+search in which applications	rag	ro	Căutare în aplicații
+should search in apps be ordered by relevance	rag	ro	Căutarea în aplicații ar trebui ordonată după relevanță
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	ro	Caracterul wildcard, care indică zero sau mai multe caractere. Poate apărea numai la sfârșitul unui cuvânt
+the word cannot appear in any row returned.	rag	ro	Cuvântul nu poate apărea în niciun rând returnat
+the word following contributes negatively to the relevance of the row.	rag	ro	Cuvântul care urmează contribuie negativ la relevanța rândului
+the word is mandatory in all rows returned.	rag	ro	Cuvântul este obligatoriu în toate rândurile returnate
+the word that follows has a higher relevance than other words.	rag	ro	Cuvântul care urmează are o relevanță mai mare decât alte cuvinte
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	ro	Cuvântul care urmează are o relevanță mai mică decât alte cuvinte, deși rândurile care îl conțin vor fi totuși potrivite
+type of search	rag	ro	Tipul căutării
+use operators:	rag	ro	Utilizați operatori:
+used to group words into subexpressions.	rag	ro	Utilizat pentru a grupa cuvintele în subexpresii
+what type of search to use for search in the apps	rag	ro	Ce tip de căutare să se utilizeze pentru căutarea în aplicații

@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	sl	Vse, kar je v dvojnih narekovajih, se obravnava kot celota (tako lahko na primer ujemate fraze)
+app	rag	sl	Aplikacija
+app id	rag	sl	ID aplikacije
+change fulltext search pattern to match words starting with pattern	rag	sl	Spremeni vzorec iskanja po celotnem besedilu, da se ujemajo besede, ki se začnejo z vzorcem
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	sl	Trenutno so podprti samo modeli z vgrajenimi dimenzijami 1024, kot je bge-m3!
+default sorting	rag	sl	Privzeto razvrščanje
+enter your search query here...	rag	sl	Vnesite svojo poizvedbo tukaj ...
+fulltext search	rag	sl	Iskanje po celotnem besedilu
+hybrid search: rag+fulltext	rag	sl	Hibridno iskanje: RAG + celotno besedilo
+legacy search, as used before	rag	sl	Staro iskanje, kot se je uporabljalo prej
+query	rag	sl	Poizvedba
+rag	common	sl	RAG
+rag / semantic search	rag	sl	RAG / Semantično iskanje
+rag search	rag	sl	RAG Iskanje
+rag search only	rag	sl	Samo iskanje RAG
+search in which applications	rag	sl	Iskanje v katerih aplikacijah
+should search in apps be ordered by relevance	rag	sl	Ali naj bo iskanje v aplikacijah razvrščeno po relevantnosti
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	sl	Nadomestni znak, ki označuje nič ali več znakov. Lahko se pojavi samo na koncu besede
+the word cannot appear in any row returned.	rag	sl	Beseda se ne sme pojaviti v nobeni vrstici, ki se vrne
+the word following contributes negatively to the relevance of the row.	rag	sl	Beseda, ki sledi, negativno vpliva na relevantnost vrstice
+the word is mandatory in all rows returned.	rag	sl	Beseda je obvezna v vseh vrsticah, ki se vrnejo
+the word that follows has a higher relevance than other words.	rag	sl	Beseda, ki sledi, ima večjo relevantnost kot druge besede
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	sl	Beseda, ki sledi, ima manjšo relevantnost kot druge besede, čeprav se vrstice, ki jo vsebujejo, še vedno ujemajo
+type of search	rag	sl	Vrsta iskanja
+use operators:	rag	sl	Uporabi operaterje:
+used to group words into subexpressions.	rag	sl	Uporablja se za združevanje besed v podizraze
+what type of search to use for search in the apps	rag	sl	Kakšen tip iskanja uporabiti za iskanje v aplikacijah

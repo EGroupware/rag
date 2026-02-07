@@ -1,12 +1,15 @@
 all supported	rag	de	Alle unterstützten
 always use relevance	rag	de	Immer Relevanz verwenden
-anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	de	Alles, was in doppelten Anführungszeichen steht, wird als Ganzes betrachtet (so können Sie beispielsweise Phrasen abgleichen).
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	de	Alles, was in doppelten Anführungszeichen steht, wird als Ganzes betrachtet (so können Sie beispielsweise Phrasen abgleichen)
 api key	rag	de	API Key
+app	rag	de	App
+app id	rag	de	App ID
 applications for rag / to calculate embeddings for	rag	de	Anwendungen für das RAG / um Embeddings zu berechnet
 applications to add to fulltext-index	rag	de	Anwendungen für den Volltext Index
 change fulltext search pattern to match words starting with pattern	rag	de	Ändere das Suchmuster der Volltextsuche um auch Worte zu finden die damit beginnen
 chunk overlap	rag	de	Chunk Überlappung
 chunk size	rag	de	Größe der Chunks
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	de	Derzeit werden nur Einbettungsmodelle mit 1024 Dimensionen wie bge-m3 unterstützt!
 default sorting	rag	de	Normale Sortierung
 distance	rag	de	Distanz
 distance/relevance	rag	de	Distanz/Relevanz
@@ -17,7 +20,7 @@ fulltext search	rag	de	Volltextsuche
 fulltext search only	rag	de	Volltextsuche ausschließlich
 general configuration	rag	de	Allgemeine Konfiguration
 higher is better	rag	de	größer ist besser
-hybrid search: rag+fulltext	rag	de	Hybride Suche: RAG+Volltext
+hybrid search: rag+fulltext	rag	de	Hybride Suche: RAG + Volltext
 identical	rag	de	identisch
 last errors of rag's async job	rag	de	Letzte Fehler des asynchronen Jobs des RAG's
 leave empty to disable rag	rag	de	Leer lassen um das RAG auszuschalten
@@ -30,21 +33,22 @@ opposite	rag	de	Gegenteil
 please note: ollama must be bound to all interfaces, not just localhost!	rag	de	Bitte beachten: Ollama muss auf allen Schnittstellen gebunden sein, NICHT nur auf localhost!
 query	rag	de	Suchanfrage
 rag	common	de	RAG
+rag / semantic search	rag	de	RAG / Semantische Suche
 rag search	rag	de	RAG Suche
 rag search only	rag	de	RAG Suche ausschließlich
 relevance	rag	de	Relevanz
 search in which applications	rag	de	In welchen Anwendungen suchen
 should search in apps be ordered by relevance	rag	de	Solle die Suche in den Anwendungen nach Relevanz sortiert sein
 syntax error in fulltext search-pattern	common	de	Syntaxfehler in Volltext Suchmuster
-the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	de	Der Platzhalter, der null oder mehr Zeichen angibt. Er kann nur am Ende eines Wortes stehen.
-the word cannot appear in any row returned.	rag	de	Das Wort darf in keiner Zeile der Rückgabe vorkommen.
-the word following contributes negatively to the relevance of the row.	rag	de	Das folgende Wort trägt negativ zur Relevanz der Zeile bei.
-the word is mandatory in all rows returned.	rag	de	Das Wort ist in allen zurückgegebenen Zeilen obligatorisch.
-the word that follows has a higher relevance than other words.	rag	de	Das folgende Wort hat eine höhere Relevanz als andere Wörter.
-the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	de	Das folgende Wort hat eine geringere Relevanz als andere Wörter, obwohl Zeilen, die es enthalten, weiterhin übereinstimmen.
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	de	Der Platzhalter, der null oder mehr Zeichen angibt. Er kann nur am Ende eines Wortes stehen
+the word cannot appear in any row returned.	rag	de	Das Wort darf in keiner Zeile der Rückgabe vorkommen
+the word following contributes negatively to the relevance of the row.	rag	de	Das folgende Wort trägt negativ zur Relevanz der Zeile bei
+the word is mandatory in all rows returned.	rag	de	Das Wort ist in allen zurückgegebenen Zeilen obligatorisch
+the word that follows has a higher relevance than other words.	rag	de	Das folgende Wort hat eine höhere Relevanz als andere Wörter
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	de	Das folgende Wort hat eine geringere Relevanz als andere Wörter, obwohl Zeilen, die es enthalten, weiterhin übereinstimmen
 type of search	rag	de	Art der Suche
 unexpected	common	de	unerwartet
 url of openai compatible api	rag	de	URL der OpenAI kompatiblen API
 use operators:	rag	de	Operatoren verwenden:
-used to group words into subexpressions.	rag	de	Wird verwendet, um Wörter zu Unterausdrücken zu gruppieren.
+used to group words into subexpressions.	rag	de	Wird verwendet, um Wörter zu Unterausdrücken zu gruppieren
 what type of search to use for search in the apps	rag	de	Welche Art der Suche soll zum Suchen in den Anwendungen verwendet werden

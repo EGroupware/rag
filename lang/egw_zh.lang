@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	zh	双引号括起的任何内容均视为整体（例如可匹配短语）
+app	rag	zh	应用
+app id	rag	zh	应用ID
+change fulltext search pattern to match words starting with pattern	rag	zh	将全文搜索模式改为匹配以模式开头的单词
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	zh	目前仅支持嵌入1024维度的模型，如bge-m3！
+default sorting	rag	zh	默认排序
+enter your search query here...	rag	zh	在此输入您的搜索查询...
+fulltext search	rag	zh	全文搜索
+hybrid search: rag+fulltext	rag	zh	混合搜索：RAG + 全文搜索
+legacy search, as used before	rag	zh	传统搜索（此前使用模式）
+query	rag	zh	查询
+rag	common	zh	RAG
+rag / semantic search	rag	zh	RAG / 语义搜索
+rag search	rag	zh	RAG 搜索
+rag search only	rag	zh	仅RAG搜索
+search in which applications	rag	zh	在哪些应用程序中搜索
+should search in apps be ordered by relevance	rag	zh	应用内搜索是否应按相关性排序
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	zh	通配符，表示零个或多个字符。仅可出现在词尾
+the word cannot appear in any row returned.	rag	zh	该词不得出现在任何返回行中
+the word following contributes negatively to the relevance of the row.	rag	zh	后续词汇对行相关性产生负面影响
+the word is mandatory in all rows returned.	rag	zh	该词在所有返回行中必须出现
+the word that follows has a higher relevance than other words.	rag	zh	后续词的相关性高于其他词
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	zh	后续词的相关性低于其他词，但包含该词的行仍会匹配
+type of search	rag	zh	搜索类型
+use operators:	rag	zh	使用运算符：
+used to group words into subexpressions.	rag	zh	用于将词汇分组为子表达式
+what type of search to use for search in the apps	rag	zh	应用内搜索应采用何种类型

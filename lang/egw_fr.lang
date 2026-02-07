@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	fr	Tout ce qui est entre guillemets doubles est pris dans son ensemble (vous pouvez ainsi faire correspondre des phrases, par exemple)
+app	rag	fr	App
+app id	rag	fr	App ID
+change fulltext search pattern to match words starting with pattern	rag	fr	Modifier le modèle de recherche en texte intégral pour faire correspondre les mots commençant par le modèle
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	fr	Actuellement, seuls les modèles intégrés avec 1024 dimensions, comme bge-m3, sont pris en charge !
+default sorting	rag	fr	Tri par défaut
+enter your search query here...	rag	fr	Entrez votre requête de recherche ici...
+fulltext search	rag	fr	Recherche en texte intégral
+hybrid search: rag+fulltext	rag	fr	Recherche hybride : RAG + texte intégral
+legacy search, as used before	rag	fr	Recherche héritée, telle qu'utilisée auparavant
+query	rag	fr	Requête
+rag	common	fr	RAG
+rag / semantic search	rag	fr	RAG / Recherche sémantique
+rag search	rag	fr	Recherche RAG
+rag search only	rag	fr	Recherche RAG uniquement
+search in which applications	rag	fr	Rechercher dans quelles applications
+should search in apps be ordered by relevance	rag	fr	Les recherches dans les applications doivent-elles être classées par pertinence
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	fr	Le caractère générique, indiquant zéro ou plusieurs caractères. Il ne peut apparaître qu'à la fin d'un mot
+the word cannot appear in any row returned.	rag	fr	Le mot ne peut apparaître dans aucune ligne renvoyée
+the word following contributes negatively to the relevance of the row.	rag	fr	Le mot suivant contribue négativement à la pertinence de la ligne
+the word is mandatory in all rows returned.	rag	fr	Le mot est obligatoire dans toutes les lignes renvoyées
+the word that follows has a higher relevance than other words.	rag	fr	Le mot qui suit a une pertinence supérieure à celle des autres mots
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	fr	Le mot qui suit a une pertinence inférieure à celle des autres mots, mais les lignes qui le contiennent seront tout de même prises en compte
+type of search	rag	fr	Type de recherche
+use operators:	rag	fr	Utiliser les opérateurs :
+used to group words into subexpressions.	rag	fr	Utilisé pour regrouper des mots en sous-expressions
+what type of search to use for search in the apps	rag	fr	Quel type de recherche utiliser pour effectuer des recherches dans les applications

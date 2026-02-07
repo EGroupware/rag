@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	sk	Všetko, čo je uzavreté v úvodzovkách, sa berie ako celok (takže môžete vyhľadávať napríklad frázy)
+app	rag	sk	Aplikácia
+app id	rag	sk	ID aplikácie
+change fulltext search pattern to match words starting with pattern	rag	sk	Zmeniť vzor fulltextového vyhľadávania tak, aby zodpovedal slovám začínajúcim vzorom
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	sk	V súčasnosti sú podporované iba vložené modely s rozmermi 1024, ako napríklad bge-m3!
+default sorting	rag	sk	Predvolené triedenie
+enter your search query here...	rag	sk	Zadajte sem svoj vyhľadávací dotaz ...
+fulltext search	rag	sk	Fulltextové vyhľadávanie
+hybrid search: rag+fulltext	rag	sk	Hybridné vyhľadávanie: RAG + Fulltext
+legacy search, as used before	rag	sk	Staré vyhľadávanie, ako sa používalo predtým
+query	rag	sk	Dotaz
+rag	common	sk	RAG
+rag / semantic search	rag	sk	RAG / Sémantické vyhľadávanie
+rag search	rag	sk	Vyhľadávanie RAG
+rag search only	rag	sk	Iba vyhľadávanie RAG
+search in which applications	rag	sk	Vyhľadávať v ktorých aplikáciách
+should search in apps be ordered by relevance	rag	sk	Malo by sa vyhľadávanie v aplikáciách zoradiť podľa relevantnosti
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	sk	Zástupné znaky, ktoré označujú nula alebo viac znakov. Môžu sa vyskytovať iba na konci slova
+the word cannot appear in any row returned.	rag	sk	Slovo sa nesmie vyskytovať v žiadnom vrátenom riadku
+the word following contributes negatively to the relevance of the row.	rag	sk	Nasledujúce slovo negatívne ovplyvňuje relevantnosť riadku
+the word is mandatory in all rows returned.	rag	sk	Slovo je povinné vo všetkých vrátených riadkoch
+the word that follows has a higher relevance than other words.	rag	sk	Nasledujúce slovo má vyššiu relevanciu ako ostatné slová
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	sk	Nasledujúce slovo má nižšiu relevanciu ako ostatné slová, hoci riadky, ktoré ho obsahujú, budú stále zodpovedať
+type of search	rag	sk	Typ vyhľadávania
+use operators:	rag	sk	Použiť operátory:
+used to group words into subexpressions.	rag	sk	Používa sa na zoskupovanie slov do podvýrazov
+what type of search to use for search in the apps	rag	sk	Aký typ vyhľadávania použiť na vyhľadávanie v aplikáciách

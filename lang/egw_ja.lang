@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	ja	二重引用符で囲まれた部分は全体として扱われる（例：フレーズの一致が可能）
+app	rag	ja	アプリ
+app id	rag	ja	アプリID
+change fulltext search pattern to match words starting with pattern	rag	ja	全文検索パターンを変更し、パターンで始まる単語に一致させる
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	ja	現在、bge-m3のような1024次元の埋め込みモデルのみがサポートされています！
+default sorting	rag	ja	デフォルトの並べ替え
+enter your search query here...	rag	ja	検索クエリを入力してください ...
+fulltext search	rag	ja	全文検索
+hybrid search: rag+fulltext	rag	ja	ハイブリッド検索：RAG + 全文検索
+legacy search, as used before	rag	ja	従来型検索（従来使用されていたもの）
+query	rag	ja	クエリ
+rag	common	ja	RAG
+rag / semantic search	rag	ja	RAG / 意味検索
+rag search	rag	ja	RAG検索
+rag search only	rag	ja	RAG検索のみ
+search in which applications	rag	ja	検索対象アプリケーション
+should search in apps be ordered by relevance	rag	ja	アプリ内検索を関連性順に並べるべきか
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	ja	ワイルドカード。0個以上の文字を表す。単語の末尾にのみ出現可能
+the word cannot appear in any row returned.	rag	ja	この単語は返される行に一切出現できません
+the word following contributes negatively to the relevance of the row.	rag	ja	後続の単語は行の関連性に負の影響を与える
+the word is mandatory in all rows returned.	rag	ja	この単語は返される全行に必須です
+the word that follows has a higher relevance than other words.	rag	ja	続く単語は他の単語より関連性が高くなります
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	ja	続く単語は他の単語より関連性が低くなりますが、含まれる行は依然として一致します
+type of search	rag	ja	検索の種類
+use operators:	rag	ja	演算子の使用:
+used to group words into subexpressions.	rag	ja	単語を部分式にグループ化するために使用
+what type of search to use for search in the apps	rag	ja	アプリ内検索で使用する検索タイプ

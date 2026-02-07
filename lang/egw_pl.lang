@@ -1,0 +1,26 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	pl	Wszystko, co znajduje się w cudzysłowie, jest traktowane jako całość (dzięki czemu można na przykład dopasować frazy)
+app	rag	pl	Aplikacja
+app id	rag	pl	Identyfikator aplikacji
+change fulltext search pattern to match words starting with pattern	rag	pl	Zmień wzorzec wyszukiwania pełnotekstowego, aby dopasować słowa zaczynające się od wzorca
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	pl	Obecnie obsługiwane są tylko modele osadzone o wymiarach 1024, takie jak bge-m3!
+default sorting	rag	pl	Domyślne sortowanie
+enter your search query here...	rag	pl	Wpisz tutaj swoje zapytanie ...
+fulltext search	rag	pl	Wyszukiwanie pełnotekstowe
+hybrid search: rag+fulltext	rag	pl	Wyszukiwanie hybrydowe: RAG + pełnotekstowe
+legacy search, as used before	rag	pl	Wyszukiwanie starszego typu, stosowane wcześniej
+query	rag	pl	Zapytanie
+rag	common	pl	RAG
+rag / semantic search	rag	pl	RAG / Wyszukiwanie semantyczne
+rag search	rag	pl	Wyszukiwanie RAG
+search in which applications	rag	pl	Wyszukiwanie w aplikacjach
+should search in apps be ordered by relevance	rag	pl	Czy wyniki wyszukiwania w aplikacjach powinny być uporządkowane według trafności
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	pl	Symbol wieloznaczny, oznaczający zero lub więcej znaków. Może pojawiać się tylko na końcu słowa
+the word cannot appear in any row returned.	rag	pl	Słowo nie może pojawić się w żadnym zwróconym wierszu
+the word following contributes negatively to the relevance of the row.	rag	pl	Słowo następujące po nim ma negatywny wpływ na trafność wiersza
+the word is mandatory in all rows returned.	rag	pl	Słowo jest obowiązkowe we wszystkich zwróconych wierszach
+the word that follows has a higher relevance than other words.	rag	pl	Słowo, które następuje po nim, ma większą trafność niż inne słowa
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	pl	Słowo, które następuje po nim, ma mniejszą trafność niż inne słowa, chociaż wiersze zawierające je nadal będą pasować
+type of search	rag	pl	Rodzaj wyszukiwania
+use operators:	rag	pl	Użyj operatorów:
+used to group words into subexpressions.	rag	pl	Służy do grupowania słów w podwyrażenia
+what type of search to use for search in the apps	rag	pl	Jaki rodzaj wyszukiwania należy stosować w aplikacjach

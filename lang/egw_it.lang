@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	it	Tutto ciò che è racchiuso tra virgolette doppie viene considerato come un insieme (in modo da poter trovare corrispondenze con frasi, ad esempio)
+app	rag	it	App
+app id	rag	it	App ID
+change fulltext search pattern to match words starting with pattern	rag	it	Modificare il modello di ricerca full-text per trovare le parole che iniziano con il modello
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	it	Attualmente sono supportati solo modelli con 1024 dimensioni, come bge-m3!
+default sorting	rag	it	Ordinamento predefinito
+enter your search query here...	rag	it	Inserisci qui la tua query di ricerca...
+fulltext search	rag	it	Ricerca full-text
+hybrid search: rag+fulltext	rag	it	Ricerca ibrida: RAG + Full-text
+legacy search, as used before	rag	it	Ricerca legacy, come utilizzata in precedenza
+query	rag	it	Domanda
+rag	common	it	RAG
+rag / semantic search	rag	it	RAG / Ricerca semantica
+rag search	rag	it	Ricerca RAG
+rag search only	rag	it	Solo ricerca RAG
+search in which applications	rag	it	Cerca in quali applicazioni
+should search in apps be ordered by relevance	rag	it	La ricerca nelle app deve essere ordinata per rilevanza
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	it	Il carattere jolly, che indica zero o più caratteri. Può apparire solo alla fine di una parola
+the word cannot appear in any row returned.	rag	it	La parola non può comparire in nessuna delle righe restituite
+the word following contributes negatively to the relevance of the row.	rag	it	La parola che segue contribuisce negativamente alla rilevanza della riga
+the word is mandatory in all rows returned.	rag	it	La parola è obbligatoria in tutte le righe restituite
+the word that follows has a higher relevance than other words.	rag	it	La parola che segue ha una rilevanza superiore rispetto alle altre parole
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	it	La parola che segue ha una rilevanza inferiore rispetto alle altre parole, anche se le righe che la contengono saranno comunque corrispondenti
+type of search	rag	it	Tipo di ricerca
+use operators:	rag	it	Usa operatori:
+used to group words into subexpressions.	rag	it	Utilizzato per raggruppare le parole in sottoespressioni
+what type of search to use for search in the apps	rag	it	Che tipo di ricerca utilizzare per la ricerca nelle app

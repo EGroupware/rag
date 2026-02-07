@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	fi	Kaikki kaksoislauseissa olevat merkit otetaan kokonaisuutena (jotta voit esimerkiksi löytää lauseita)
+app	rag	fi	Sovellus
+app id	rag	fi	Sovelluksen tunnus
+change fulltext search pattern to match words starting with pattern	rag	fi	Muuta täystekstihaku malliksi, joka vastaa mallilla alkavia sanoja
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	fi	Tällä hetkellä tuetaan vain 1024-ulotteisia upotusmalleja, kuten bge-m3!
+default sorting	rag	fi	Oletusjärjestys
+enter your search query here...	rag	fi	Kirjoita hakukysely tähän ...
+fulltext search	rag	fi	Täystekstihaku
+hybrid search: rag+fulltext	rag	fi	Hybridihaku: RAG + täysteksti
+legacy search, as used before	rag	fi	Vanha haku, kuten aiemmin käytetty
+query	rag	fi	Kysely
+rag	common	fi	RAG
+rag / semantic search	rag	fi	RAG / Semanttinen haku
+rag search	rag	fi	RAG-haku
+rag search only	rag	fi	Vain RAG-haku
+search in which applications	rag	fi	Hae sovelluksista
+should search in apps be ordered by relevance	rag	fi	Pitäisikö sovelluksissa suoritetut haut järjestää relevanssin mukaan
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	fi	Jokeri, joka tarkoittaa nollaa tai useampaa merkkiä. Se voi esiintyä vain sanan lopussa
+the word cannot appear in any row returned.	rag	fi	Sana ei voi esiintyä missään palautetussa rivissä
+the word following contributes negatively to the relevance of the row.	rag	fi	Seuraava sana vaikuttaa negatiivisesti rivin relevanssiin
+the word is mandatory in all rows returned.	rag	fi	Sana on pakollinen kaikissa palautetuissa riveissä
+the word that follows has a higher relevance than other words.	rag	fi	Seuraava sana on merkityksellisempi kuin muut sanat
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	fi	Seuraava sana on vähemmän merkityksellinen kuin muut sanat, mutta sitä sisältävät rivit vastaavat silti hakua
+type of search	rag	fi	Hakutyyppi
+use operators:	rag	fi	Käytä operaattoreita:
+used to group words into subexpressions.	rag	fi	Käytetään sanojen ryhmittämiseen alilausekkeiksi
+what type of search to use for search in the apps	rag	fi	Minkä tyyppistä hakua sovelluksissa käytetään

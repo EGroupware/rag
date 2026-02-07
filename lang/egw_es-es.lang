@@ -1,0 +1,26 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	es-es	Todo lo que se encuentra entre comillas dobles se toma como un todo (por lo que se pueden buscar frases, por ejemplo)
+app	rag	es-es	App
+app id	rag	es-es	App ID
+change fulltext search pattern to match words starting with pattern	rag	es-es	Cambiar el patrón de búsqueda de texto completo para que coincida con las palabras que comienzan con el patrón.
+default sorting	rag	es-es	Ordenación predeterminada
+enter your search query here...	rag	es-es	Introduzca aquí su consulta de búsqueda...
+fulltext search	rag	es-es	Búsqueda de texto completo
+hybrid search: rag+fulltext	rag	es-es	Hybrid search: RAG + Fulltext
+legacy search, as used before	rag	es-es	Búsqueda heredada, como se utilizaba anteriormente
+query	rag	es-es	Consulta
+rag	common	es-es	RAG
+rag / semantic search	rag	es-es	RAG / Búsqueda semántica
+rag search	rag	es-es	Búsqueda RAG
+rag search only	rag	es-es	Solo búsqueda RAG
+search in which applications	rag	es-es	Buscar en qué aplicaciones
+should search in apps be ordered by relevance	rag	es-es	Las búsquedas en las aplicaciones deben ordenarse por relevancia
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	es-es	El comodín, que indica cero o más caracteres. Solo puede aparecer al final de una palabra
+the word cannot appear in any row returned.	rag	es-es	La palabra no puede aparecer en ninguna de las filas devueltas
+the word following contributes negatively to the relevance of the row.	rag	es-es	La palabra siguiente contribuye negativamente a la relevancia de la fila
+the word is mandatory in all rows returned.	rag	es-es	La palabra es obligatoria en todas las filas devueltas
+the word that follows has a higher relevance than other words.	rag	es-es	La palabra que sigue tiene una relevancia mayor que otras palabras
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	es-es	La palabra que sigue tiene una relevancia menor que otras palabras, aunque las filas que la contienen seguirán coincidiendo
+type of search	rag	es-es	Tipo de búsqueda
+use operators:	rag	es-es	Usar operadores:
+used to group words into subexpressions.	rag	es-es	Se utiliza para agrupar palabras en subexpresiones
+what type of search to use for search in the apps	rag	es-es	Qué tipo de búsqueda utilizar para buscar en las aplicaciones

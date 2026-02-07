@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	cs	Vše, co je uzavřeno v uvozovkách, je bráno jako celek (můžete tak například vyhledávat fráze)
+app	rag	cs	App
+app id	rag	cs	App ID
+change fulltext search pattern to match words starting with pattern	rag	cs	Změnit vzor fulltextového vyhledávání tak, aby odpovídal slovům začínajícím vzorem
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	cs	V současné době jsou podporovány pouze modely s 1024 dimenzemi, jako je bge-m3!
+default sorting	rag	cs	Výchozí řazení
+enter your search query here...	rag	cs	Zadejte zde svůj vyhledávací dotaz ...
+fulltext search	rag	cs	Fulltextové vyhledávání
+hybrid search: rag+fulltext	rag	cs	Hybridní vyhledávání: RAG + Fulltext
+legacy search, as used before	rag	cs	Starší vyhledávání, jak bylo používáno dříve
+query	rag	cs	Dotaz
+rag	common	cs	RAG
+rag / semantic search	rag	cs	RAG / Sémantické vyhledávání
+rag search	rag	cs	RAG Vyhledávání
+rag search only	rag	cs	Pouze vyhledávání RAG
+search in which applications	rag	cs	Vyhledávání v aplikacích
+should search in apps be ordered by relevance	rag	cs	Mělo by být vyhledávání v aplikacích seřazeno podle relevance
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	cs	Zástupný znak označující nulový nebo více znaků. Může se objevit pouze na konci slova
+the word cannot appear in any row returned.	rag	cs	Slovo se nesmí objevit v žádném vráceném řádku
+the word following contributes negatively to the relevance of the row.	rag	cs	Následující slovo má negativní vliv na relevanci řádku
+the word is mandatory in all rows returned.	rag	cs	Slovo je povinné ve všech vrácených řádcích
+the word that follows has a higher relevance than other words.	rag	cs	Následující slovo má vyšší relevanci než ostatní slova
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	cs	Následující slovo má nižší relevanci než ostatní slova, ale řádky, které jej obsahují, budou stále odpovídat
+type of search	rag	cs	Typ vyhledávání
+use operators:	rag	cs	Použít operátory:
+used to group words into subexpressions.	rag	cs	Slouží ke seskupování slov do podvýrazů
+what type of search to use for search in the apps	rag	cs	Jaký typ vyhledávání použít pro vyhledávání v aplikacích

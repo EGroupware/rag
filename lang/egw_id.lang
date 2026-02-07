@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	id	Segala sesuatu yang diapit oleh tanda kutip ganda dianggap sebagai satu kesatuan (sehingga Anda dapat mencocokkan frasa, misalnya)
+app	rag	id	Aplikasi
+app id	rag	id	ID Aplikasi
+change fulltext search pattern to match words starting with pattern	rag	id	Ubah pola pencarian teks lengkap agar cocok dengan kata-kata yang dimulai dengan pola
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	id	Saat ini, hanya model dengan dimensi 1024, seperti bge-m3, yang didukung!
+default sorting	rag	id	Pengejaan default
+enter your search query here...	rag	id	Masukkan kueri pencarian Anda di sini ...
+fulltext search	rag	id	Pencarian teks lengkap
+hybrid search: rag+fulltext	rag	id	Pencarian hibrida: RAG + Teks Lengkap
+legacy search, as used before	rag	id	Pencarian lama, seperti yang digunakan sebelumnya
+query	rag	id	Kueri
+rag	common	id	RAG
+rag / semantic search	rag	id	RAG / Pencarian Semantik
+rag search	rag	id	Pencarian RAG
+rag search only	rag	id	Hanya pencarian RAG
+search in which applications	rag	id	Cari di aplikasi mana
+should search in apps be ordered by relevance	rag	id	Apakah pencarian di aplikasi harus diurutkan berdasarkan relevansi
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	id	Wildcard, yang menunjukkan nol atau lebih karakter. Hanya dapat muncul di akhir kata
+the word cannot appear in any row returned.	rag	id	Kata ini tidak boleh muncul di baris mana pun yang dikembalikan
+the word following contributes negatively to the relevance of the row.	rag	id	Kata yang mengikuti berkontribusi negatif terhadap relevansi baris
+the word is mandatory in all rows returned.	rag	id	Kata ini wajib ada di semua baris yang dikembalikan
+the word that follows has a higher relevance than other words.	rag	id	Kata yang mengikuti memiliki relevansi yang lebih tinggi daripada kata lain
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	id	Kata yang mengikuti memiliki relevansi yang lebih rendah daripada kata lain, meskipun baris yang mengandungnya tetap akan cocok
+type of search	rag	id	Jenis pencarian
+use operators:	rag	id	Gunakan operator:
+used to group words into subexpressions.	rag	id	Digunakan untuk mengelompokkan kata-kata ke dalam subekspresi
+what type of search to use for search in the apps	rag	id	Jenis pencarian apa yang digunakan untuk pencarian di aplikasi

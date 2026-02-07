@@ -1,0 +1,10 @@
+app	rag	lv	Lietotne
+app id	rag	lv	Lietotnes ID
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	lv	Pašlaik tiek atbalstīti tikai modeļi ar 1024 dimensijām, piemēram, bge-m3!
+default sorting	rag	lv	Noklusējuma šķirošana
+enter your search query here...	rag	lv	Ievadiet savu meklēšanas vaicājumu šeit ...
+query	rag	lv	Vaicājums
+rag	common	lv	RAG
+search in which applications	rag	lv	Meklēt kurās lietojumprogrammās
+type of search	rag	lv	Meklēšanas veids
+use operators:	rag	lv	Izmantot operatorus:

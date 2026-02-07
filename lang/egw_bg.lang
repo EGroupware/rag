@@ -1,0 +1,26 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	bg	Всичко, което е поставено в двойни кавички, се приема като цяло (така че можете да съвпадате с фрази, например)
+app	rag	bg	App
+app id	rag	bg	App ID
+change fulltext search pattern to match words starting with pattern	rag	bg	Промяна на модела за пълнотекстово търсене, за да съответства на думи, започващи с модела
+default sorting	rag	bg	Сортиране по подразбиране
+enter your search query here...	rag	bg	Въведете тук заявката си за търсене ...
+fulltext search	rag	bg	Пълнотекстово търсене
+hybrid search: rag+fulltext	rag	bg	Хибридно търсене: RAG + Пълнотекстово
+legacy search, as used before	rag	bg	Старо търсене, както се използваше преди
+query	rag	bg	Заявка
+rag	common	bg	RAG
+rag / semantic search	rag	bg	RAG / Семантично търсене
+rag search	rag	bg	RAG Търсене
+rag search only	rag	bg	Само RAG търсене
+search in which applications	rag	bg	Търсене в кои приложения
+should search in apps be ordered by relevance	rag	bg	Търсенето в приложенията да се подрежда по релевантност
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	bg	Дизайнерът, обозначаващ нула или повече символа. Може да се появява само в края на думата
+the word cannot appear in any row returned.	rag	bg	Думата не може да се появява в нито един от върнатите редове
+the word following contributes negatively to the relevance of the row.	rag	bg	Следващата дума допринася отрицателно за релевантността на реда
+the word is mandatory in all rows returned.	rag	bg	Думата е задължителна във всички върнати редове
+the word that follows has a higher relevance than other words.	rag	bg	Следващата дума има по-висока релевантност от другите думи
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	bg	Следващата дума има по-ниска релевантност от другите думи, въпреки че редовете, които я съдържат, все пак ще съвпадат
+type of search	rag	bg	Тип търсене
+use operators:	rag	bg	Използвайте оператори:
+used to group words into subexpressions.	rag	bg	Използва се за групиране на думи в подизрази
+what type of search to use for search in the apps	rag	bg	Какъв тип търсене да се използва за търсене в приложенията

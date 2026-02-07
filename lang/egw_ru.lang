@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	ru	Все, что заключено в двойные кавычки, рассматривается как целое (так что вы можете, например, находить фразы)
+app	rag	ru	Приложение
+app id	rag	ru	Идентификатор приложения
+change fulltext search pattern to match words starting with pattern	rag	ru	Изменить шаблон полнотекстового поиска, чтобы он соответствовал словам, начинающимся с шаблона
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	ru	В настоящее время поддерживаются только встроенные модели с 1024 измерениями, такие как bge-m3!
+default sorting	rag	ru	Сортировка по умолчанию
+enter your search query here...	rag	ru	Введите здесь свой поисковый запрос...
+fulltext search	rag	ru	Полнотекстовый поиск
+hybrid search: rag+fulltext	rag	ru	Гибридный поиск: RAG + полнотекстовый
+legacy search, as used before	rag	ru	Устаревший поиск, как использовался ранее
+query	rag	ru	Запрос
+rag	common	ru	RAG
+rag / semantic search	rag	ru	RAG / Семантический поиск
+rag search	rag	ru	Поиск RAG
+rag search only	rag	ru	Только поиск RAG
+search in which applications	rag	ru	Поиск в каких приложениях
+should search in apps be ordered by relevance	rag	ru	Должен ли поиск в приложениях упорядочиваться по релевантности
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	ru	Подстановочный знак, обозначающий ноль или более символов. Он может появляться только в конце слова
+the word cannot appear in any row returned.	rag	ru	Слово не может присутствовать ни в одной из возвращаемых строк
+the word following contributes negatively to the relevance of the row.	rag	ru	Следующее слово отрицательно влияет на релевантность строки
+the word is mandatory in all rows returned.	rag	ru	Слово обязательно должно присутствовать во всех возвращаемых строках
+the word that follows has a higher relevance than other words.	rag	ru	Следующее слово имеет более высокую релевантность, чем другие слова
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	ru	Следующее слово имеет более низкую релевантность, чем другие слова, хотя строки, содержащие его, все равно будут соответствовать
+type of search	rag	ru	Тип поиска
+use operators:	rag	ru	Использовать операторы:
+used to group words into subexpressions.	rag	ru	Используется для группировки слов в подвыражения
+what type of search to use for search in the apps	rag	ru	Какой тип поиска использовать для поиска в приложениях

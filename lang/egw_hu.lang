@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	hu	A dupla idézőjelek között szereplő szöveg egészében kerül figyelembevételre (így például kifejezéseket is kereshet)
+app	rag	hu	App
+app id	rag	hu	App ID
+change fulltext search pattern to match words starting with pattern	rag	hu	A teljes szövegű keresési mintát úgy módosítsa, hogy a mintával kezdődő szavakat keresse
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	hu	Jelenleg csak a 1024 dimenziós modellek, például a bge-m3 támogatottak!
+default sorting	rag	hu	Alapértelmezett rendezés
+enter your search query here...	rag	hu	Írja be ide a keresési kifejezést ...
+fulltext search	rag	hu	Teljes szövegű keresés
+hybrid search: rag+fulltext	rag	hu	Régi keresés, ahogy korábban használták
+legacy search, as used before	rag	hu	Régi keresés, ahogy korábban használták
+query	rag	hu	Keresés
+rag	common	hu	RAG
+rag / semantic search	rag	hu	RAG / Szemantikus keresés
+rag search	rag	hu	RAG keresés
+rag search only	rag	hu	Csak RAG keresés
+search in which applications	rag	hu	Keresés mely alkalmazásokban
+should search in apps be ordered by relevance	rag	hu	Az alkalmazásokban történő keresést relevancia szerint kell rendezni
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	hu	A helyettesítő karakter, amely nulla vagy több karaktert jelöl. Csak egy szó végén jelenhet meg
+the word cannot appear in any row returned.	rag	hu	A szó egyetlen visszaküldött sorban sem szerepelhet
+the word following contributes negatively to the relevance of the row.	rag	hu	A következő szó negatívan befolyásolja a sor relevanciáját
+the word is mandatory in all rows returned.	rag	hu	A szó minden visszaküldött sorban kötelezően szerepelnie kell
+the word that follows has a higher relevance than other words.	rag	hu	A következő szó relevanciája magasabb, mint a többi szóé
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	hu	A következő szó relevanciája alacsonyabb, mint a többi szóé, de a sorok, amelyek tartalmazzák, továbbra is egyeznek
+type of search	rag	hu	Keresés típusa
+use operators:	rag	hu	Operátorok használata:
+used to group words into subexpressions.	rag	hu	Szavak alfejezetekbe csoportosítására szolgál
+what type of search to use for search in the apps	rag	hu	Milyen típusú keresést használjon az alkalmazásokban történő kereséshez

@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	uk	Все, що взято в подвійні лапки, розглядається як ціле (так ви можете, наприклад, знаходити збіги з фразами)
+app	rag	uk	Додаток
+app id	rag	uk	Ідентифікатор додатка
+change fulltext search pattern to match words starting with pattern	rag	uk	Змінити шаблон повнотекстового пошуку, щоб він відповідав словам, що починаються з шаблону
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	uk	Наразі підтримуються лише вбудовані моделі з 1024 вимірами, такі як bge-m3!
+default sorting	rag	uk	Сортування за замовчуванням
+enter your search query here...	rag	uk	Введіть тут свій пошуковий запит ...
+fulltext search	rag	uk	Повнотекстовий пошук
+hybrid search: rag+fulltext	rag	uk	Гібридний пошук: RAG + повнотекстовий
+legacy search, as used before	rag	uk	Старий пошук, який використовувався раніше
+query	rag	uk	Запит
+rag	common	uk	RAG
+rag / semantic search	rag	uk	RAG / Семантичний пошук
+rag search	rag	uk	Пошук RAG
+rag search only	rag	uk	Тільки пошук RAG
+search in which applications	rag	uk	Пошук в яких додатках
+should search in apps be ordered by relevance	rag	uk	Чи слід сортувати результати пошуку в додатках за релевантністю
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	uk	Символ-замінник, що позначає нуль або більше символів. Він може з'являтися тільки в кінці слова
+the word cannot appear in any row returned.	rag	uk	Слово не може з'являтися в жодному рядку, що повертається
+the word following contributes negatively to the relevance of the row.	rag	uk	Слово, що йде за ним, негативно впливає на релевантність рядка
+the word is mandatory in all rows returned.	rag	uk	Слово є обов'язковим у всіх рядках, що повертаються
+the word that follows has a higher relevance than other words.	rag	uk	Слово, що йде за ним, має вищу релевантність, ніж інші слова
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	uk	Слово, що йде за ним, має нижчу релевантність, ніж інші слова, хоча рядки, що містять його, все одно будуть відповідати
+type of search	rag	uk	Тип пошуку
+use operators:	rag	uk	Використовувати оператори:
+used to group words into subexpressions.	rag	uk	Використовується для групування слів у підвирази
+what type of search to use for search in the apps	rag	uk	Який тип пошуку використовувати для пошуку в додатках

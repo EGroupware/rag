@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	el	Οτιδήποτε περικλείεται σε διπλά εισαγωγικά θεωρείται ως σύνολο (έτσι μπορείτε να αντιστοιχίσετε φράσεις, για παράδειγμα)
+app	rag	el	Εφαρμογή
+app id	rag	el	Αναγνωριστικό εφαρμογής
+change fulltext search pattern to match words starting with pattern	rag	el	Αλλαγή του μοτίβου αναζήτησης πλήρους κειμένου για να ταιριάζει με λέξεις που ξεκινούν με το μοτίβο
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	el	Προς το παρόν υποστηρίζονται μόνο μοντέλα ενσωμάτωσης με 1024 διαστάσεις, όπως το bge-m3!
+default sorting	rag	el	Προεπιλεγμένη ταξινόμηση
+enter your search query here...	rag	el	Εισάγετε εδώ την ερώτησή σας...
+fulltext search	rag	el	Αναζήτηση πλήρους κειμένου
+hybrid search: rag+fulltext	rag	el	Υβριδική αναζήτηση: RAG + Πλήρες κείμενο
+legacy search, as used before	rag	el	Παλαιά αναζήτηση, όπως χρησιμοποιούνταν προηγουμένως
+query	rag	el	Ερώτηση
+rag	common	el	RAG
+rag / semantic search	rag	el	RAG / Σημασιολογική αναζήτηση
+rag search	rag	el	Αναζήτηση RAG
+rag search only	rag	el	Μόνο αναζήτηση RAG
+search in which applications	rag	el	Αναζήτηση σε ποιες εφαρμογές
+should search in apps be ordered by relevance	rag	el	Η αναζήτηση στις εφαρμογές πρέπει να ταξινομείται κατά συνάφεια
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	el	Ο χαρακτήρας μπαλαντέρ, που υποδηλώνει μηδέν ή περισσότερους χαρακτήρες. Μπορεί να εμφανίζεται μόνο στο τέλος μιας λέξης
+the word cannot appear in any row returned.	rag	el	Η λέξη δεν μπορεί να εμφανίζεται σε καμία σειρά που επιστρέφεται
+the word following contributes negatively to the relevance of the row.	rag	el	Η λέξη που ακολουθεί συμβάλλει αρνητικά στη συνάφεια της σειράς
+the word is mandatory in all rows returned.	rag	el	Η λέξη είναι υποχρεωτική σε όλες τις σειρές που επιστρέφονται
+the word that follows has a higher relevance than other words.	rag	el	Η λέξη που ακολουθεί έχει υψηλότερη συνάφεια από άλλες λέξεις
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	el	Η λέξη που ακολουθεί έχει χαμηλότερη συνάφεια από άλλες λέξεις, αν και οι σειρές που την περιέχουν θα εξακολουθούν να ταιριάζουν
+type of search	rag	el	Τύπος αναζήτησης
+use operators:	rag	el	Χρήση τελεστών:
+used to group words into subexpressions.	rag	el	Χρησιμοποιείται για την ομαδοποίηση λέξεων σε υποεκφράσεις
+what type of search to use for search in the apps	rag	el	Τι τύπος αναζήτησης να χρησιμοποιηθεί για την αναζήτηση στις εφαρμογές

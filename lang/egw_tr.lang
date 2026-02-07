@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	tr	Çift tırnak içine alınan her şey bir bütün olarak alınır (böylece örneğin kelime öbeklerini eşleştirebilirsiniz)
+app	rag	tr	Uygulama
+app id	rag	tr	Uygulama Kimliği
+change fulltext search pattern to match words starting with pattern	rag	tr	Tam metin arama modelini, modelle başlayan kelimelerle eşleşecek şekilde değiştirin
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	tr	Şu anda yalnızca bge-m3 gibi 1024 boyutlu modeller desteklenmektedir!
+default sorting	rag	tr	Varsayılan sıralama
+enter your search query here...	rag	tr	Arama sorgunuzu buraya girin ...
+fulltext search	rag	tr	Tam metin arama
+hybrid search: rag+fulltext	rag	tr	Hibrit arama: RAG + Tam metin
+legacy search, as used before	rag	tr	Daha önce kullanılan eski arama
+query	rag	tr	Sorgu
+rag	common	tr	RAG
+rag / semantic search	rag	tr	RAG / Anlamsal arama
+rag search	rag	tr	RAG Arama
+rag search only	rag	tr	Yalnızca RAG arama
+search in which applications	rag	tr	Hangi uygulamalarda arama yapın
+should search in apps be ordered by relevance	rag	tr	Uygulamalarda arama, alaka düzeyine göre sıralanmalı mı
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	tr	Sıfır veya daha fazla karakteri gösteren joker karakter. Yalnızca kelimenin sonunda görünebilir
+the word cannot appear in any row returned.	rag	tr	Kelime, döndürülen hiçbir satırda görünemez
+the word following contributes negatively to the relevance of the row.	rag	tr	Sonraki kelime, satırın alaka düzeyine olumsuz katkıda bulunur
+the word is mandatory in all rows returned.	rag	tr	Kelime, döndürülen tüm satırlarda zorunludur
+the word that follows has a higher relevance than other words.	rag	tr	Aşağıdaki kelime, diğer kelimelerden daha yüksek bir alaka düzeyine sahiptir
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	tr	Aşağıdaki kelime, diğer kelimelerden daha düşük bir alaka düzeyine sahiptir, ancak onu içeren satırlar yine de eşleşecektir
+type of search	rag	tr	Arama türü
+use operators:	rag	tr	Operatörleri kullanın:
+used to group words into subexpressions.	rag	tr	Kelimeleri alt ifadeler halinde gruplandırmak için kullanılır
+what type of search to use for search in the apps	rag	tr	Uygulamalarda arama yapmak için hangi arama türünün kullanılacağı

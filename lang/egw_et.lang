@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	et	Kõik, mis on kahekordsete jutumärkide vahel, võetakse tervikuna (nii saab näiteks leida fraase)
+app	rag	et	App
+app id	rag	et	App ID
+change fulltext search pattern to match words starting with pattern	rag	et	Muuda täisteksti otsingumustrit, et see vastaks mustrile algavate sõnadega
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	et	Praegu toetatakse ainult 1024-mõõtmelisi mudeleid, nagu bge-m3!
+default sorting	rag	et	Vaikimisi sorteerimine
+enter your search query here...	rag	et	Sisestage siia oma otsingupäring ...
+fulltext search	rag	et	Täisteksti otsing
+hybrid search: rag+fulltext	rag	et	Hübriidotsing: RAG + täisteksti otsing
+legacy search, as used before	rag	et	Vana otsing, nagu varem kasutatud
+query	rag	et	Päring
+rag	common	et	RAG
+rag / semantic search	rag	et	RAG / Semantiline otsing
+rag search	rag	et	RAG-otsing
+rag search only	rag	et	Ainult RAG-otsing
+search in which applications	rag	et	Otsi millistes rakendustes
+should search in apps be ordered by relevance	rag	et	Kas rakendustes otsingud peaksid olema järjestatud asjakohasuse järgi
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	et	Asendussümbol, mis tähistab null või enam tähemärki. See võib esineda ainult sõna lõpus
+the word cannot appear in any row returned.	rag	et	Sõna ei tohi esineda üheski tagastatud reas
+the word following contributes negatively to the relevance of the row.	rag	et	Järgnev sõna mõjutab rea asjakohasust negatiivselt
+the word is mandatory in all rows returned.	rag	et	Sõna on kohustuslik kõigis tagastatud ridades
+the word that follows has a higher relevance than other words.	rag	et	Järgnev sõna on teistest sõnadest asjakohasem.
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	et	Järgnev sõna on teistest sõnadest vähem asjakohane, kuigi seda sisaldavad read ikkagi vastavad
+type of search	rag	et	Otsingu tüüp
+use operators:	rag	et	Kasuta operaatoreid:
+used to group words into subexpressions.	rag	et	Kasutatakse sõnade rühmitamiseks alaväljenditeks
+what type of search to use for search in the apps	rag	et	Millist tüüpi otsingut kasutada rakendustes otsinguks

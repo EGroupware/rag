@@ -1,0 +1,27 @@
+anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	no	Alt som er omgitt av doble anførselstegn, blir behandlet som en helhet (slik at du for eksempel kan matche setninger)
+app	rag	no	App
+app id	rag	no	App-ID
+change fulltext search pattern to match words starting with pattern	rag	no	Endre fulltekstsøkemønster for å matche ord som begynner med mønsteret
+currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	no	For øyeblikket støttes kun innebygde modeller med 1024 dimensjoner, som bge-m3!
+default sorting	rag	no	Standard sortering
+enter your search query here...	rag	no	Skriv inn søkeordet her ...
+fulltext search	rag	no	Fulltekstsøk
+hybrid search: rag+fulltext	rag	no	Hybridsøk: RAG + Fulltekst
+legacy search, as used before	rag	no	Legacy-søk, som brukt tidligere
+query	rag	no	Søk
+rag	common	no	RAG
+rag / semantic search	rag	no	RAG / Semantisk søk
+rag search	rag	no	RAG-søk
+rag search only	rag	no	Kun RAG-søk
+search in which applications	rag	no	Søk i hvilke applikasjoner
+should search in apps be ordered by relevance	rag	no	Skal søk i appene sorteres etter relevans
+the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	no	Jokertegnet, som indikerer null eller flere tegn. Det kan bare vises på slutten av et ord
+the word cannot appear in any row returned.	rag	no	Ordet kan ikke forekomme i noen av radene som returneres
+the word following contributes negatively to the relevance of the row.	rag	no	Ordet som følger etter, bidrar negativt til relevansen av raden
+the word is mandatory in all rows returned.	rag	no	Ordet er obligatorisk i alle rader som returneres
+the word that follows has a higher relevance than other words.	rag	no	Ordet som følger har høyere relevans enn andre ord
+the word that follows has a lower relevance than other words, although rows containing it will still match.	rag	no	Ordet som følger har lavere relevans enn andre ord, selv om rader som inneholder det fortsatt vil samsvare
+type of search	rag	no	Type søk
+use operators:	rag	no	Bruk operatorer:
+used to group words into subexpressions.	rag	no	Brukes til å gruppere ord i underuttrykk
+what type of search to use for search in the apps	rag	no	Hvilken type søk skal brukes for søk i appene

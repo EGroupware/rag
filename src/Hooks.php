@@ -196,7 +196,7 @@ class Hooks
 	 */
 	public static function etemplate2_before_exec(array $data)
 	{
-		if (!preg_match('/^([^.]+)(\.[a-z]+)?\.(index|list)$/', $data['location_name'], $matches) ||
+		if (!preg_match('/^([^.]+)\.(index|list)$/', $data['location_name'], $matches) ||
 			!isset(Embedding::plugins()[$app=$matches[1]]) ||
 			$app === 'calendar')    // plugin, but no search-integration yet
 		{

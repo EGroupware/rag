@@ -348,7 +348,7 @@ class Embedding
 					self::EMBEDDING_APP_ID => $data['id'],
 				], __LINE__, __FILE__, self::APP);
 			}
-			catch (Api\Db\InvalidSql $e) {
+			catch (InvalidSql $e) {
 				// ignore, MariaDB is probably not 11.8, or table not installed
 			}
 		}

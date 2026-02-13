@@ -681,13 +681,14 @@ class Embedding
 	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
 	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $max_distance default .4
+	 * @param float $min_relevance default 0.05 = 5% of highest match
 	 * @return float[]|array[] int id => float distance pairs, for $app === '' we return string "$app:$id"
 	 *  If there is no result, we return [0 => 1.0], to not generate an SQL error, but an empty result!
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
 	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
-	                       string $order='default', float $max_distance=.4) : array
+	                       string $order='default', float $max_distance=.4, float $min_relevance=0.05) : array
 	{
 		if (!$this->client)
 		{
@@ -697,7 +698,7 @@ class Embedding
 		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $return_modified, $order, $max_distance);
 		$total_embeddings = $this->total ?? 0;
 
-		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_modified, $order);
+		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_modified, $order, $min_relevance);
 
 		// + makes sure to return every entry only once, with the embeddings first
 		$both = $return_modified ? self::add_rows($embedding_matches, $fulltext_matches) : $embedding_matches+$fulltext_matches;
@@ -859,7 +860,7 @@ class Embedding
 	 * @param int $num_rows default 50
 	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
 	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
-	 * @param float $min_relevance default 0
+	 * @param float $min_relevance default 0.05 = 5% of highest relevance
 	 * @param ?string $mode default null, check for BOOLEAN mode operators in $pattern: +-<>()~*",
 	 *  or 'IN BOOLEAN MODE', 'IN NATURAL LANGUAGE MODE', 'WITH QUERY EXPANSION'
 	 * @return float[] int id => float relevance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
@@ -867,7 +868,7 @@ class Embedding
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
 	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
-	                               string $order='default', float $min_relevance=0, ?string $mode=null) : array
+	                               string $order='default', float $min_relevance=0.05, ?string $mode=null) : array
 	{
 		// To find word(s) with a dash inside e.g. domain-names or ending with one (gives a FT syntax error!),
 		// we must NOT use boolean mode, but natural language mode.
@@ -907,9 +908,16 @@ class Embedding
 		];
 		$order = self::validateOrder($order, '!relevance');
 		try {
+			if ($min_relevance)
+			{
+				$max_relevance = $this->db->select(self::FULLTEXT_TABLE, $match.' AS relevance',
+					($app ? [self::FULLTEXT_APP => $app] : []) + [$match],
+					__LINE__, __FILE__, 0, 'ORDER BY relevance DESC', self::APP, 1)->fetchColumn();
+				$min_relevance *= $max_relevance;
+			}
 			$id_relevance = [];
 			foreach ($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS ' . implode(',', $cols),
-				($app ? [self::FULLTEXT_APP => $app] : []) + [$match],
+				($app ? [self::FULLTEXT_APP => $app] : []) + [$match . ' > '.$min_relevance],
 				__LINE__, __FILE__, $start, 'ORDER BY '.$order, self::APP, $num_rows) as $row)
 			{
 				if ($row['relevance'] < $min_relevance)

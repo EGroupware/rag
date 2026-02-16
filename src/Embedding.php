@@ -215,7 +215,13 @@ class Embedding
 			return null;
 		}
 		// check default search not switched to legacy --> not available
-		if (($type = $type ?? $GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'hybrid') === 'legacy')
+		if (!isset($type))
+		{
+			$type = $GLOBALS['egw_info']['user']['preferences']['rag'][$app.'_search'] ??
+				$GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ??
+				($app === 'addressbook' ? 'legacy' : 'hybrid');
+		}
+		if ($type === 'legacy')
 		{
 			return null;
 		}
@@ -334,7 +340,7 @@ class Embedding
 			return;
 		}
 		// delete embeddings of deleted entries
-		if ($data['type'] === 'delete' && !empty($data['hold_for_purge']) && !empty($data['id']))
+		if ($data['type'] === 'delete' && !empty($data['id']))
 		{
 			/** @var Api\Db $db */
 			$db = $GLOBALS['egw']->db;
@@ -500,6 +506,9 @@ class Embedding
 				try {
 					/** @var Embedding\Base $plugin */
 					$plugin = new $class();
+
+					// purge deleted entries (run only once for fulltext, purges both)
+					if ($fulltext) $plugin->purgeDeleted();
 
 					// check if only certain apps are enabled for RAG or fulltext
 					if ($fulltext && !empty(self::$fulltext_apps) && !in_array($app, self::$fulltext_apps) ||

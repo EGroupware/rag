@@ -119,6 +119,21 @@ class Hooks
 	public static function settings(array $data) : array
 	{
 		return [
+			'addressbook_search' => [
+				'type'    => 'select',
+				'label'   => lang('What type of search to use for search in %1', lang('Addressbook')),
+				'name'    => 'addressbook_search',
+				'values'  => [
+					'legacy' => lang('Legacy search, as used before'),
+					'fulltext' => lang('Fulltext search'),
+					'hybrid'  => lang('Hybrid search: RAG+Fulltext'),
+					'rag' => lang('RAG search only'),
+				],
+				'help'    => '',
+				'xmlrpc'  => false,
+				'admin'   => false,
+				'default' => 'legacy',
+			],
 			'default_search' => [
 				'type'    => 'select',
 				'label'   => 'What type of search to use for search in the apps',

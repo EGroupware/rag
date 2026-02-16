@@ -20,10 +20,12 @@ fulltext search	rag	en	Fulltext search
 fulltext search only	rag	en	Fulltext search only
 general configuration	rag	en	General configuration
 higher is better	rag	en	higher is better
+hybrid search (rag+fulltext)	rag	en	Hybrid search (RAG+Fulltext)
 hybrid search: rag+fulltext	rag	en	Hybrid search: RAG+Fulltext
 identical	rag	en	identical
 last errors of rag's async job	rag	en	Last errors of RAG's async job
 leave empty to disable rag	rag	en	leave empty to disable RAG
+legacy search	rag	en	Legacy search
 legacy search, as used before	rag	en	Legacy search, as used before
 minimize chunks e.g. concatenate title and description	rag	en	Minimize chunks e.g. concatenate title and description
 model to use	rag	en	Model to use
@@ -51,4 +53,5 @@ unexpected	common	en	unexpected
 url of openai compatible api	rag	en	URL of OpenAI compatible API
 use operators:	rag	en	Use operators:
 used to group words into subexpressions.	rag	en	Used to group words into subexpressions
+what type of search to use for search in %1	rag	en	What type of search to use for search in %1
 what type of search to use for search in the apps	rag	en	What type of search to use for search in the apps

@@ -312,4 +312,30 @@ abstract class Base
 		}
 		return static::MODIFIED_TYPE === 'int' ? $this->db->from_unixtime($col) : $col;
 	}
+
+	/**
+	 * purge deleted / no longer existing entries from the RAG's indexes
+	 *
+	 * @return void
+	 */
+	public function purgeDeleted()
+	{
+		try
+		{
+			// clean fulltext index
+			$this->db->query('DELETE ' . Embedding::FULLTEXT_TABLE .' FROM ' . Embedding::FULLTEXT_TABLE .
+				' LEFT JOIN ' . static::TABLE . ' ON ' . Embedding::FULLTEXT_TABLE . '.' . Embedding::FULLTEXT_APP_ID . '=' . static::TABLE . '.' . static::ID .
+					(static::NOT_DELETED ? ' AND '.static::NOT_DELETED : '').
+				' WHERE ' . Embedding::FULLTEXT_APP . '=' . $this->db->quote(static::APP) . ' AND ' . static::TABLE . '.' . static::ID . ' IS NULL');
+			// clean RAG
+			$this->db->query('DELETE ' . Embedding::TABLE .' FROM ' . Embedding::TABLE .
+				' LEFT JOIN ' . static::TABLE . ' ON ' . Embedding::TABLE . '.' . Embedding::EMBEDDING_APP_ID . '=' . static::TABLE . '.' . static::ID .
+					(static::NOT_DELETED ? ' AND '.static::NOT_DELETED : '').
+				' WHERE ' . Embedding::EMBEDDING_APP . '=' . $this->db->quote(static::APP) . ' AND ' . static::TABLE . '.' . static::ID . ' IS NULL');
+		}
+		catch (Api\Db\Exception\InvalidSql $e) {
+			// ignore exception, as VECTOR / RAG table might be missing
+			_egw_log_exception($e);
+		}
+	}
 }

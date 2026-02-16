@@ -20,10 +20,12 @@ fulltext search	rag	de	Volltextsuche
 fulltext search only	rag	de	Volltextsuche ausschließlich
 general configuration	rag	de	Allgemeine Konfiguration
 higher is better	rag	de	größer ist besser
+hybrid search (rag+fulltext)	rag	de	Hybride Suche (RAG+Volltext)
 hybrid search: rag+fulltext	rag	de	Hybride Suche: RAG + Volltext
 identical	rag	de	identisch
 last errors of rag's async job	rag	de	Letzte Fehler des asynchronen Jobs des RAG's
 leave empty to disable rag	rag	de	Leer lassen um das RAG auszuschalten
+legacy search	rag	de	Legacy Suche
 legacy search, as used before	rag	de	Legacy-Suche, wie zuvor verwendet
 minimize chunks e.g. concatenate title and description	rag	de	Minimiere die Chunks z.B. durch aneinander hängen von Titel und Beschreibung
 model to use	rag	de	Benutztes Model
@@ -51,4 +53,5 @@ unexpected	common	de	unerwartet
 url of openai compatible api	rag	de	URL der OpenAI kompatiblen API
 use operators:	rag	de	Operatoren verwenden:
 used to group words into subexpressions.	rag	de	Wird verwendet, um Wörter zu Unterausdrücken zu gruppieren
+what type of search to use for search in %1	rag	de	Welche Art der Suche soll zum Suchen in der Anwendung %1 verwendet werden
 what type of search to use for search in the apps	rag	de	Welche Art der Suche soll zum Suchen in den Anwendungen verwendet werden

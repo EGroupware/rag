@@ -124,13 +124,14 @@ class Ui
 		{
 			foreach(Api\Link::titles($app, $ids) as $id => $title)
 			{
-				if (isset($rows[$row_id=$app.':'.$id]))
+				// $title can be null for not existing entries or false for not available ones to the current user
+				if (isset($rows[$row_id=$app.':'.$id]) && $title)
 				{
 					$rows[$row_id] = $rows[$row_id]+[
 						'id' => $row_id,
 						'app' => $app,
 						'app_id' => $id,
-						'title' => $title ?: '*** '.lang('Deleted').' ***',
+						'title' => $title,
 					];
 					unset($ids[array_search($id, $ids)]);
 				}

@@ -26,7 +26,7 @@
 				</row>
 				<row>
 					<et2-description  value="API Key"></et2-description>
-					<et2-textbox id="newsettings[api_key]"></et2-textbox>
+					<et2-password id="newsettings[api_key]"></et2-password>
 				</row>
 				<row>
 					<et2-description></et2-description>

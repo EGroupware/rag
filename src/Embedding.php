@@ -507,8 +507,8 @@ class Embedding
 					/** @var Embedding\Base $plugin */
 					$plugin = new $class();
 
-					// purge deleted entries (run only once for fulltext, purges both)
-					if ($fulltext) $plugin->purgeDeleted();
+					// purge deleted entries (run only once for async job and fulltext, purges both indexes)
+					if ($fulltext && !$hook_data) $plugin->purgeDeleted();
 
 					// check if only certain apps are enabled for RAG or fulltext
 					if ($fulltext && !empty(self::$fulltext_apps) && !in_array($app, self::$fulltext_apps) ||

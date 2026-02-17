@@ -27,7 +27,7 @@ class Calendar extends Base
 	const TITLE = 'cal_title';
 	const DESCRIPTION = 'cal_description';
 	protected static $additional_cols = ['cal_location'];
-	const NOT_DELETED = 'cal_deleted IS NOT NULL';
+	const NOT_DELETED = 'cal_deleted IS NULL';
 	const EXTRA_TABLE = 'egw_cal_extra';
 	const EXTRA_ID = 'cal_id';
 	const EXTRA_NAME = 'cal_extra_name';

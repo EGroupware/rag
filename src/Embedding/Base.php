@@ -131,9 +131,7 @@ abstract class Base
 	 */
 	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
 	{
-		$where = [
-			static::NOT_DELETED, // no need to embed deleted entries
-		];
+		$where = [];
 		$cols = array_merge([static::ID, static::MODIFIED, static::TITLE, static::DESCRIPTION], static::$additional_cols);
 		// check / process hook-data to not query entry again, if already contained
 		if ($hook_data && $hook_data['app'] === static::APP && !empty($hook_data['id']))
@@ -189,16 +187,20 @@ abstract class Base
 	 */
 	protected function getJoin(array &$where=[], bool $fulltext=false)
 	{
+		$not_deleted = static::NOT_DELETED ? static::NOT_DELETED.' AND ' : ''; // no need to embed deleted entries
+
 		if (!$fulltext)
 		{
 			$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$this->modified().')';
 
-			return 'LEFT JOIN '.Embedding::TABLE.' ON '.Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
+			return 'LEFT JOIN '.Embedding::TABLE.' ON '.$not_deleted.
+				Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
 				Embedding::EMBEDDING_APP_ID.'='.static::ID.' AND '.Embedding::EMBEDDING_CHUNK.'=0';
 		}
 		$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$this->modified().')';
 
-		return 'LEFT JOIN '.Embedding::FULLTEXT_TABLE.' ON '.Embedding::FULLTEXT_APP.'='.$this->db->quote(static::APP).' AND '.
+		return 'LEFT JOIN '.Embedding::FULLTEXT_TABLE.' ON '.$not_deleted.
+			Embedding::FULLTEXT_APP.'='.$this->db->quote(static::APP).' AND '.
 			Embedding::FULLTEXT_APP_ID.'='.static::ID;
 	}
 
@@ -324,14 +326,16 @@ abstract class Base
 		{
 			// clean fulltext index
 			$this->db->query('DELETE ' . Embedding::FULLTEXT_TABLE .' FROM ' . Embedding::FULLTEXT_TABLE .
-				' LEFT JOIN ' . static::TABLE . ' ON ' . Embedding::FULLTEXT_TABLE . '.' . Embedding::FULLTEXT_APP_ID . '=' . static::TABLE . '.' . static::ID .
+				' LEFT JOIN ' . static::TABLE . ' ON ' . Embedding::FULLTEXT_APP . '=' . $this->db->quote(static::APP) . ' AND ' .
+					Embedding::FULLTEXT_TABLE . '.' . Embedding::FULLTEXT_APP_ID . '=' . static::TABLE . '.' . static::ID .
 					(static::NOT_DELETED ? ' AND '.static::NOT_DELETED : '').
-				' WHERE ' . Embedding::FULLTEXT_APP . '=' . $this->db->quote(static::APP) . ' AND ' . static::TABLE . '.' . static::ID . ' IS NULL');
+				' WHERE ' . static::TABLE . '.' . static::ID . ' IS NULL');
 			// clean RAG
 			$this->db->query('DELETE ' . Embedding::TABLE .' FROM ' . Embedding::TABLE .
-				' LEFT JOIN ' . static::TABLE . ' ON ' . Embedding::TABLE . '.' . Embedding::EMBEDDING_APP_ID . '=' . static::TABLE . '.' . static::ID .
+				' LEFT JOIN ' . Embedding::EMBEDDING_APP . '=' . $this->db->quote(static::APP) . ' AND ' .
+					static::TABLE . ' ON ' . Embedding::TABLE . '.' . Embedding::EMBEDDING_APP_ID . '=' . static::TABLE . '.' . static::ID .
 					(static::NOT_DELETED ? ' AND '.static::NOT_DELETED : '').
-				' WHERE ' . Embedding::EMBEDDING_APP . '=' . $this->db->quote(static::APP) . ' AND ' . static::TABLE . '.' . static::ID . ' IS NULL');
+				' WHERE ' . static::TABLE . '.' . static::ID . ' IS NULL');
 		}
 		catch (Api\Db\Exception\InvalidSql $e) {
 			// ignore exception, as VECTOR / RAG table might be missing

@@ -231,7 +231,8 @@ class Ui
 
 			'operators' => implode(' ', str_split(implode('', array_keys($operators)))),
 
-			'search_type' => $GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'fulltext',
+			'search_type' => $GLOBALS['egw_info']['user']['preferences']['rag'][$app.'_search'] ??
+				$GLOBALS['egw_info']['user']['preferences']['rag']['default_search'] ?? 'fulltext',
 			'options-search_type' => $search_types,
 		];
 	}

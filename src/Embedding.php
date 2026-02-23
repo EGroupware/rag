@@ -80,7 +80,7 @@ class Embedding
 	/**
 	 * @var int log-level: 0: errors only, 1: result of search*() methods
 	 */
-	protected int $log_level = 0;
+	protected static int $log_level = 0;
 
 	/**
 	 * @var array|null limit RAG to the following apps, default all
@@ -127,7 +127,7 @@ class Embedding
 			$this->client = $factory->make();
 		}
 		$this->db = $GLOBALS['egw']->db;
-		$this->log_level = $log_level;
+		self::$log_level = $log_level;
 	}
 
 	/**
@@ -250,6 +250,7 @@ class Embedding
 	 */
 	public static function search2criteria(string $app, string &$criteria, &$order_by, &$extra_cols, ?array &$filter) : bool
 	{
+		$criteria_in = $criteria;
 		// Contacts class in API uses "api", but the app is / has to be "addressbook"
 		if ($app === 'api')
 		{
@@ -259,7 +260,7 @@ class Embedding
 		{
 			$criteria = $matches[2];
 		}
-		if ($matches[1] === 'legacy' || preg_match('/^#?\d+$/', $criteria) ||
+		if (($matches[1]??null) === 'legacy' || preg_match('/^#?\d+$/', $criteria) ||
 			// automatic switch to legacy search when using an asterisk at the beginning of a word
 			preg_match('/(^|\s)\*[\\pL\\pN.]+/', $criteria) &&
 				// remove the asterisk, when it's the only one in the pattern, to also find matches including the pattern, not just starting with
@@ -267,6 +268,7 @@ class Embedding
 					($criteria = preg_replace('/(^|\s)\*([\\pL\\pN.]+)/', '$1$2', $criteria))) ||
 			!($search = self::available($app, $matches[1]??null)))
 		{
+			if (self::$log_level) error_log(__METHOD__."(app='$app', criteria='$criteria_in', ...) returning false --> legacy search");
 			return false;
 		}
 		/**
@@ -281,6 +283,7 @@ class Embedding
 		catch (InvalidFulltextSyntax $e) {
 			Api\Json\Response::get()->message($e->getMessage(), 'error');
 			$filter[] = '0=1';  // never true --> finds nothing
+			if (self::$log_level) error_log(__METHOD__."(app='$app', criteria='$criteria_in', ...) returning true --> Fulltext syntax error");
 			return true;
 		}
 		$plugin = new (self::plugins()[$app]);
@@ -293,6 +296,7 @@ class Embedding
 		if (!is_array($extra_cols)) $extra_cols = $extra_cols ? explode(',', $extra_cols) : [];
 		$extra_cols[] = self::distanceById($ids, $plugin->table().'.'.$plugin->id()).' AS distance';
 		$criteria = null;
+		if (self::$log_level) error_log(__METHOD__."(app='$app', criteria='$criteria_in', ...) returning true --> $search found ".count($ids)." results");
 		return true;
 	}
 
@@ -741,7 +745,7 @@ class Embedding
 			}
 		}
 		$both = array_slice($both, $start, $num_rows, true);
-		if ($this->log_level)
+		if (self::$log_level)
 		{
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, return_modified=$return_modified, order=$order, max_distance=$max_distance) total=$this->total returning ".
 				json_encode($both));
@@ -847,7 +851,7 @@ class Embedding
 			}
 		}
 		$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();
-		if ($this->log_level)
+		if (self::$log_level)
 		{
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, max_distance=$max_distance) total=$this->total returning ".
 				json_encode($id_distance));
@@ -956,7 +960,7 @@ class Embedding
 			}
 			throw $e;
 		}
-		if ($this->log_level)
+		if (self::$log_level)
 		{
 			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, min_relevance=$min_relevance) total=$this->total returning ".
 				json_encode($id_relevance));

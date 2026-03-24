@@ -652,7 +652,7 @@ class Embedding
 	}
 
 	/**
-	 * Verify $sort
+	 * Validate order parameter
 	 *
 	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param ?string $not_modified what to return if sort is not "modified": "!?(relevance|distance|default)"
@@ -691,7 +691,8 @@ class Embedding
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
-	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
+	 * @param bool $return_all true: return array with modified time, title, description, extra data and distance&relevance,
+	 *  false: only return distance and relevance value
 	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $max_distance default .4
 	 * @param float $min_relevance default 0.05 = 5% of highest match
@@ -700,21 +701,21 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
+	public function search(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_all=false,
 	                       string $order='default', float $max_distance=.4, float $min_relevance=0.05) : array
 	{
 		if (!$this->client)
 		{
-			return $this->searchFulltext($pattern, $app, $start, $num_rows, $return_modified, $order);
+			return $this->searchFulltext($pattern, $app, $start, $num_rows, $return_all, $order);
 		}
 		// quick/dump approach for merging: always query from start=0, $start+$num_rows rows, and then slice
-		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $return_modified, $order, $max_distance);
+		$embedding_matches = $this->searchEmbeddings($pattern, $app, 0, $start+$num_rows, $return_all, $order, $max_distance);
 		$total_embeddings = $this->total ?? 0;
 
-		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_modified, $order, $min_relevance);
+		$fulltext_matches = $this->searchFulltext($pattern, $app, 0, $start+$num_rows, $return_all, $order, $min_relevance);
 
 		// + makes sure to return every entry only once, with the embeddings first
-		$both = $return_modified ? self::add_rows($embedding_matches, $fulltext_matches) : $embedding_matches+$fulltext_matches;
+		$both = $return_all ? self::add_rows($embedding_matches, $fulltext_matches) : $embedding_matches+$fulltext_matches;
 
 		// we can only subtract the entries found in both returned sets, but there might be more in common ...
 		$this->total += $total_embeddings - (count($embedding_matches)+count($fulltext_matches)-count($both));
@@ -722,8 +723,8 @@ class Embedding
 		if ($order !== 'default ASC')
 		{
 			[$order, $sort] = explode(' ', self::validateOrder($order), 2);
-			// we can only order it by a different criteria if we got the data / $return_modified === true
-			if ($return_modified && $order !== 'default')
+			// we can only order it by a different criteria if we got the data / $return_all === true
+			if ($return_all && $order !== 'default')
 			{
 				$sort_to_end = $sort === 'ASC' ? 1 : -1;
 				uasort($both, static function(array $a, array $b) use ($order, $sort_to_end)
@@ -747,7 +748,7 @@ class Embedding
 		$both = array_slice($both, $start, $num_rows, true);
 		if (self::$log_level)
 		{
-			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, return_modified=$return_modified, order=$order, max_distance=$max_distance) total=$this->total returning ".
+			error_log(__METHOD__."('$pattern', '$app', start=$start, num_rows=$num_rows, return_modified=$return_all, order=$order, max_distance=$max_distance) total=$this->total returning ".
 				json_encode($both));
 		}
 		return $both;
@@ -788,14 +789,15 @@ class Embedding
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
-	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
+	 * @param bool $return_all true: return array with modified time, title, description, extra data and distance,
+	 * *  false: only return distance value
 	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $max_distance default .4
 	 * @return float[] int id => float distance pairs for non-empty and string $app, empty $app or array we return string "$app:$id"
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
+	public function searchEmbeddings(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_all=false,
 	                                 string $order='default', float $max_distance=.4) : array
 	{
 		// we remove boolean mode fulltext operators
@@ -834,19 +836,46 @@ class Embedding
 			'VEC_DISTANCE_COSINE('.Embedding::EMBEDDING.', '.$this->db->quote($response[0]->embedding, 'vector').') as distance',
 			self::EMBEDDING_MODIFIED.' AS modified',
 		];
+		if ($return_all)
+		{
+			$cols[] = self::FULLTEXT_TITLE.' AS title';
+			$cols[] = self::FULLTEXT_DESCRIPTION.' AS description';
+			$cols[] = self::FULLTEXT_EXTRA.' AS extra';
+		}
 		$order = self::validateOrder($order, 'distance');
 		$id_distance = [];
 		foreach($this->db->select(self::TABLE, 'SQL_CALC_FOUND_ROWS '.implode(',', $cols),
 			$app ? [self::EMBEDDING_APP => $app,] : self::EMBEDDING_APP.'<>'.$this->db->quote(self::EMBEDDING_CACHE),
-			__LINE__, __FILE__, $start, 'HAVING distance<'.$max_distance.' ORDER BY '.$order, self::APP, $num_rows) as $row)
+			__LINE__, __FILE__, $start, 'HAVING distance<'.$max_distance.' ORDER BY '.$order, self::APP, $num_rows,
+			$return_all ? ' LEFT JOIN '.self::FULLTEXT_TABLE.' ON '.self::EMBEDDING_APP.'='.self::FULLTEXT_APP.
+			' AND '.self::EMBEDDING_APP_ID.'='.self::FULLTEXT_APP_ID : '') as $row)
 		{
 			$id = $app && is_string($app) ? (int)$row[self::EMBEDDING_APP_ID] : $row[self::EMBEDDING_APP].':'.$row[self::EMBEDDING_APP_ID];
 			// only insert the first / best match, as multiple chunks could match
 			if (!isset($id_distance[$id]))
 			{
-				$id_distance[$id] = $return_modified ? [
+				// if the app is not fulltext index, we won't get texts and need to query them separate from the app
+				if ($return_all && !isset($row['title']))
+				{
+					static $plugins=null; $plugins ??= self::plugins();
+					/** @var Embedding\Base $plugin */ $plugin = $plugins[$row[self::EMBEDDING_APP]] ?? null;
+					if ($plugin)
+					{
+						foreach((new $plugin)->getUpdated(true, ['data' => [
+							'app' => $row[self::EMBEDDING_APP],
+							'id' => $row[self::EMBEDDING_APP_ID],
+						]]) as $entry)
+						{
+							$row += $entry;
+						}
+					}
+				}
+				$id_distance[$id] = $return_all ? [
 					'distance' => (float)$row['distance'],
 					'modified' => new Api\DateTime($row['modified'], Api\DateTime::$server_timezone),
+					'title' => $row['title'],
+					'description' => $row['description'],
+					'extra' => $row['extra'] ? (array)json_decode($row['extra'], true) : [],
 				] : (float)$row['distance'];
 			}
 		}
@@ -871,7 +900,8 @@ class Embedding
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0
 	 * @param int $num_rows default 50
-	 * @param bool $return_modified true: return array with modified time and relevance, false: only return relevance value
+	 * @param bool $return_all true: return array with modified time, title, description, extra data and relevance,
+	 *  false: only return relevance value
 	 * @param string $order one of "default", "distance", "relevance" or "modified", optional with ASC or DESC suffix
 	 * @param float $min_relevance default 0.05 = 5% of highest relevance
 	 * @param ?string $mode default null, check for BOOLEAN mode operators in $pattern: +-<>()~*",
@@ -880,7 +910,7 @@ class Embedding
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_modified=false,
+	public function searchFulltext(string $pattern, $app=null, int $start=0, int $num_rows=50, bool $return_all=false,
 	                               string $order='default', float $min_relevance=0.05, ?string $mode=null) : array
 	{
 		// To find word(s) with a dash inside e.g. domain-names or ending with one (gives a FT syntax error!),
@@ -919,6 +949,12 @@ class Embedding
 			$match.' AS relevance',
 			self::FULLTEXT_MODIFIED.' AS modified',
 		];
+		if ($return_all)
+		{
+			$cols[] = self::FULLTEXT_TITLE.' AS title';
+			$cols[] = self::FULLTEXT_DESCRIPTION.' AS description';
+			$cols[] = self::FULLTEXT_EXTRA.' AS extra';
+		}
 		$order = self::validateOrder($order, '!relevance');
 		try {
 			if ($min_relevance)
@@ -945,9 +981,12 @@ class Embedding
 					}
 				}
 				$id = $app && is_string($app) ? (int)$row[self::FULLTEXT_APP_ID] : $row[self::FULLTEXT_APP] . ':' . $row[self::FULLTEXT_APP_ID];
-				$id_relevance[$id] = $return_modified ? [
+				$id_relevance[$id] = $return_all ? [
 					'relevance' => (float)$row['relevance'],
 					'modified' => new Api\DateTime($row['modified'], Api\DateTime::$server_timezone),
+					'title' => $row['title'],
+					'description' => $row['description'],
+					'extra' => $row['extra'] ? (array)json_decode($row['extra'], true) : [],
 				] : (float)$row['relevance'];
 			}
 			$this->total = $this->db->query('SELECT FOUND_ROWS()')->fetchColumn();

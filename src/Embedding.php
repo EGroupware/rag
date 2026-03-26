@@ -423,6 +423,7 @@ class Embedding
 	 */
 	public function create(array $chunks) : array
 	{
+		if (!$chunks) return [];    // otherwise we start a query for rag_hash IS NULL
 		$responses = [];
 		foreach($chunks as $n => $chunk)
 		{
@@ -438,7 +439,7 @@ class Embedding
 			'rag_hash' => array_map(fn($v) => $v->sha256, $responses),
 		], __LINE__, __FILE__, false, 'GROUP BY rag_hash', self::APP) as $row)
 		{
-			if (!isset($responses[$row->rag_hash])) continue;   // not sure how this can happen, but it does...
+			if (!isset($responses[$row['rag_hash']])) continue;   // not sure how this can happen, but it does...
 			$responses[$row['rag_hash']]->embedding = array_values(unpack('g*', $row['rag_embedding']));
 			$responses[$row['rag_hash']]->app = $row['rag_app'];
 			$responses[$row['rag_hash']]->app_id = $row['rag_app_id'];

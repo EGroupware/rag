@@ -67,10 +67,7 @@ class Addressbook extends Base
 		if (!$fulltext)
 		{
 			// only index description/note for RAG
-			$row = [
-				self::ID => $row[self::ID],
-				self::DESCRIPTION => $row[self::DESCRIPTION],
-			];
+			$row = array_intersect_key($row, array_flip([self::ID, self::MODIFIED, self::DESCRIPTION]));
 		}
 	}
 }

@@ -274,7 +274,7 @@ class ApiHandler extends Api\CalDAV\Handler
 	 * @param array $filter
 	 * @return array
 	 */
-	protected function filter2col_filter(array $filter, int $user)
+	protected function filter2col_filter(array $filter)
 	{
 		if (!is_string($filter['search'] ?? null) || strlen($filter['search']) < 3)
 		{

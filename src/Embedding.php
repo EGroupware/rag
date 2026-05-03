@@ -504,8 +504,9 @@ class Embedding
 				false => self::$rag_apps,
 			] : []) as $fulltext => $apps)
 		{
-			foreach($apps ?: self::plugins() as $app => $class)
+			foreach(self::plugins() as $app => $class)
 			{
+				if (!empty($apps) && !in_array($app, $apps)) continue;
 				if ($hook_data && $hook_data['app'] !== $app) continue;
 
 				try {
@@ -687,7 +688,7 @@ class Embedding
 	 * then the fulltext search results with the highest relevance first.
 	 * Same entries are only returned once with their embedding distance!.
 	 *
-	 * @ToDo: better way to merge fulltext and embedding searches
+	 * @ToDo: better way to merge fulltext and embedding searches https://mariadb.com/docs/server/reference/sql-structure/vectors/optimizing-hybrid-search-query-with-reciprocal-rank-fusion-rrf
 	 * @param string $pattern
 	 * @param ?string|string[] $app app-name(s) or '' or NULL for searching all apps
 	 * @param int $start default 0

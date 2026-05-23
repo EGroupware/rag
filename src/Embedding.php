@@ -48,7 +48,14 @@ class Embedding
 	 *
 	 * So the async job stops before the next one starts.
 	 */
-	const MAX_RUNTIME = 285;
+	protected static int $max_runtime = 285;
+
+	/**
+	 *
+	 * When should the async job run
+	 *
+	 */
+	protected static array $async_times = ['min'=>'*/5'];
 
 	/**
 	 * @var ?OpenAI\Client
@@ -189,6 +196,19 @@ class Embedding
 		self::$chunk_overlap = $config['chunk_overlap'] ?? 50;
 		self::$model = $config['embedding_model'] ?? 'bge-m3';
 		self::$minimize_chunks = ($config['minimize_chunks'] ?? 'yes') !== 'no';
+		self::$max_runtime = $config['async_maxruntime'] ?? 285;
+
+		$custom_times = [];
+		foreach (['year', 'month', 'day', 'dow', 'hour', 'min'] as $key) {
+			if (isset($config['async_' . $key])) {
+				$custom_times[$key] = $config['async_' . $key];
+			}
+		}
+
+		if (!empty($custom_times)) {
+			self::$async_times = $custom_times;
+		}
+
 	}
 
 	/**
@@ -318,7 +338,7 @@ class Embedding
 		$async = new Api\Asyncservice();
 		if (!$async->read(self::ASYNC_JOB))
 		{
-			$async->set_timer(['min'=>'*/5'], self::ASYNC_JOB, self::class.'::asyncJob');
+			$async->set_timer(self::$async_times, self::ASYNC_JOB, self::class.'::asyncJob');
 		}
 	}
 
@@ -525,7 +545,7 @@ class Embedding
 					$entry = null;
 					foreach ($plugin->getUpdated($fulltext, $hook_data) as $entry)
 					{
-						if (microtime(true) - $start > self::MAX_RUNTIME)
+						if (microtime(true) - $start > self::$max_runtime)
 						{
 							break;
 						}
@@ -619,7 +639,7 @@ class Embedding
 			}
 		}
 		// if we finished, we can remove the job (gets readded for new entries via notify hook)
-		if (!$hook_data && microtime(true) - $start < self::MAX_RUNTIME)
+		if (!$hook_data && microtime(true) - $start < self::$max_runtime)
 		{
 			self::removeAsyncJob();
 		}

@@ -72,6 +72,18 @@
 					</et2-select>
 				</row>
 				<row>
+					<et2-description  value="Async Job Settings (Cron Schedule): Leave empty to use defaults."/>
+					<et2-hbox>
+						<et2-textbox width="14%" id="newsettings[async_year]"  label="Year:"/>
+						<et2-textbox width="14%" id="newsettings[async_month]" label="Month:"/>
+						<et2-textbox width="14%" id="newsettings[async_day]"   label="Day"/>
+						<et2-textbox width="14%" id="newsettings[async_dow]" label="DoW:" statustext="Weekday 0-6, 0=Sun"/>
+						<et2-textbox width="14%" id="newsettings[async_hour]" label="Hour:" />
+						<et2-textbox width="14%" id="newsettings[async_min]" label="Minute:" statustext="Default: */5 (=every 5 minutes)" placeholder="*/5"/>
+						<et2-textbox width="14%" id="newsettings[async_maxruntime]" label="Max.Runtime" placeholder="285" statustext="Stop calculating embeddings after this time (in seconds). Default: 285 (5min:15sec)"/>
+					</et2-hbox>
+				</row>
+				<row>
 					<et2-description  value="Last errors of RAG's async job" span="all" class="subHeader"></et2-description>
 				</row>
 				<row>

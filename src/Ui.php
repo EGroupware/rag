@@ -69,6 +69,9 @@ class Ui
 			'search' => $query['search'],
 			'col_filter' => $query['col_filter'],
 		]);
+		// close no longer needed session, so other requests can run in parallel, e.g. when embedding takes some time ...
+		$GLOBALS['egw']->session->commit_session();
+
 		$rows = [];
 		if (empty($query['search']))
 		{

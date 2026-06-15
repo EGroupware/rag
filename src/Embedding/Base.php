@@ -239,11 +239,14 @@ abstract class Base
 						$rows = null;
 						break;
 					}
-					$rows[] = [
-						static::EXTRA_ID    => $id,
-						static::EXTRA_NAME  => $cf,
-						static::EXTRA_VALUE => $hook_data['#'.$cf],
-					];
+					if (!empty($hook_data['#'.$cf]) && !trim($hook_data['#'.$cf]))
+					{
+						$rows[] = [
+							static::EXTRA_ID    => $id,
+							static::EXTRA_NAME  => $cf,
+							static::EXTRA_VALUE => $hook_data['#'.$cf],
+						];
+					}
 				}
 			}
 			foreach($rows ?? $this->db->select(static::EXTRA_TABLE, [static::EXTRA_ID, static::EXTRA_NAME, static::EXTRA_VALUE], [

@@ -6,13 +6,16 @@ app	rag	de	App
 app id	rag	de	App ID
 applications for rag / to calculate embeddings for	rag	de	Anwendungen für das RAG / um Embeddings zu berechnet
 applications to add to fulltext-index	rag	de	Anwendungen für den Volltext Index
+async job settings (cron schedule): leave empty to use defaults.	rag	de	Einstellungen für den Asynchronen Dienst (Cron Ausführung): Leer lassen um die Vorgaben zu benutzen.
 change fulltext search pattern to match words starting with pattern	rag	de	Ändere das Suchmuster der Volltextsuche um auch Worte zu finden die damit beginnen
 chunk overlap	rag	de	Chunk Überlappung
 chunk size	rag	de	Größe der Chunks
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	de	Derzeit werden nur Einbettungsmodelle mit 1024 Dimensionen wie bge-m3 unterstützt!
 default sorting	rag	de	Normale Sortierung
+default: */5 (=every 5 minutes)	rag	de	Vorgabe: */5 (=alle 5 Minuten)
 distance	rag	de	Distanz
 distance/relevance	rag	de	Distanz/Relevanz
+dow	rag	de	Wochentag
 embedding configuration	rag	de	Embedding Konfiguration
 enter your search query here...	rag	de	Geben Sie Ihre Suchanfrage hier ein...
 fulltext	rag	de	Volltext
@@ -27,6 +30,7 @@ last errors of rag's async job	rag	de	Letzte Fehler des asynchronen Jobs des RAG
 leave empty to disable rag	rag	de	Leer lassen um das RAG auszuschalten
 legacy search	rag	de	Legacy Suche
 legacy search, as used before	rag	de	Legacy-Suche, wie zuvor verwendet
+max. runtime	rag	de	Max. Ausführungszeit
 minimize chunks e.g. concatenate title and description	rag	de	Minimiere die Chunks z.B. durch aneinander hängen von Titel und Beschreibung
 model to use	rag	de	Benutztes Model
 no match	rag	de	kein Treffer
@@ -41,6 +45,7 @@ rag search only	rag	de	RAG Suche ausschließlich
 relevance	rag	de	Relevanz
 search in which applications	rag	de	In welchen Anwendungen suchen
 should search in apps be ordered by relevance	rag	de	Solle die Suche in den Anwendungen nach Relevanz sortiert sein
+stop calculating embeddings after this time (in seconds). default: 285 (4min:45sec)	rag	de	Beende die Berechnung von Embeddings nach dieser Zeit (in Sekunden). Vorgabe (4min:45sec)
 syntax error in fulltext search-pattern	common	de	Syntaxfehler in Volltext Suchmuster
 the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	de	Der Platzhalter, der null oder mehr Zeichen angibt. Er kann nur am Ende eines Wortes stehen
 the word cannot appear in any row returned.	rag	de	Das Wort darf in keiner Zeile der Rückgabe vorkommen
@@ -53,5 +58,7 @@ unexpected	common	de	unerwartet
 url of openai compatible api	rag	de	URL der OpenAI kompatiblen API
 use operators:	rag	de	Operatoren verwenden:
 used to group words into subexpressions.	rag	de	Wird verwendet, um Wörter zu Unterausdrücken zu gruppieren
+weekday 0-6, 0=sun	rag	de	Wochentag 0-6, 0=Sonntag
 what type of search to use for search in %1	rag	de	Welche Art der Suche soll zum Suchen in der Anwendung %1 verwendet werden
+what type of search to use for search in adressbuch	rag	de	Welche Art der Suche soll zum Suchen im Adressbuch verwendet werden
 what type of search to use for search in the apps	rag	de	Welche Art der Suche soll zum Suchen in den Anwendungen verwendet werden

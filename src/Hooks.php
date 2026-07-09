@@ -108,6 +108,7 @@ class Hooks
 			try {
 				$embed = new Embedding(0, array_filter($data)); // array-filter removes empty fields
 				$embed->testConfig();
+				Embedding::removeAsyncJob();
 				Embedding::installAsyncJob();
 			}
 			catch (\Exception $e) {

@@ -6,13 +6,16 @@ app	rag	en	App
 app id	rag	en	App ID
 applications for rag / to calculate embeddings for	rag	en	Applications for RAG / to calculate embeddings for
 applications to add to fulltext-index	rag	en	Applications to add to fulltext-index
+async job settings (cron schedule): leave empty to use defaults.	rag	en	Async Job Settings (Cron Schedule): Leave empty to use defaults.
 change fulltext search pattern to match words starting with pattern	rag	en	Change fulltext search pattern to match words starting with pattern
 chunk overlap	rag	en	Chunk overlap
 chunk size	rag	en	Chunk size
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	en	Currently only embedding models with 1024 dimensions, like bge-m3 are supported!
 default sorting	rag	en	Default sorting
+default: */5 (=every 5 minutes)	rag	en	Default: */5 (=every 5 minutes)
 distance	rag	en	Distance
 distance/relevance	rag	en	Distance/Relevance
+dow	rag	en	DoW
 embedding configuration	rag	en	Embedding configuration
 enter your search query here...	rag	en	Enter your search query here...
 fulltext	rag	en	Fulltext
@@ -27,6 +30,7 @@ last errors of rag's async job	rag	en	Last errors of RAG's async job
 leave empty to disable rag	rag	en	leave empty to disable RAG
 legacy search	rag	en	Legacy search
 legacy search, as used before	rag	en	Legacy search, as used before
+max. runtime	rag	en	Max. Runtime
 minimize chunks e.g. concatenate title and description	rag	en	Minimize chunks e.g. concatenate title and description
 model to use	rag	en	Model to use
 no match	rag	en	no match
@@ -41,6 +45,7 @@ rag search only	rag	en	RAG search only
 relevance	rag	en	Relevance
 search in which applications	rag	en	Search in which applications
 should search in apps be ordered by relevance	rag	en	Should search in apps be ordered by relevance
+stop calculating embeddings after this time (in seconds). default: 285 (4min:45sec)	rag	en	Stop calculating embeddings after this time (in seconds). Default: 285 (4min:45sec)
 syntax error in fulltext search-pattern	common	en	Syntax error in fulltext search-pattern
 the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	en	The wildcard, indicating zero or more characters. It can only appear at the end of a word
 the word cannot appear in any row returned.	rag	en	The word cannot appear in any row returned
@@ -53,5 +58,7 @@ unexpected	common	en	unexpected
 url of openai compatible api	rag	en	URL of OpenAI compatible API
 use operators:	rag	en	Use operators:
 used to group words into subexpressions.	rag	en	Used to group words into subexpressions
+weekday 0-6, 0=sun	rag	en	Weekday 0-6, 0=Sun
 what type of search to use for search in %1	rag	en	What type of search to use for search in %1
+what type of search to use for search in adressbuch	rag	en	What type of search to use for search in Adressbuch
 what type of search to use for search in the apps	rag	en	What type of search to use for search in the apps

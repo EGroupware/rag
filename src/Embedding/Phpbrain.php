@@ -27,10 +27,10 @@ class Phpbrain extends Base
 	const DESCRIPTION = 'text';
 	protected static $additional_cols = ['topic'];
 	const NOT_DELETED = 'published>0';
-	const EXTRA_TABLE = 'egw_timesheet_extra';
-	const EXTRA_ID = 'ts_id';
-	const EXTRA_NAME = 'ts_extra_name';
-	const EXTRA_VALUE = 'ts_extra_value';
+	// phpbrain is not part of this checkout, so its actual custom-fields table/columns
+	// (if any) can't be verified here — leave unset rather than guess, to avoid
+	// querying an unrelated app's table (this previously pointed at Timesheet's
+	// egw_timesheet_extra/ts_id, leaking timesheet custom-field text into phpbrain's index)
 
 	/**
 	 * Allows row-specific modifications without overwriting getUpdated()

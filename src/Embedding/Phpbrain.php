@@ -27,10 +27,11 @@ class Phpbrain extends Base
 	const DESCRIPTION = 'text';
 	protected static $additional_cols = ['topic'];
 	const NOT_DELETED = 'published>0';
-	// phpbrain is not part of this checkout, so its actual custom-fields table/columns
-	// (if any) can't be verified here — leave unset rather than guess, to avoid
-	// querying an unrelated app's table (this previously pointed at Timesheet's
-	// egw_timesheet_extra/ts_id, leaking timesheet custom-field text into phpbrain's index)
+	// Verified against github.com/EGroupware/phpbrain: its schema (setup/tables_current.inc.php)
+	// has no egw_kb_articles_extra-style custom-fields table, and its admin menu (hook_admin.inc.php)
+	// has no "Custom fields" entry, so phpbrain has no custom-fields storage at all — leaving these
+	// unset (Base.php's empty-string defaults) is correct, not a placeholder. This previously pointed
+	// at Timesheet's egw_timesheet_extra/ts_id, leaking timesheet custom-field text into phpbrain's index.
 
 	/**
 	 * Allows row-specific modifications without overwriting getUpdated()

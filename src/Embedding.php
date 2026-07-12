@@ -685,6 +685,9 @@ class Embedding
 	 * Read a single search-result entry by its composite "app:id" identifier
 	 *
 	 * Enforces the same per-entry ACL as search() does for result rows, via Api\Link::title().
+	 * Always asks the app's plugin directly instead of using the fulltext index cache: not every
+	 * app is guaranteed to be fulltext-indexed, and the index can be stale relative to the entry's
+	 * current modified time.
 	 *
 	 * @param string $id "app:id" e.g. "addressbook:123"
 	 * @param bool $check_acl unused, kept for Api\CalDAV\Handler::read() signature compatibility
@@ -706,32 +709,24 @@ class Embedding
 		{
 			return $title === false ? false : null;
 		}
-		foreach ($this->db->select(self::FULLTEXT_TABLE, '*', [
-			self::FULLTEXT_APP => $app,
-			self::FULLTEXT_APP_ID => $app_id,
-		], __LINE__, __FILE__, false, '', self::APP) as $row)
-		{
-			return [
-				'app' => $app,
-				'app_id' => $app_id,
-				'modified' => new Api\DateTime($row[self::FULLTEXT_MODIFIED], Api\DateTime::$server_timezone),
-				'title' => $title,
-				'description' => $row[self::FULLTEXT_DESCRIPTION],
-				'extra' => $row[self::FULLTEXT_EXTRA] ? (array)json_decode($row[self::FULLTEXT_EXTRA], true) : [],
-			];
-		}
-		// not yet in the fulltext index (e.g. just created, async job not run yet) --> ask the app's plugin directly
 		/** @var Embedding\Base $plugin */
 		$plugin = new $plugin_class();
-		foreach ($plugin->getUpdated(true, ['data' => ['app' => $app, 'id' => $app_id]]) as $entry)
+		// top-level app+id (not nested under 'data') is required so getUpdated() scopes its
+		// query to this one entry via $where[ID], see Base::getUpdated()/notify()'s $data shape
+		foreach ($plugin->getUpdated(true, ['app' => $app, 'id' => $app_id]) as $entry)
 		{
+			// same value-only extra shape as stored in FULLTEXT_EXTRA, see embed()
+			$extra = $entry;
+			unset($extra[$plugin_class::ID], $extra[$plugin_class::MODIFIED], $extra[$plugin_class::TITLE], $extra[$plugin_class::DESCRIPTION]);
 			return [
 				'app' => $app,
 				'app_id' => $app_id,
 				'modified' => $entry[$plugin_class::MODIFIED] ?? null,
 				'title' => $title,
 				'description' => $entry[$plugin_class::DESCRIPTION] ?? null,
-				'extra' => [],
+				'extra' => $extra ? array_values(array_filter(array_map('trim', $extra), static function ($v) {
+					return $v && strlen((string)$v) > 3;
+				})) : [],
 			];
 		}
 		return null;
@@ -876,25 +871,17 @@ class Embedding
 		// is $pattern already cached, or do we need to do so now
 		if (empty($response[0]->id))
 		{
-			$chunk = 1+(int)$this->db->select(self::TABLE, 'MAX('.self::EMBEDDING_CHUNK.')', [
-				self::EMBEDDING_APP => self::EMBEDDING_CACHE,
-				self::EMBEDDING_APP_ID => 0,
-			], __LINE__, __FILE__, false, '', self::APP)->fetchColumn();
-			// pass $where keyed on the unique (app,app_id,chunk) constraint, so a concurrent
-			// search computing the same next-chunk value REPLACEs instead of throwing a
-			// duplicate-key InvalidSql (plain INSERT via $where=false is not race-safe here)
 			$this->db->insert(self::TABLE, [
 				self::EMBEDDING_APP => self::EMBEDDING_CACHE,
 				self::EMBEDDING_APP_ID => 0,
-				self::EMBEDDING_CHUNK => $chunk,
+				self::EMBEDDING_CHUNK => 1+(int)$this->db->select(self::TABLE, 'MAX('.self::EMBEDDING_CHUNK.')', [
+					self::EMBEDDING_APP => self::EMBEDDING_CACHE,
+					self::EMBEDDING_APP_ID => 0,
+				], __LINE__, __FILE__, false, '', self::APP)->fetchColumn(),
 				self::EMBEDDING_HASH => $response[0]->sha256,
 				self::EMBEDDING => $response[0]->embedding,
 				self::EMBEDDING_MODIFIED => new Api\DateTime(),
-			], [
-				self::EMBEDDING_APP => self::EMBEDDING_CACHE,
-				self::EMBEDDING_APP_ID => 0,
-				self::EMBEDDING_CHUNK => $chunk,
-			], __LINE__, __FILE__, self::APP);
+			], false, __LINE__, __FILE__, self::APP);
 		}
 		$cols = [
 			self::EMBEDDING_APP,

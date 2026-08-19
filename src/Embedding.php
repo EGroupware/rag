@@ -163,7 +163,7 @@ class Embedding
 		try {
 			$models = $this->client->models()->list()->data ?? [];
 		}
-		catch (\Exception $e) {
+		catch (\Throwable $e) {
 			throw new \Exception($e->getMessage(), 1003, $e);
 		}
 

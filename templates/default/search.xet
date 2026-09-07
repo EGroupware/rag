@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2.0//EN" "https://www.egroupware.org/etemplate2.0.dtd">
 <overlay>
-    <template id="rag.search">
-        <et2-groupbox summary="RAG Search" open="true">
+    <et2-template  id="rag.search">
+        <et2-groupbox  summary="RAG Search" open="true">
             <et2-vbox>
-                <et2-searchbox id="search"></et2-searchbox>
+                <et2-searchbox  id="search"></et2-searchbox>
                 <et2-hbox>
-                    <et2-select id="search_type"></et2-select>
-                    <et2-description id="operators" statustext="@operator_help" label="Operators:"></et2-description>
+                    <et2-select  id="search_type"></et2-select>
+                    <et2-description  id="operators" statustext="@operator_help" label="Operators:"></et2-description>
                 </et2-hbox>
             </et2-vbox>
         </et2-groupbox>
-    </template>
+    </et2-template>
 </overlay>

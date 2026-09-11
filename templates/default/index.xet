@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../doc/etemplate2/etemplate2.0.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2.0//EN" "https://www.egroupware.org/etemplate2.0.dtd">
 <overlay>
-	<et2-template id="rag.index.rows" template="" lang="" group="0" version="26.1">
+	<et2-template  id="rag.index.rows" template="" lang="" group="0" version="26.1">
 		<grid width="100%">
 			<columns>
 				<column width="150"/> <!-- ID -->
@@ -17,7 +18,7 @@
 					<nextmatch-header id="id" label="ID"></nextmatch-header>
 					<nextmatch-header id="app" label="App"></nextmatch-header>
 					<nextmatch-header id="app_id" label="App ID"></nextmatch-header>
-					<et2-hbox width="100%">
+					<et2-hbox  width="100%">
 						<nextmatch-header id="title" label="Title" width="90%"></nextmatch-header>
 						<nextmatch-sortheader id="default" label="Default sorting" sortmode="ASC" align="right"></nextmatch-sortheader>
 					</et2-hbox>
@@ -26,26 +27,26 @@
 					<nextmatch-sortheader id="relevance" label="Relevance" sortmode="DESC"></nextmatch-sortheader>
 				</row>
 				<row class="row">
-					<et2-description id="${row}[id]"></et2-description>
-					<et2-appicon src="$row_cont[app]" align="center" statustext="$row_cont[app]"></et2-appicon>
-					<et2-description id="${row}[app_id]"></et2-description>
-					<et2-description id="${row}[title]"></et2-description>
-					<et2-date-time id="${row}[modified]" readonly="true"></et2-date-time>
-					<et2-number id="${row}[distance]" readonly="true" precision="2"></et2-number>
-					<et2-number id="${row}[relevance]" readonly="true" precision="2"></et2-number>
+					<et2-description  id="${row}[id]"></et2-description>
+					<et2-appicon  src="$row_cont[app]" align="center" statustext="$row_cont[app]"></et2-appicon>
+					<et2-description  id="${row}[app_id]"></et2-description>
+					<et2-description  id="${row}[title]"></et2-description>
+					<et2-date-time  id="${row}[modified]" readonly="true"></et2-date-time>
+					<et2-number  id="${row}[distance]" readonly="true" precision="2"></et2-number>
+					<et2-number  id="${row}[relevance]" readonly="true" precision="2"></et2-number>
 				</row>
 			</rows>
 		</grid>
 	</et2-template>
-	<et2-template id="rag.index.header" template="" lang="" group="0" version="26.1">
+	<et2-template  id="rag.index.header" template="" lang="" group="0" version="26.1">
 		<et2-hbox>
 			<et2-vbox>
-				<et2-groupbox summary="Query">
-					<et2-searchbox id="search" placeholder="Enter your search query here..." autofocus="true" onchange="app.rag.search"></et2-searchbox>
+				<et2-groupbox  summary="Query">
+					<et2-searchbox  id="search" placeholder="Enter your search query here..." autofocus="true" onchange="app.rag.search"></et2-searchbox>
 				</et2-groupbox>
-				<et2-description label="Use operators:" id="operators" statustext="@operator_help"></et2-description>
+				<et2-description  label="Use operators:" id="operators" statustext="@operator_help"></et2-description>
 			</et2-vbox>
-			<et2-groupbox summary="Type of search" width="250px">
+			<et2-groupbox  summary="Type of search" width="250px">
 				<et2-vbox>
 					<radio id="col_filter[type]" set_value="hybrid" label="Hybrid search: RAG+Fulltext" onchange="app.rag.search"></radio>
 					<radio id="col_filter[type]" set_value="rag" label="RAG search only" onchange="app.rag.search"></radio>
@@ -53,17 +54,16 @@
 					<!-- et2-button label="Search..." noSubmit="true" onclick="app.rag.search"></et2-button -->
 				</et2-vbox>
 			</et2-groupbox>
-			<et2-vbox width="fit-content">
-				<et2-groupbox summary="Search in which applications">
-					<et2-select id="col_filter[apps]" multiple="true" placeholder="All supported" onchange="app.rag.search"></et2-select>
+			<et2-vbox  width="fit-content">
+				<et2-groupbox  summary="Search in which applications">
+					<et2-select  id="col_filter[apps]" multiple="true" placeholder="All supported" onchange="app.rag.search"></et2-select>
 				</et2-groupbox>
-				<et2-description label="RAG {Distance}: 0={identical}, 1={no match}, -1={opposite}, {Fulltext} {Relevance}: 0={none}, >0={higher is better}"
-					align="right"></et2-description>
+				<et2-description  label="RAG {Distance}: 0={identical}, 1={no match}, -1={opposite}, {Fulltext} {Relevance}: 0={none}, >0={higher is better}" align="right"></et2-description>
 			</et2-vbox>
 		</et2-hbox>
 	</et2-template>
-	<et2-template id="rag.index" template="" lang="" group="0" version="26.1">
-		<et2-template template="rag.index.header" content="nm"></et2-template>
+	<et2-template  id="rag.index" template="" lang="" group="0" version="26.1">
+		<et2-template  template="rag.index.header" content="nm"></et2-template>
 		<nextmatch id="nm" template="rag.index.rows"></nextmatch>
 	</et2-template>
 </overlay>

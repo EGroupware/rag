@@ -8,8 +8,9 @@
  * @license https://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  */
 
-import {app} from "../../api/js/jsapi/egw_global";
 import { EgwApp } from '../../api/js/jsapi/egw_app';
+// app is an ambient global (declare global {} in egw_global.d.ts, unconditionally included
+// via tsconfig's "**/*.d.ts") - no import needed or possible.
 
 class RagApp extends EgwApp
 {

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../../../doc/etemplate2/etemplate2.0.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
 <!DOCTYPE overlay PUBLIC "-//EGroupware GmbH//eTemplate 2.0//EN" "https://www.egroupware.org/etemplate2.0.dtd">
 <overlay>
-	<template id="rag.config" template="" lang="" group="0" version="16.1">
+	<et2-template  id="rag.config" template="" lang="" group="0" version="16.1">
 		<grid width="100%" class="admin-config egwGridView_grid">
 			<columns>
 				<column width="40%"/>
@@ -12,37 +13,36 @@
 					<et2-description  value="General configuration" span="all" class="subHeader"></et2-description>
 				</row>
 				<row>
-					<et2-description value="Applications to add to fulltext-index"></et2-description>
-					<et2-select id="newsettings[fulltext_apps]" multiple="true" placeholder="All supported"></et2-select>
+					<et2-description  value="Applications to add to fulltext-index"></et2-description>
+					<et2-select  id="newsettings[fulltext_apps]" multiple="true" placeholder="All supported"></et2-select>
 				</row>
 				<row>
-					<et2-description value="Applications for RAG / to calculate embeddings for"></et2-description>
-					<et2-select id="newsettings[rag_apps]" multiple="true" placeholder="All supported"></et2-select>
+					<et2-description  value="Applications for RAG / to calculate embeddings for"></et2-description>
+					<et2-select  id="newsettings[rag_apps]" multiple="true" placeholder="All supported"></et2-select>
 				</row>
 				<row>
 					<et2-description  value="URL of OpenAI compatible API"></et2-description>
-					<et2-url id="newsettings[url]" class="et2_required" placeholder="http://172.17.0.1:11434/v1 {leave empty to disable RAG}"
-						validator="/^https?:\/\/.*\/v1$/" trailingSlash="false"></et2-url>
+					<et2-url  id="newsettings[url]" class="et2_required" placeholder="http://172.17.0.1:11434/v1 {leave empty to disable RAG}" validator="/^https?:\/\/.*\/v1$/" trailingSlash="false"></et2-url>
 				</row>
 				<row>
 					<et2-description  value="API Key"></et2-description>
-					<et2-password id="newsettings[api_key]"></et2-password>
+					<et2-password  id="newsettings[api_key]"></et2-password>
 				</row>
 				<row>
 					<et2-description></et2-description>
 					<et2-vbox>
-						<et2-details summary="{General configuration}: Ollama" accordionGroup="notes">
-							<et2-description label="URL:" value="http://172.17.0.1:11435/v1"></et2-description>
-							<et2-description value="Please note: Ollama must be bound to all interfaces, NOT just localhost!"></et2-description>
-							<et2-description label="Model:" value="bge-m3"></et2-description>
+						<et2-details  summary="{General configuration}: Ollama" accordionGroup="notes">
+							<et2-description  label="URL:" value="http://172.17.0.1:11435/v1"></et2-description>
+							<et2-description  value="Please note: Ollama must be bound to all interfaces, NOT just localhost!"></et2-description>
+							<et2-description  label="Model:" value="bge-m3"></et2-description>
 						</et2-details>
-						<et2-details summary="{General configuration}: EGroupware AI Proxy" accordionGroup="notes">
-							<et2-description label="URL:" value="https://ai-proxy.egroupware.org/v1"></et2-description>
-							<et2-description label="Model:" value="bge-m3"></et2-description>
+						<et2-details  summary="{General configuration}: EGroupware AI Proxy" accordionGroup="notes">
+							<et2-description  label="URL:" value="https://ai-proxy.egroupware.org/v1"></et2-description>
+							<et2-description  label="Model:" value="bge-m3"></et2-description>
 						</et2-details>
-						<et2-details summary="{General configuration}: IONOS AI Hub" accordionGroup="notes">
-							<et2-description label="URL:" value="https://openai.inference.de-txl.ionos.com/v1"></et2-description>
-							<et2-description label="Model:" value="BAAI/bge-m3"></et2-description>
+						<et2-details  summary="{General configuration}: IONOS AI Hub" accordionGroup="notes">
+							<et2-description  label="URL:" value="https://openai.inference.de-txl.ionos.com/v1"></et2-description>
+							<et2-description  label="Model:" value="BAAI/bge-m3"></et2-description>
 						</et2-details>
 					</et2-vbox>
 				</row>
@@ -52,17 +52,17 @@
 				<row>
 					<et2-description  value="Model to use"></et2-description>
 					<et2-hbox>
-						<et2-textbox id="newsettings[embedding_model]" placeholder="bge-m3"></et2-textbox>
-						<et2-description label="Currently only embedding models with 1024 dimensions, like bge-m3 are supported!"></et2-description>
+						<et2-textbox  id="newsettings[embedding_model]" placeholder="bge-m3"></et2-textbox>
+						<et2-description  label="Currently only embedding models with 1024 dimensions, like bge-m3 are supported!"></et2-description>
 					</et2-hbox>
 				</row>
 				<row>
 					<et2-description  value="Chunk size"></et2-description>
-					<et2-number id="newsettings[chunk_size]" min="100" placeholder="500" precision="0"></et2-number>
+					<et2-number  id="newsettings[chunk_size]" min="100" placeholder="500" precision="0"></et2-number>
 				</row>
 				<row>
 					<et2-description  value="Chunk overlap"></et2-description>
-					<et2-number id="newsettings[chunk_overlap]" min="0" placeholder="50" precision="0"></et2-number>
+					<et2-number  id="newsettings[chunk_overlap]" min="0" placeholder="50" precision="0"></et2-number>
 				</row>
 				<row>
 					<et2-description  value="Minimize chunks e.g. concatenate title and description"></et2-description>
@@ -74,13 +74,13 @@
 				<row>
 					<et2-description  value="Async Job Settings (Cron Schedule): Leave empty to use defaults."/>
 					<et2-hbox>
-						<et2-textbox width="14%" id="newsettings[async_year]"  label="Year"/>
-						<et2-textbox width="14%" id="newsettings[async_month]" label="Month"/>
-						<et2-textbox width="14%" id="newsettings[async_day]"   label="Day"/>
-						<et2-textbox width="14%" id="newsettings[async_dow]" label="DoW" statustext="Weekday 0-6, 0=Sun"/>
-						<et2-textbox width="14%" id="newsettings[async_hour]" label="Hour" />
-						<et2-textbox width="14%" id="newsettings[async_min]" label="Minute" statustext="Default: */5 (=every 5 minutes)" placeholder="*/5"/>
-						<et2-textbox width="14%" id="newsettings[async_maxruntime]" label="Max. Runtime" placeholder="285" statustext="Stop calculating embeddings after this time (in seconds). Default: 285 (4min:45sec)"/>
+						<et2-textbox  width="14%" id="newsettings[async_year]" label="Year"/>
+						<et2-textbox  width="14%" id="newsettings[async_month]" label="Month"/>
+						<et2-textbox  width="14%" id="newsettings[async_day]" label="Day"/>
+						<et2-textbox  width="14%" id="newsettings[async_dow]" label="DoW" statustext="Weekday 0-6, 0=Sun"/>
+						<et2-textbox  width="14%" id="newsettings[async_hour]" label="Hour" />
+						<et2-textbox  width="14%" id="newsettings[async_min]" label="Minute" statustext="Default: */5 (=every 5 minutes)" placeholder="*/5"/>
+						<et2-textbox  width="14%" id="newsettings[async_maxruntime]" label="Max. Runtime" placeholder="285" statustext="Stop calculating embeddings after this time (in seconds). Default: 285 (4min:45sec)"/>
 					</et2-hbox>
 				</row>
 				<row>
@@ -88,11 +88,11 @@
 				</row>
 				<row>
 					<!-- hack to get summary="@newsettings[rag_last_error_time]" working/propagated: id="newsettings[rag_last_error_time]" -->
-					<et2-details summary="@newsettings[rag_last_error_time]" span="all">
-						<et2-description id="newsettings[rag_last_errors]"></et2-description>
+					<et2-details  summary="@newsettings[rag_last_error_time]" span="all">
+						<et2-description  id="newsettings[rag_last_errors]"></et2-description>
 					</et2-details>
 				</row>
 			</rows>
 		</grid>
-	</template>
+	</et2-template>
 </overlay>

@@ -4,7 +4,7 @@
  *
  * @link https://www.egroupware.org
  * @author Ralf Becker <rb-AT-egroupware.org>
- * @package invoices
+ * @package rag
  * @license https://opensource.org/licenses/gpl-license.php GPL - GNU General Public License
  * @copyright (c) 2026 by Ralf Becker <rb-AT-egroupware.org>
  */
@@ -14,7 +14,7 @@ namespace EGroupware\Rag;
 use EGroupware\Api;
 
 /**
- * REST API for Invoices
+ * REST API for RAG search
  */
 class ApiHandler extends Api\CalDAV\Handler
 {
@@ -210,16 +210,6 @@ class ApiHandler extends Api\CalDAV\Handler
 				{
 					unset($this->requested_multiget_ids[$k]);
 				}
-				/* sync-collection report: deleted entry need to be reported without properties
-				if (!empty($invoice['course_closed']))
-				{
-					if (++$yielded && isset($nresults) && $yielded > $nresults)
-					{
-						return;
-					}
-					yield ['path' => $path.urldecode($this->get_path($invoice))];
-					continue;
-				}*/
 				$props = array(
 					'getcontenttype' => Api\CalDAV::mkprop('getcontenttype', 'application/json'),
 					'getlastmodified' => Api\DateTime::user2server($entry['modified']),
@@ -491,9 +481,9 @@ class ApiHandler extends Api\CalDAV\Handler
 	{
 		header('Content-Type: application/json');
 
-		if (!is_array($invoice = $this->_common_get_put_delete('GET',$options,$id)))
+		if (!is_array($entry = $this->_common_get_put_delete('GET',$options,$id)))
 		{
-			return $invoice;
+			return $entry;
 		}
 
 		try
@@ -502,28 +492,11 @@ class ApiHandler extends Api\CalDAV\Handler
 			if (($type=Api\CalDAV::isJSON($type)))
 			{
 				$options['mimetype'] = 'application/json';
-
-				if (!preg_match('#/invoices/(\d+)(/(positions|allowances)/(\d+)?)?#', $options['path'], $matches))
-				{
-					return '404 Not Found';
-				}
-				[, $invoice_id, , $sub, $position_id ] = $matches+[null, null, null, null, null];
-
-				if ($invoice_id && empty($sub))
-				{
-					$options['data'] = JsObjects::JsInvoice($invoice, false);
-				}
-				else
-				{
-					$options['data'] = JsObjects::getJsInvoiceSub($invoice, $sub, $position_id);
-				}
-				$options['data'] = Api\CalDAV::json_encode($options['data'], $type === 'pretty');
+				$options['data'] = Api\CalDAV::json_encode($entry, $type === 'pretty');
 
 				header('Content-Encoding: identity');
-				// ToDo: header('ETag: "'.$this->get_etag($invoice).'"');
 				return true;
 			}
-			// ToDo: allow upload of invoices as XML and PDF files via PUT or POST
 		}
 		catch (\Throwable $e) {
 			return self::handleException($e);
@@ -571,7 +544,7 @@ class ApiHandler extends Api\CalDAV\Handler
 	}
 
 	/**
-	 * Handle PUT & POST request for invoices
+	 * Handle PUT & POST request — always forbidden, RAG entries are read-only via this API
 	 *
 	 * @param array &$options
 	 * @param int $id
@@ -629,27 +602,18 @@ class ApiHandler extends Api\CalDAV\Handler
 	}
 
 	/**
-	 * Check if user has the necessary rights on an invoice
+	 * Check if user has the necessary rights on a RAG search-result entry
 	 *
-	 * Invoices currently only cares for run-rights to the app, nothing else.
+	 * RAG entries are read-only via this REST API (put/post/delete always return
+	 * 403 Forbidden below), per-entry access is enforced separately via Api\Link::title(s)
+	 * in Embedding::read()/search(), so this only needs to gate on run-rights to the app.
 	 *
 	 * @param int $acl Api\Acl::READ, Api\Acl::EDIT or Api\Acl::DELETE
 	 * @param array|int $entry entry-array or id
-	 * @return boolean null if entry does not exist, false if no access, true if access permitted
+	 * @return boolean true if access permitted
 	 */
 	function check_access($acl, $entry)
 	{
-		if (empty($GLOBALS['egw_info']['user']['apps']['invoices']))
-		{
-			return false;
-		}
-		// we only allow to delete invoices in draft or imported status
-		// same is true for most of the fields of non-draft invoices --> currently we forbid it via REST API
-		// ToDo: allow updating allowed fields like description, maybe only via PATCH
-		if ($acl == Api\Acl::DELETE || $acl == Api\Acl::EDIT)
-		{
-			return in_array($entry['invoice_status'], ['draft', 'imported']);
-		}
-		return true;
+		return !empty($GLOBALS['egw_info']['user']['apps']['rag']);
 	}
 }

@@ -702,6 +702,57 @@ class Embedding
 	}
 
 	/**
+	 * Read a single search-result entry by its composite "app:id" identifier
+	 *
+	 * Enforces the same per-entry ACL as search() does for result rows, via Api\Link::title().
+	 * Always asks the app's plugin directly instead of using the fulltext index cache: not every
+	 * app is guaranteed to be fulltext-indexed, and the index can be stale relative to the entry's
+	 * current modified time.
+	 *
+	 * @param string $id "app:id" e.g. "addressbook:123"
+	 * @param bool $check_acl unused, kept for Api\CalDAV\Handler::read() signature compatibility
+	 * @return array|null|false array with app, app_id, modified, title, description, extra;
+	 *  null if not found, false if user has no access to the underlying entry
+	 * @throws Api\Db\Exception
+	 * @throws Api\Db\Exception\InvalidSql
+	 */
+	public function read($id, bool $check_acl=false)
+	{
+		[$app, $app_id] = array_pad(explode(':', (string)$id, 2), 2, null);
+		if (!$app || !$app_id || !($plugin_class = self::plugins()[$app] ?? null))
+		{
+			return null;
+		}
+		// Api\Link::title() enforces the ACL of the underlying app-entry:
+		// null = entry does not exist, false = exists but no access, string = title
+		if (!($title = Api\Link::title($app, $app_id)))
+		{
+			return $title === false ? false : null;
+		}
+		/** @var Embedding\Base $plugin */
+		$plugin = new $plugin_class();
+		// top-level app+id (not nested under 'data') is required so getUpdated() scopes its
+		// query to this one entry via $where[ID], see Base::getUpdated()/notify()'s $data shape
+		foreach ($plugin->getUpdated(true, ['app' => $app, 'id' => $app_id]) as $entry)
+		{
+			// same value-only extra shape as stored in FULLTEXT_EXTRA, see embed()
+			$extra = $entry;
+			unset($extra[$plugin_class::ID], $extra[$plugin_class::MODIFIED], $extra[$plugin_class::TITLE], $extra[$plugin_class::DESCRIPTION]);
+			return [
+				'app' => $app,
+				'app_id' => $app_id,
+				'modified' => $entry[$plugin_class::MODIFIED] ?? null,
+				'title' => $title,
+				'description' => $entry[$plugin_class::DESCRIPTION] ?? null,
+				'extra' => $extra ? array_values(array_filter(array_map('trim', $extra), static function ($v) {
+					return $v && strlen((string)$v) > 3;
+				})) : [],
+			];
+		}
+		return null;
+	}
+
+	/**
 	 * Hybrid search in RAG and fulltext index for given app and $pattern
 	 *
 	 * Returns found IDs and their distance ordered by the smallest distance / the best match first,

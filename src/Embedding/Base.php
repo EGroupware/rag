@@ -125,11 +125,15 @@ abstract class Base
 	 *
 	 * @param bool $fulltext false: check the rag, true: check fulltext index
 	 * @param ?array $hook_data null or data from notify-all hook, to just emit this entry
+	 * @param bool $ignoreStaleness true: also return an entry that's already fully up-to-date
+	 *  in the index - used by Embedding::read() to fetch one given entry's current data
+	 *  regardless of index freshness, instead of "what's pending an update" (the latter is
+	 *  empty, by definition, for an already up-to-date entry - the common, correct-state case)
 	 * @return \Generator<array>
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
-	public function getUpdated(bool $fulltext=false, ?array $hook_data=null)
+	public function getUpdated(bool $fulltext=false, ?array $hook_data=null, bool $ignoreStaleness=false)
 	{
 		$where = [];
 		$cols = array_merge([static::ID, static::MODIFIED, static::TITLE, static::DESCRIPTION], static::$additional_cols);
@@ -143,7 +147,7 @@ abstract class Base
 		{
 			$where[] = static::RAG_EXTRA_CONDITION;
 		}
-		$join = $this->getJoin($where, $fulltext);
+		$join = $this->getJoin($where, $fulltext, $ignoreStaleness);
 		do
 		{
 			$r = 0;
@@ -183,9 +187,12 @@ abstract class Base
 	 *
 	 * @param array &$where
 	 * @param bool $fulltext false: check the rag, true: check fulltext index
+	 * @param bool $ignoreStaleness true: skip the "not yet indexed / stale" condition, so an
+	 *  already fully up-to-date entry is still returned - used by read() which wants the one
+	 *  given entry's current data regardless of index freshness, not "what's pending an update"
 	 * @return string
 	 */
-	protected function getJoin(array &$where=[], bool $fulltext=false)
+	protected function getJoin(array &$where=[], bool $fulltext=false, bool $ignoreStaleness=false)
 	{
 		if (static::NOT_DELETED)
 		{
@@ -193,14 +200,18 @@ abstract class Base
 		}
 		if (!$fulltext)
 		{
-			$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$this->modified().')';
-
+			if (!$ignoreStaleness)
+			{
+				$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$this->modified().')';
+			}
 			return 'LEFT JOIN '.Embedding::TABLE.' ON '.
 				Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
 				Embedding::EMBEDDING_APP_ID.'='.static::ID.' AND '.Embedding::EMBEDDING_CHUNK.'=0';
 		}
-		$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$this->modified().')';
-
+		if (!$ignoreStaleness)
+		{
+			$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$this->modified().')';
+		}
 		return 'LEFT JOIN '.Embedding::FULLTEXT_TABLE.' ON '.
 			Embedding::FULLTEXT_APP.'='.$this->db->quote(static::APP).' AND '.
 			Embedding::FULLTEXT_APP_ID.'='.static::ID;

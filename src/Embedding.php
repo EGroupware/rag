@@ -732,8 +732,13 @@ class Embedding
 		/** @var Embedding\Base $plugin */
 		$plugin = new $plugin_class();
 		// top-level app+id (not nested under 'data') is required so getUpdated() scopes its
-		// query to this one entry via $where[ID], see Base::getUpdated()/notify()'s $data shape
-		foreach ($plugin->getUpdated(true, ['app' => $app, 'id' => $app_id]) as $entry)
+		// query to this one entry via $where[ID], see Base::getUpdated()/notify()'s $data shape.
+		// $ignoreStaleness=true: we want this entry's current data regardless of whether the
+		// fulltext/rag index already is up-to-date for it - getUpdated()'s default "what's
+		// pending an update" semantics is empty by definition for an already up-to-date entry,
+		// which is the common, correct-state case (a bug found while adding read()'s test
+		// coverage: read() on any already-indexed entry always returned null, "not found").
+		foreach ($plugin->getUpdated(true, ['app' => $app, 'id' => $app_id], true) as $entry)
 		{
 			// same value-only extra shape as stored in FULLTEXT_EXTRA, see embed()
 			$extra = $entry;

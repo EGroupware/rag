@@ -891,32 +891,7 @@ class Embedding
 		// is $pattern already cached, or do we need to do so now
 		if (empty($response[0]->id))
 		{
-			// concurrent requests caching a new, not yet seen pattern can compute the same
-			// next rag_chunk and collide on the (rag_app,rag_app_id,rag_chunk) unique key:
-			// retry with a freshly read MAX(rag_chunk) instead of failing the whole search
-			for ($retry = 0; ; ++$retry)
-			{
-				try {
-					$this->db->insert(self::TABLE, [
-						self::EMBEDDING_APP => self::EMBEDDING_CACHE,
-						self::EMBEDDING_APP_ID => 0,
-						self::EMBEDDING_CHUNK => 1+(int)$this->db->select(self::TABLE, 'MAX('.self::EMBEDDING_CHUNK.')', [
-							self::EMBEDDING_APP => self::EMBEDDING_CACHE,
-							self::EMBEDDING_APP_ID => 0,
-						], __LINE__, __FILE__, false, '', self::APP)->fetchColumn(),
-						self::EMBEDDING_HASH => $response[0]->sha256,
-						self::EMBEDDING => $response[0]->embedding,
-						self::EMBEDDING_MODIFIED => new Api\DateTime(),
-					], false, __LINE__, __FILE__, self::APP);
-					break;
-				}
-				catch (InvalidSql $e) {
-					if ($e->getCode() != 1062 || $retry >= 3)   // not a duplicate-key error, or retries exhausted
-					{
-						throw $e;
-					}
-				}
-			}
+			$this->cacheQueryEmbedding($response[0]);
 		}
 		$cols = [
 			self::EMBEDDING_APP,
@@ -974,6 +949,44 @@ class Embedding
 				json_encode($id_distance));
 		}
 		return $id_distance;
+	}
+
+	/**
+	 * Cache a query embedding under the *cache* pseudo-app, retrying on a chunk-number collision
+	 *
+	 * Concurrent searches caching two different, not yet seen patterns can read the same
+	 * MAX(rag_chunk) and then collide on the (rag_app,rag_app_id,rag_chunk) unique key. Retrying
+	 * with a freshly read MAX(rag_chunk) lets both survive, instead of REPLACEing (which would
+	 * silently discard whichever of the two colliding rows loses the race) or failing the search.
+	 *
+	 * @param object $response object with ->sha256 (binary sha256 hash) and ->embedding (float[]) attributes
+	 * @throws InvalidSql if not a duplicate-key error, or retries exhausted
+	 */
+	protected function cacheQueryEmbedding(object $response) : void
+	{
+		for ($retry = 0; ; ++$retry)
+		{
+			try {
+				$this->db->insert(self::TABLE, [
+					self::EMBEDDING_APP => self::EMBEDDING_CACHE,
+					self::EMBEDDING_APP_ID => 0,
+					self::EMBEDDING_CHUNK => 1+(int)$this->db->select(self::TABLE, 'MAX('.self::EMBEDDING_CHUNK.')', [
+						self::EMBEDDING_APP => self::EMBEDDING_CACHE,
+						self::EMBEDDING_APP_ID => 0,
+					], __LINE__, __FILE__, false, '', self::APP)->fetchColumn(),
+					self::EMBEDDING_HASH => $response->sha256,
+					self::EMBEDDING => $response->embedding,
+					self::EMBEDDING_MODIFIED => new Api\DateTime(),
+				], false, __LINE__, __FILE__, self::APP);
+				return;
+			}
+			catch (InvalidSql $e) {
+				if ($e->getCode() != 1062 || $retry >= 3)   // not a duplicate-key error, or retries exhausted
+				{
+					throw $e;
+				}
+			}
+		}
 	}
 
 	/**

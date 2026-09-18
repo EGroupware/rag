@@ -191,7 +191,7 @@ class ApiHandler extends Api\CalDAV\Handler
 			{
 				foreach(Api\Link::titles($app, $app_ids) as $id => $title)
 				{
-					if ($titles)
+					if ($title)
 					{
 						$entries[$app.':'.$id]['title'] = $title;
 						unset($app_ids[array_search($id, $app_ids)]);

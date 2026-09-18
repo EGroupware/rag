@@ -90,6 +90,13 @@ class EmbeddingSearchEmbeddingsTest extends Api\LoggedInTest
 	 */
 	private function embeddingWithFakeClient(array $queryEmbedding, ?int &$callCount) : Embedding
 	{
+		// construct Embedding first: its file's require_once '../vendor/autoload.php' is what
+		// registers the \OpenAI autoloader - referencing \OpenAI::factory() first, if this were
+		// the process's very first touch of anything rag-related, fails with "Class OpenAI not
+		// found" (only worked before by accident, since seedEmbedding() ran first and happened
+		// to reference Embedding::TABLE)
+		$embedding = new Embedding();
+
 		$callCount = 0;
 		$httpClient = new class($queryEmbedding, $callCount) implements ClientInterface {
 			public function __construct(private array $embedding, private int &$callCount) {}
@@ -118,7 +125,6 @@ class EmbeddingSearchEmbeddingsTest extends Api\LoggedInTest
 			->withApiKey('unused')
 			->make();
 
-		$embedding = new Embedding();
 		$property = new ReflectionProperty(Embedding::class, 'client');
 		$property->setAccessible(true);
 		$property->setValue($embedding, $client);

@@ -338,7 +338,11 @@ abstract class Base
 	 */
 	public function purgeDeleted()
 	{
-		Api\Cache::getInstance(__CLASS__, 'purge-'.self::APP, function()
+		// self::APP (and __CLASS__) would resolve to Base's OWN empty '' constant here, not the
+		// calling subclass's - self:: isn't late-static-bound for constant lookups, unlike
+		// static::. Using the wrong one made every app plugin share the same once-daily cache
+		// key, so only the first app processed each day ever actually got purged.
+		Api\Cache::getInstance(static::class, 'purge-'.static::APP, function()
 		{
 			try {
 				// clean fulltext index

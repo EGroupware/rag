@@ -130,12 +130,13 @@ class Ui
 				// $title can be null for not existing entries or false for not available ones to the current user
 				if (isset($rows[$row_id=$app.':'.$id]) && $title)
 				{
-					$rows[$row_id] = $rows[$row_id]+[
-						'id' => $row_id,
-						'app' => $app,
-						'app_id' => $id,
-						'title' => $title,
-					];
+					// direct assignment, NOT array union: $rows[$row_id] already carries a
+					// (possibly null/stale) 'title' key whenever return_all is used, and
+					// union would keep that existing key over this freshly resolved one
+					$rows[$row_id]['id'] = $row_id;
+					$rows[$row_id]['app'] = $app;
+					$rows[$row_id]['app_id'] = $id;
+					$rows[$row_id]['title'] = $title;
 					unset($ids[array_search($id, $ids)]);
 				}
 			}

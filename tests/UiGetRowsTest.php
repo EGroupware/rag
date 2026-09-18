@@ -31,6 +31,14 @@ require_once realpath(__DIR__.'/../../api/tests/LoggedInTest.php');
  * logic (type dispatch, the 2*(start+num_rows) over-fetch math, "$id" parsing, the
  * Api\Link::titles() ACL-drop/total-adjustment, and the final slice+array_values()) from a live
  * RAG/fulltext backend.
+ *
+ * Found+fixed one bug while adding this coverage (2026-09-18): the ACL-title merge used array
+ * union (`$rows[$row_id] = $rows[$row_id]+['title'=>$title,...]`), which keeps a key's
+ * existing value when the key already exists - and $rows[$row_id] always already carries a
+ * 'title' key (return_all is always used here), so the freshly resolved, ACL-checked title
+ * from Api\Link::titles() was silently discarded in favor of whatever the search result
+ * already had. Not an access-control issue (a row only survives at all when $title is truthy),
+ * just a display-staleness one - fixed via direct key assignment instead of union.
  */
 class UiGetRowsTest extends Api\LoggedInTest
 {
@@ -208,6 +216,26 @@ class UiGetRowsTest extends Api\LoggedInTest
 		$this->assertEquals($realId, $rows[0]['app_id']);
 		$this->assertNotEmpty($rows[0]['title']);
 		$this->assertSame(4, $total, 'total must be reduced by 1 for the dropped entry');
+	}
+
+	public function testFreshAclTitleOverwritesStaleTitleFromSearchResult()
+	{
+		$realId = $this->createRealContact();
+		// simulates a row that already carries a (stale/wrong, e.g. cached-at-index-time)
+		// title - return_all always includes a 'title' key, so this is the normal shape
+		$stub = $this->makeStub([
+			"addressbook:$realId" => ['distance' => 0.1, 'title' => 'STALE-OR-WRONG-TITLE'],
+		], 1);
+		$ui = $this->uiWithStub($stub);
+		$rows = null;
+		$readonlys = null;
+
+		$ui->get_rows(['search' => 'pattern', 'col_filter' => ['apps' => ['addressbook']], 'order' => 'default'], $rows, $readonlys);
+
+		$this->assertCount(1, $rows);
+		$this->assertNotSame('STALE-OR-WRONG-TITLE', $rows[0]['title'],
+			'the freshly ACL-resolved title must win over whatever the search result already carried');
+		$this->assertNotEmpty($rows[0]['title']);
 	}
 
 	public function testNumericIdUsesFirstColFilterAppAsFallback()

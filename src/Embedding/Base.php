@@ -227,21 +227,30 @@ abstract class Base
 	 * @throws Api\Db\Exception
 	 * @throws Api\Db\Exception\InvalidSql
 	 */
+	/**
+	 * Per-app cache of text/htmlarea custom fields, keyed by static::APP
+	 *
+	 * A method-local `static $cfs` would be bound to this method's compiled body, not per
+	 * calling subclass, so the first app plugin processed in embed()'s per-app loop would
+	 * silently poison every other app's custom-fields lookup for the rest of the run. Kept as
+	 * a real (resettable/reflectable) static property, rather than just keying a method-local
+	 * static by static::APP, so tests can reset it for a deterministic clean slate instead of
+	 * depending on which app another test/process happened to touch first.
+	 *
+	 * @var array<string, array>
+	 */
+	private static array $textCustomFieldsCache = [];
+
 	protected function getExtraTexts(int $id, array $texts=[], ?array $hook_data=null) : array
 	{
-		// keyed by static::APP: a bare scalar here would be shared across every plugin
-		// subclass calling this SAME inherited method (a static local is bound to the method
-		// body, not per calling class), so the first app processed in embed()'s per-app loop
-		// would silently poison every other app's custom-fields lookup for the rest of the run
-		static $cfs = [];
-		if (!isset($cfs[static::APP]))
+		if (!isset(self::$textCustomFieldsCache[static::APP]))
 		{
-			$cfs[static::APP] = array_filter(Api\Storage\Customfields::get(static::APP), static function($cf)
+			self::$textCustomFieldsCache[static::APP] = array_filter(Api\Storage\Customfields::get(static::APP), static function($cf)
 			{
 				return in_array($cf['type'], ['text', 'htmlarea']);
 			});
 		}
-		$appCfs = $cfs[static::APP];
+		$appCfs = self::$textCustomFieldsCache[static::APP];
 		if ($appCfs)
 		{
 			// check if we hook-data already supplies ALL values, then and only then use it instead querying the DB

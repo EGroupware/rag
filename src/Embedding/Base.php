@@ -229,28 +229,35 @@ abstract class Base
 	 */
 	protected function getExtraTexts(int $id, array $texts=[], ?array $hook_data=null) : array
 	{
-		static $cfs=null;
-		if (!isset($cfs))
+		// keyed by static::APP: a bare scalar here would be shared across every plugin
+		// subclass calling this SAME inherited method (a static local is bound to the method
+		// body, not per calling class), so the first app processed in embed()'s per-app loop
+		// would silently poison every other app's custom-fields lookup for the rest of the run
+		static $cfs = [];
+		if (!isset($cfs[static::APP]))
 		{
-			$cfs = array_filter(Api\Storage\Customfields::get(static::APP), static function($cf)
+			$cfs[static::APP] = array_filter(Api\Storage\Customfields::get(static::APP), static function($cf)
 			{
 				return in_array($cf['type'], ['text', 'htmlarea']);
 			});
 		}
-		if ($cfs)
+		$appCfs = $cfs[static::APP];
+		if ($appCfs)
 		{
 			// check if we hook-data already supplies ALL values, then and only then use it instead querying the DB
 			if ($hook_data)
 			{
 				$rows = [];
-				foreach(array_keys($cfs) as $cf)
+				foreach(array_keys($appCfs) as $cf)
 				{
 					if (!array_key_exists('#'.$cf, $hook_data))
 					{
 						$rows = null;
 						break;
 					}
-					if (!empty($hook_data['#'.$cf]) && !trim($hook_data['#'.$cf]))
+					// include values with real (non-whitespace) content; empty/whitespace-only
+					// values are correctly omitted, same as the DB-query path below would
+					if (!empty($hook_data['#'.$cf]) && trim($hook_data['#'.$cf]) !== '')
 					{
 						$rows[] = [
 							static::EXTRA_ID    => $id,
@@ -262,10 +269,10 @@ abstract class Base
 			}
 			foreach($rows ?? $this->db->select(static::EXTRA_TABLE, [static::EXTRA_ID, static::EXTRA_NAME, static::EXTRA_VALUE], [
 				static::EXTRA_ID => $id,
-				static::EXTRA_NAME => array_keys($cfs),
+				static::EXTRA_NAME => array_keys($appCfs),
 			], __LINE__, __FILE__, false, 'ORDER BY '.static::EXTRA_NAME, static::APP) as $row)
 			{
-				if ($cfs[$row[static::EXTRA_NAME]]['type'] == 'htmlarea')
+				if ($appCfs[$row[static::EXTRA_NAME]]['type'] == 'htmlarea')
 				{
 					$row[static::EXTRA_VALUE] = trim(strip_tags($row[static::EXTRA_VALUE]));
 				}

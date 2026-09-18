@@ -951,15 +951,31 @@ class Embedding
 				if ($return_all && !isset($row['title']))
 				{
 					static $plugins=null; $plugins ??= self::plugins();
-					/** @var Embedding\Base $plugin */ $plugin = $plugins[$row[self::EMBEDDING_APP]] ?? null;
-					if ($plugin)
+					/** @var class-string<Embedding\Base> $plugin_class */
+					$plugin_class = $plugins[$row[self::EMBEDDING_APP]] ?? null;
+					if ($plugin_class)
 					{
-						foreach((new $plugin)->getUpdated(true, ['data' => [
+						$plugin = new $plugin_class();
+						// top-level app+id (not nested under 'data') is required so getUpdated()
+						// scopes its query to this one entry via $where[ID], see
+						// Base::getUpdated()/notify()'s $data shape - and $row += $entry further
+						// down would never have overwritten $row's own (null) title/description
+						// keys with $entry's, nor would it have landed under the right key names,
+						// since getUpdated() yields the app's own raw column names (e.g.
+						// n_fileas), not 'title'/'description'
+						foreach ($plugin->getUpdated(true, [
 							'app' => $row[self::EMBEDDING_APP],
 							'id' => $row[self::EMBEDDING_APP_ID],
-						]]) as $entry)
+						], true) as $entry)
 						{
-							$row += $entry;
+							// same value-only extra shape as stored in FULLTEXT_EXTRA, see embed()
+							$extra = $entry;
+							unset($extra[$plugin_class::ID], $extra[$plugin_class::MODIFIED],
+								$extra[$plugin_class::TITLE], $extra[$plugin_class::DESCRIPTION]);
+							$row['title'] = $entry[$plugin_class::TITLE] ?? null;
+							$row['description'] = $entry[$plugin_class::DESCRIPTION] ?? null;
+							$row['extra'] = $extra ? json_encode(array_values($extra)) : null;
+							break;
 						}
 					}
 				}

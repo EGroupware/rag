@@ -1,3 +1,4 @@
+always use relevance	rag	nl	Gebruik altijd relevantie
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	nl	Alles wat tussen dubbele aanhalingstekens staat, wordt als geheel beschouwd (zodat u bijvoorbeeld zinsdelen kunt matchen)
 app	rag	nl	App
 app id	rag	nl	App ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	nl	Wijzi
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	nl	Momenteel worden alleen modellen met 1024 dimensies, zoals bge-m3, ondersteund!
 default sorting	rag	nl	Standaardsortering
 enter your search query here...	rag	nl	Voer hier uw zoekopdracht in ...
+fulltext	rag	nl	Volledige tekst
 fulltext search	rag	nl	Zoeken in volledige tekst
+hybrid search (rag+fulltext)	rag	nl	Hybride zoekopdracht (RAG + volledige tekst)
 hybrid search: rag+fulltext	rag	nl	Hybride zoeken: RAG + volledige tekst
+legacy search	rag	nl	Oude zoekfunctie
 legacy search, as used before	rag	nl	Oude zoekfunctie, zoals voorheen gebruikt
+no, use search-order chosen in app	rag	nl	Nee, gebruik de in de app gekozen zoekvolgorde
+operators	rag	nl	Operatoren
 query	rag	nl	Zoekopdracht
 rag	common	nl	RAG
 rag / semantic search	rag	nl	RAG / Semantisch zoeken

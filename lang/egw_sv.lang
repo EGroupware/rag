@@ -1,3 +1,4 @@
+always use relevance	rag	sv	Använd alltid relevans
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	sv	Allt som omges av dubbla citattecken betraktas som en helhet (så att du till exempel kan matcha fraser)
 app	rag	sv	App
 app id	rag	sv	App-ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	sv	Ändr
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	sv	För närvarande stöds endast inbäddade modeller med 1024 dimensioner, såsom bge-m3!
 default sorting	rag	sv	Standardsortering
 enter your search query here...	rag	sv	Ange din sökfråga här ...
+fulltext	rag	sv	Fulltext
 fulltext search	rag	sv	Fulltextsökning
+hybrid search (rag+fulltext)	rag	sv	Hybridsökning (RAG + fulltext)
 hybrid search: rag+fulltext	rag	sv	Hybridsökning: RAG + Fulltext
+legacy search	rag	sv	Gammal sökfunktion
 legacy search, as used before	rag	sv	Äldre sökning, som användes tidigare
+no, use search-order chosen in app	rag	sv	Nej, använd den sökordning som valts i appen
+operators	rag	sv	Operatörer
 query	rag	sv	Sökfråga
 rag	common	sv	RAG
 rag / semantic search	rag	sv	RAG / Semantisk sökning

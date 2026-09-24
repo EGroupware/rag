@@ -1,3 +1,4 @@
+always use relevance	rag	da	Brug altid relevans
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	da	Alt, der er omgivet af dobbelt anførselstegn, betragtes som en helhed (så du f.eks. kan matche sætninger)
 app	rag	da	App
 app id	rag	da	App ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	da	Změn
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	da	V současné době jsou podporovány pouze modely s 1024 dimenzemi, jako je bge-m3!
 default sorting	rag	da	Standardsortering
 enter your search query here...	rag	da	Indtast din søgestreng her ...
+fulltext	rag	da	Fuldtekst
 fulltext search	rag	da	Fulltextové vyhledávání
+hybrid search (rag+fulltext)	rag	da	Hybridsøgning (RAG+fuldtekst)
 hybrid search: rag+fulltext	rag	da	Hybridní vyhledávání: RAG + Fulltext
+legacy search	rag	da	Gammel søgefunktion
 legacy search, as used before	rag	da	Starší vyhledávání, jak bylo používáno dříve
+no, use search-order chosen in app	rag	da	Nej, brug den søgerækkefølge, der er valgt i appen
+operators	rag	da	Operatorer
 query	rag	da	Søgning
 rag	common	da	RAG
 rag / semantic search	rag	da	RAG / Semantisk søgning

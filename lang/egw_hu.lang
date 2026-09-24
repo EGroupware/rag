@@ -1,3 +1,4 @@
+always use relevance	rag	hu	Mindig a relevancia alapján
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	hu	A dupla idézőjelek között szereplő szöveg egészében kerül figyelembevételre (így például kifejezéseket is kereshet)
 app	rag	hu	App
 app id	rag	hu	App ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	hu	A tel
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	hu	Jelenleg csak a 1024 dimenziós modellek, például a bge-m3 támogatottak!
 default sorting	rag	hu	Alapértelmezett rendezés
 enter your search query here...	rag	hu	Írja be ide a keresési kifejezést ...
+fulltext	rag	hu	Teljes szöveg
 fulltext search	rag	hu	Teljes szövegű keresés
+hybrid search (rag+fulltext)	rag	hu	Hibrid keresés (RAG + teljes szöveg)
 hybrid search: rag+fulltext	rag	hu	Régi keresés, ahogy korábban használták
+legacy search	rag	hu	Régi keresés
 legacy search, as used before	rag	hu	Régi keresés, ahogy korábban használták
+no, use search-order chosen in app	rag	hu	Nem, az alkalmazásban kiválasztott keresési sorrendet használja
+operators	rag	hu	Műveletek
 query	rag	hu	Keresés
 rag	common	hu	RAG
 rag / semantic search	rag	hu	RAG / Szemantikus keresés

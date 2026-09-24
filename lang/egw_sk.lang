@@ -1,3 +1,4 @@
+always use relevance	rag	sk	Vždy použiť relevantnosť
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	sk	Všetko, čo je uzavreté v úvodzovkách, sa berie ako celok (takže môžete vyhľadávať napríklad frázy)
 app	rag	sk	Aplikácia
 app id	rag	sk	ID aplikácie
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	sk	Zmeni
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	sk	V súčasnosti sú podporované iba vložené modely s rozmermi 1024, ako napríklad bge-m3!
 default sorting	rag	sk	Predvolené triedenie
 enter your search query here...	rag	sk	Zadajte sem svoj vyhľadávací dotaz ...
+fulltext	rag	sk	Plný text
 fulltext search	rag	sk	Fulltextové vyhľadávanie
+hybrid search (rag+fulltext)	rag	sk	Hybridné vyhľadávanie (RAG + plný text)
 hybrid search: rag+fulltext	rag	sk	Hybridné vyhľadávanie: RAG + Fulltext
+legacy search	rag	sk	Klasické vyhľadávanie
 legacy search, as used before	rag	sk	Staré vyhľadávanie, ako sa používalo predtým
+no, use search-order chosen in app	rag	sk	Nie, použiť poradie vyhľadávania zvolené v aplikácii
+operators	rag	sk	Operátory
 query	rag	sk	Dotaz
 rag	common	sk	RAG
 rag / semantic search	rag	sk	RAG / Sémantické vyhľadávanie

@@ -1,3 +1,4 @@
+always use relevance	rag	ko	항상 관련성 순서 사용
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	ko	따옴표로 묶인 모든 내용은 하나의 단위로 간주됩니다(예: 구문 일치 가능)
 app	rag	ko	앱
 app id	rag	ko	앱 ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	ko	전�
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	ko	현재 bge-m3와 같이 1024차원 모델만 지원됩니다!
 default sorting	rag	ko	기본 정렬
 enter your search query here...	rag	ko	검색어를 여기에 입력하세요...
+fulltext	rag	ko	전체 텍스트
 fulltext search	rag	ko	전체 텍스트 검색
+hybrid search (rag+fulltext)	rag	ko	하이브리드 검색 (RAG + 전체 텍스트)
 hybrid search: rag+fulltext	rag	ko	하이브리드 검색: RAG + 전체 텍스트
+legacy search	rag	ko	기존 검색
 legacy search, as used before	rag	ko	기존 검색 방식 (이전과 동일)
+no, use search-order chosen in app	rag	ko	아니요, 앱에서 선택한 검색 순서 사용
+operators	rag	ko	연산자
 query	rag	ko	검색어 입력
 rag	common	ko	RAG
 rag / semantic search	rag	ko	RAG / 의미적 검색

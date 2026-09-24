@@ -1,3 +1,4 @@
+always use relevance	rag	tr	Her zaman alaka düzeyini kullan
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	tr	Çift tırnak içine alınan her şey bir bütün olarak alınır (böylece örneğin kelime öbeklerini eşleştirebilirsiniz)
 app	rag	tr	Uygulama
 app id	rag	tr	Uygulama Kimliği
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	tr	Tam m
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	tr	Şu anda yalnızca bge-m3 gibi 1024 boyutlu modeller desteklenmektedir!
 default sorting	rag	tr	Varsayılan sıralama
 enter your search query here...	rag	tr	Arama sorgunuzu buraya girin ...
+fulltext	rag	tr	Tam metin
 fulltext search	rag	tr	Tam metin arama
+hybrid search (rag+fulltext)	rag	tr	Hibrit arama (RAG + Tam metin)
 hybrid search: rag+fulltext	rag	tr	Hibrit arama: RAG + Tam metin
+legacy search	rag	tr	Eski arama
 legacy search, as used before	rag	tr	Daha önce kullanılan eski arama
+no, use search-order chosen in app	rag	tr	Hayır, uygulamada seçilen arama sırasını kullan
+operators	rag	tr	İşlemciler
 query	rag	tr	Sorgu
 rag	common	tr	RAG
 rag / semantic search	rag	tr	RAG / Anlamsal arama

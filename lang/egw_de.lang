@@ -35,6 +35,7 @@ minimize chunks e.g. concatenate title and description	rag	de	Minimiere die Chun
 model to use	rag	de	Benutztes Model
 no match	rag	de	kein Treffer
 no, use search-order chosen in app	rag	de	Nein, verwende die Sortierung die in der App gewählt wurde
+operators	rag	de	Operatoren
 opposite	rag	de	Gegenteil
 please note: ollama must be bound to all interfaces, not just localhost!	rag	de	Bitte beachten: Ollama muss auf allen Schnittstellen gebunden sein, NICHT nur auf localhost!
 query	rag	de	Suchanfrage
@@ -44,8 +45,8 @@ rag search	rag	de	RAG Suche
 rag search only	rag	de	RAG Suche ausschließlich
 relevance	rag	de	Relevanz
 search in which applications	rag	de	In welchen Anwendungen suchen
-should search in apps be ordered by relevance	rag	de	Solle die Suche in den Anwendungen nach Relevanz sortiert sein
 stop calculating embeddings after this time (in seconds). default: 285 (4min:45sec)	rag	de	Beende die Berechnung von Embeddings nach dieser Zeit (in Sekunden). Vorgabe (4min:45sec)
+should search in apps be ordered by relevance	rag	de	Soll die Suche in den Anwendungen nach Relevanz sortiert sein
 syntax error in fulltext search-pattern	common	de	Syntaxfehler in Volltext Suchmuster
 the wildcard, indicating zero or more characters. it can only appear at the end of a word.	rag	de	Der Platzhalter, der null oder mehr Zeichen angibt. Er kann nur am Ende eines Wortes stehen
 the word cannot appear in any row returned.	rag	de	Das Wort darf in keiner Zeile der Rückgabe vorkommen

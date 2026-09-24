@@ -1,3 +1,4 @@
+always use relevance	rag	lt	Visada naudoti atitiktį
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	lt	Viskas, kas yra tarp dvigubų kabučių, yra laikoma kaip visuma (todėl galite rasti, pavyzdžiui, frazes)
 app	rag	lt	Programėlė
 app id	rag	lt	Programėlės ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	lt	Pakei
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	lt	Šiuo metu palaikomi tik 1024 matmenų modeliai, pvz., bge-m3!
 default sorting	rag	lt	Numatytasis rūšiavimas
 enter your search query here...	rag	lt	Įveskite savo paieškos užklausą čia ...
+fulltext	rag	lt	Pilnas tekstas
 fulltext search	rag	lt	Visatekstė paieška
+hybrid search (rag+fulltext)	rag	lt	Hibridinė paieška (RAG + pilnas tekstas)
 hybrid search: rag+fulltext	rag	lt	Hibridinė paieška: RAG + visatekstė
+legacy search	rag	lt	Tradicinė paieška
 legacy search, as used before	rag	lt	Senasis paieškos modelis, naudotas anksčiau
+no, use search-order chosen in app	rag	lt	Ne, naudoti programoje pasirinktą paieškos tvarką
+operators	rag	lt	Operatoriai
 query	rag	lt	Užklausa
 rag	common	lt	RAG
 rag / semantic search	rag	lt	RAG / Semantinė paieška

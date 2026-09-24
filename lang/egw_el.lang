@@ -1,3 +1,4 @@
+always use relevance	rag	el	Πάντα χρήση σχετικότητας
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	el	Οτιδήποτε περικλείεται σε διπλά εισαγωγικά θεωρείται ως σύνολο (έτσι μπορείτε να αντιστοιχίσετε φράσεις, για παράδειγμα)
 app	rag	el	Εφαρμογή
 app id	rag	el	Αναγνωριστικό εφαρμογής
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	el	Αλ�
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	el	Προς το παρόν υποστηρίζονται μόνο μοντέλα ενσωμάτωσης με 1024 διαστάσεις, όπως το bge-m3!
 default sorting	rag	el	Προεπιλεγμένη ταξινόμηση
 enter your search query here...	rag	el	Εισάγετε εδώ την ερώτησή σας...
+fulltext	rag	el	Πλήρες κείμενο
 fulltext search	rag	el	Αναζήτηση πλήρους κειμένου
+hybrid search (rag+fulltext)	rag	el	Υβριδική αναζήτηση (RAG + Πλήρες κείμενο)
 hybrid search: rag+fulltext	rag	el	Υβριδική αναζήτηση: RAG + Πλήρες κείμενο
+legacy search	rag	el	Παλαιά αναζήτηση
 legacy search, as used before	rag	el	Παλαιά αναζήτηση, όπως χρησιμοποιούνταν προηγουμένως
+no, use search-order chosen in app	rag	el	Όχι, χρήση της σειράς αναζήτησης που έχει επιλεγεί στην εφαρμογή
+operators	rag	el	Λειτουργίες
 query	rag	el	Ερώτηση
 rag	common	el	RAG
 rag / semantic search	rag	el	RAG / Σημασιολογική αναζήτηση

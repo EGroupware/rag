@@ -1,3 +1,4 @@
+always use relevance	rag	pt	Utilizar sempre a relevância
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	pt	Tudo o que estiver entre aspas duplas é considerado como um todo (para que você possa corresponder frases, por exemplo)
 app	rag	pt	Aplicação
 app id	rag	pt	ID da aplicação
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	pt	Alter
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	pt	Atualmente, apenas modelos incorporados com 1024 dimensões, como bge-m3, são suportados!
 default sorting	rag	pt	Classificação padrão
 enter your search query here...	rag	pt	Insira aqui a sua consulta de pesquisa...
+fulltext	rag	pt	Texto completo
 fulltext search	rag	pt	Pesquisa de texto completo
+hybrid search (rag+fulltext)	rag	pt	Pesquisa híbrida (RAG + Texto completo)
 hybrid search: rag+fulltext	rag	pt	Pesquisa híbrida: RAG + Texto completo
+legacy search	rag	pt	Pesquisa tradicional
 legacy search, as used before	rag	pt	Pesquisa legada, como usada anteriormente
+no, use search-order chosen in app	rag	pt	Não, utilizar a ordem de pesquisa selecionada na aplicação
+operators	rag	pt	Operadores
 query	rag	pt	Consulta
 rag	common	pt	RAG
 rag / semantic search	rag	pt	RAG / Pesquisa semântica

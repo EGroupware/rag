@@ -1,3 +1,4 @@
+always use relevance	rag	fr	Toujours utiliser la pertinence
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	fr	Tout ce qui est entre guillemets doubles est pris dans son ensemble (vous pouvez ainsi faire correspondre des phrases, par exemple)
 app	rag	fr	App
 app id	rag	fr	App ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	fr	Modif
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	fr	Actuellement, seuls les modèles intégrés avec 1024 dimensions, comme bge-m3, sont pris en charge !
 default sorting	rag	fr	Tri par défaut
 enter your search query here...	rag	fr	Entrez votre requête de recherche ici...
+fulltext	rag	fr	Texte intégral
 fulltext search	rag	fr	Recherche en texte intégral
+hybrid search (rag+fulltext)	rag	fr	Recherche hybride (RAG + texte intégral)
 hybrid search: rag+fulltext	rag	fr	Recherche hybride : RAG + texte intégral
+legacy search	rag	fr	Recherche classique
 legacy search, as used before	rag	fr	Recherche héritée, telle qu'utilisée auparavant
+no, use search-order chosen in app	rag	fr	Non, utiliser l'ordre de recherche choisi dans l'application
+operators	rag	fr	Opérateurs
 query	rag	fr	Requête
 rag	common	fr	RAG
 rag / semantic search	rag	fr	RAG / Recherche sémantique

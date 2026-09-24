@@ -1,3 +1,4 @@
+always use relevance	rag	no	Bruk alltid relevans
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	no	Alt som er omgitt av doble anførselstegn, blir behandlet som en helhet (slik at du for eksempel kan matche setninger)
 app	rag	no	App
 app id	rag	no	App-ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	no	Endre
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	no	For øyeblikket støttes kun innebygde modeller med 1024 dimensjoner, som bge-m3!
 default sorting	rag	no	Standard sortering
 enter your search query here...	rag	no	Skriv inn søkeordet her ...
+fulltext	rag	no	Fulltekst
 fulltext search	rag	no	Fulltekstsøk
+hybrid search (rag+fulltext)	rag	no	Hybridsøk (RAG + fulltekst)
 hybrid search: rag+fulltext	rag	no	Hybridsøk: RAG + Fulltekst
+legacy search	rag	no	Gammelt søk
 legacy search, as used before	rag	no	Legacy-søk, som brukt tidligere
+no, use search-order chosen in app	rag	no	Nei, bruk søkerangering valgt i appen
+operators	rag	no	Operatører
 query	rag	no	Søk
 rag	common	no	RAG
 rag / semantic search	rag	no	RAG / Semantisk søk

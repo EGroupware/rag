@@ -1,3 +1,4 @@
+always use relevance	rag	et	Kasuta alati asjakohasust
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	et	Kõik, mis on kahekordsete jutumärkide vahel, võetakse tervikuna (nii saab näiteks leida fraase)
 app	rag	et	App
 app id	rag	et	App ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	et	Muuda
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	et	Praegu toetatakse ainult 1024-mõõtmelisi mudeleid, nagu bge-m3!
 default sorting	rag	et	Vaikimisi sorteerimine
 enter your search query here...	rag	et	Sisestage siia oma otsingupäring ...
+fulltext	rag	et	Täistekst
 fulltext search	rag	et	Täisteksti otsing
+hybrid search (rag+fulltext)	rag	et	Hübriidotsing (RAG + täistekst)
 hybrid search: rag+fulltext	rag	et	Hübriidotsing: RAG + täisteksti otsing
+legacy search	rag	et	Vana otsing
 legacy search, as used before	rag	et	Vana otsing, nagu varem kasutatud
+no, use search-order chosen in app	rag	et	Ei, kasuta rakenduses valitud otsingujärjekorda
+operators	rag	et	Operaatorid
 query	rag	et	Päring
 rag	common	et	RAG
 rag / semantic search	rag	et	RAG / Semantiline otsing

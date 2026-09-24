@@ -1,3 +1,4 @@
+always use relevance	rag	it	Usa sempre la rilevanza
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	it	Tutto ciò che è racchiuso tra virgolette doppie viene considerato come un insieme (in modo da poter trovare corrispondenze con frasi, ad esempio)
 app	rag	it	App
 app id	rag	it	App ID
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	it	Modif
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	it	Attualmente sono supportati solo modelli con 1024 dimensioni, come bge-m3!
 default sorting	rag	it	Ordinamento predefinito
 enter your search query here...	rag	it	Inserisci qui la tua query di ricerca...
+fulltext	rag	it	Testo completo
 fulltext search	rag	it	Ricerca full-text
+hybrid search (rag+fulltext)	rag	it	Ricerca ibrida (RAG + testo completo)
 hybrid search: rag+fulltext	rag	it	Ricerca ibrida: RAG + Full-text
+legacy search	rag	it	Ricerca tradizionale
 legacy search, as used before	rag	it	Ricerca legacy, come utilizzata in precedenza
+no, use search-order chosen in app	rag	it	No, usa l'ordine di ricerca scelto nell'app
+operators	rag	it	Operatori
 query	rag	it	Domanda
 rag	common	it	RAG
 rag / semantic search	rag	it	RAG / Ricerca semantica

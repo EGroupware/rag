@@ -1,3 +1,4 @@
+always use relevance	rag	fi	Käytä aina relevanssia
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	fi	Kaikki kaksoislauseissa olevat merkit otetaan kokonaisuutena (jotta voit esimerkiksi löytää lauseita)
 app	rag	fi	Sovellus
 app id	rag	fi	Sovelluksen tunnus
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	fi	Muuta
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	fi	Tällä hetkellä tuetaan vain 1024-ulotteisia upotusmalleja, kuten bge-m3!
 default sorting	rag	fi	Oletusjärjestys
 enter your search query here...	rag	fi	Kirjoita hakukysely tähän ...
+fulltext	rag	fi	Täysteksti
 fulltext search	rag	fi	Täystekstihaku
+hybrid search (rag+fulltext)	rag	fi	Hybridi-haku (RAG + täysteksti)
 hybrid search: rag+fulltext	rag	fi	Hybridihaku: RAG + täysteksti
+legacy search	rag	fi	Vanha hakutoiminto
 legacy search, as used before	rag	fi	Vanha haku, kuten aiemmin käytetty
+no, use search-order chosen in app	rag	fi	Ei, käytä sovelluksessa valittua hakujärjestystä
+operators	rag	fi	Laskutoimitusmerkit
 query	rag	fi	Kysely
 rag	common	fi	RAG
 rag / semantic search	rag	fi	RAG / Semanttinen haku

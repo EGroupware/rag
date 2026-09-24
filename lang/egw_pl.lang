@@ -1,3 +1,4 @@
+always use relevance	rag	pl	Zawsze używaj trafności
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	pl	Wszystko, co znajduje się w cudzysłowie, jest traktowane jako całość (dzięki czemu można na przykład dopasować frazy)
 app	rag	pl	Aplikacja
 app id	rag	pl	Identyfikator aplikacji
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	pl	Zmie�
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	pl	Obecnie obsługiwane są tylko modele osadzone o wymiarach 1024, takie jak bge-m3!
 default sorting	rag	pl	Domyślne sortowanie
 enter your search query here...	rag	pl	Wpisz tutaj swoje zapytanie ...
+fulltext	rag	pl	Wyszukiwanie pełnotekstowe
 fulltext search	rag	pl	Wyszukiwanie pełnotekstowe
+hybrid search (rag+fulltext)	rag	pl	Wyszukiwanie hybrydowe (RAG + wyszukiwanie pełnotekstowe)
 hybrid search: rag+fulltext	rag	pl	Wyszukiwanie hybrydowe: RAG + pełnotekstowe
+legacy search	rag	pl	Wyszukiwanie tradycyjne
 legacy search, as used before	rag	pl	Wyszukiwanie starszego typu, stosowane wcześniej
+no, use search-order chosen in app	rag	pl	Nie, użyj kolejności wyszukiwania wybranej w aplikacji
+operators	rag	pl	Operatory
 query	rag	pl	Zapytanie
 rag	common	pl	RAG
 rag / semantic search	rag	pl	RAG / Wyszukiwanie semantyczne

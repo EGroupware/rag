@@ -1,3 +1,4 @@
+always use relevance	rag	ro	Se utilizează întotdeauna relevanța
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	ro	Orice este inclus între ghilimele duble este luat ca un întreg (astfel încât să puteți potrivi fraze, de exemplu)
 app	rag	ro	Aplicație
 app id	rag	ro	ID aplicație
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	ro	Modif
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	ro	În prezent sunt acceptate numai modelele cu 1024 dimensiuni, cum ar fi bge-m3!
 default sorting	rag	ro	Sortare implicită
 enter your search query here...	rag	ro	Introduceți aici termenul de căutare ...
+fulltext	rag	ro	Text integral
 fulltext search	rag	ro	Căutare fulltext
+hybrid search (rag+fulltext)	rag	ro	Căutare hibridă (RAG + text integral)
 hybrid search: rag+fulltext	rag	ro	Căutare hibridă: RAG + Fulltext
+legacy search	rag	ro	Căutare tradițională
 legacy search, as used before	rag	ro	Căutare tradițională, așa cum se utiliza înainte
+no, use search-order chosen in app	rag	ro	Nu, se utilizează ordinea de căutare selectată în aplicație
+operators	rag	ro	Operatori
 query	rag	ro	Căutare
 rag	common	ro	RAG
 rag / semantic search	rag	ro	RAG / Căutare semantică

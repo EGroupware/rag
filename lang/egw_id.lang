@@ -1,3 +1,4 @@
+always use relevance	rag	id	Selalu gunakan relevansi
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	id	Segala sesuatu yang diapit oleh tanda kutip ganda dianggap sebagai satu kesatuan (sehingga Anda dapat mencocokkan frasa, misalnya)
 app	rag	id	Aplikasi
 app id	rag	id	ID Aplikasi
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	id	Ubah 
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	id	Saat ini, hanya model dengan dimensi 1024, seperti bge-m3, yang didukung!
 default sorting	rag	id	Pengejaan default
 enter your search query here...	rag	id	Masukkan kueri pencarian Anda di sini ...
+fulltext	rag	id	Teks lengkap
 fulltext search	rag	id	Pencarian teks lengkap
+hybrid search (rag+fulltext)	rag	id	Pencarian hibrida (RAG + Teks lengkap)
 hybrid search: rag+fulltext	rag	id	Pencarian hibrida: RAG + Teks Lengkap
+legacy search	rag	id	Pencarian lama
 legacy search, as used before	rag	id	Pencarian lama, seperti yang digunakan sebelumnya
+no, use search-order chosen in app	rag	id	Tidak, gunakan urutan pencarian yang dipilih di aplikasi
+operators	rag	id	Operator
 query	rag	id	Kueri
 rag	common	id	RAG
 rag / semantic search	rag	id	RAG / Pencarian Semantik

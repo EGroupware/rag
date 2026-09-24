@@ -1,3 +1,4 @@
+always use relevance	rag	sl	Vedno uporabi relevantnost
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	sl	Vse, kar je v dvojnih narekovajih, se obravnava kot celota (tako lahko na primer ujemate fraze)
 app	rag	sl	Aplikacija
 app id	rag	sl	ID aplikacije
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	sl	Sprem
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	sl	Trenutno so podprti samo modeli z vgrajenimi dimenzijami 1024, kot je bge-m3!
 default sorting	rag	sl	Privzeto razvrščanje
 enter your search query here...	rag	sl	Vnesite svojo poizvedbo tukaj ...
+fulltext	rag	sl	Celotno besedilo
 fulltext search	rag	sl	Iskanje po celotnem besedilu
+hybrid search (rag+fulltext)	rag	sl	Hibridno iskanje (RAG + celotno besedilo)
 hybrid search: rag+fulltext	rag	sl	Hibridno iskanje: RAG + celotno besedilo
+legacy search	rag	sl	Klasično iskanje
 legacy search, as used before	rag	sl	Staro iskanje, kot se je uporabljalo prej
+no, use search-order chosen in app	rag	sl	Ne, uporabi vrstni red iskanja, izbran v aplikaciji
+operators	rag	sl	Operatorji
 query	rag	sl	Poizvedba
 rag	common	sl	RAG
 rag / semantic search	rag	sl	RAG / Semantično iskanje

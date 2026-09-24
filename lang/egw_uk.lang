@@ -1,3 +1,4 @@
+always use relevance	rag	uk	Завжди використовувати релевантність
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	uk	Все, що взято в подвійні лапки, розглядається як ціле (так ви можете, наприклад, знаходити збіги з фразами)
 app	rag	uk	Додаток
 app id	rag	uk	Ідентифікатор додатка
@@ -5,9 +6,14 @@ change fulltext search pattern to match words starting with pattern	rag	uk	Зм�
 currently only embedding models with 1024 dimensions, like bge-m3 are supported!	rag	uk	Наразі підтримуються лише вбудовані моделі з 1024 вимірами, такі як bge-m3!
 default sorting	rag	uk	Сортування за замовчуванням
 enter your search query here...	rag	uk	Введіть тут свій пошуковий запит ...
+fulltext	rag	uk	Повнотекстовий пошук
 fulltext search	rag	uk	Повнотекстовий пошук
+hybrid search (rag+fulltext)	rag	uk	Гібридний пошук (RAG + повнотекстовий пошук)
 hybrid search: rag+fulltext	rag	uk	Гібридний пошук: RAG + повнотекстовий
+legacy search	rag	uk	Старий пошук
 legacy search, as used before	rag	uk	Старий пошук, який використовувався раніше
+no, use search-order chosen in app	rag	uk	Ні, використовувати порядок пошуку, обраний у додатку
+operators	rag	uk	Оператори
 query	rag	uk	Запит
 rag	common	uk	RAG
 rag / semantic search	rag	uk	RAG / Семантичний пошук

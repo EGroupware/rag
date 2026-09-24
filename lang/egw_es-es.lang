@@ -1,12 +1,18 @@
+always use relevance	rag	es-es	Utilizar siempre la relevancia
 anything enclosed in the double quotes is taken as a whole (so you can match phrases, for example).	rag	es-es	Todo lo que se encuentra entre comillas dobles se toma como un todo (por lo que se pueden buscar frases, por ejemplo)
 app	rag	es-es	App
 app id	rag	es-es	App ID
 change fulltext search pattern to match words starting with pattern	rag	es-es	Cambiar el patrón de búsqueda de texto completo para que coincida con las palabras que comienzan con el patrón.
 default sorting	rag	es-es	Ordenación predeterminada
 enter your search query here...	rag	es-es	Introduzca aquí su consulta de búsqueda...
+fulltext	rag	es-es	Texto completo
 fulltext search	rag	es-es	Búsqueda de texto completo
+hybrid search (rag+fulltext)	rag	es-es	Búsqueda híbrida (RAG + texto completo)
 hybrid search: rag+fulltext	rag	es-es	Hybrid search: RAG + Fulltext
+legacy search	rag	es-es	Búsqueda tradicional
 legacy search, as used before	rag	es-es	Búsqueda heredada, como se utilizaba anteriormente
+no, use search-order chosen in app	rag	es-es	No, utilizar el orden de búsqueda seleccionado en la aplicación
+operators	rag	es-es	Operadores
 query	rag	es-es	Consulta
 rag	common	es-es	RAG
 rag / semantic search	rag	es-es	RAG / Búsqueda semántica

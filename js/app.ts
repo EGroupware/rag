@@ -9,6 +9,7 @@
  */
 
 import { EgwApp } from '../../api/js/jsapi/egw_app';
+import type {EgwFrameworkApp, FilterInfo} from "../../kdots/js/EgwFrameworkApp";
 // app is an ambient global (declare global {} in egw_global.d.ts, unconditionally included
 // via tsconfig's "**/*.d.ts") - no import needed or possible.
 
@@ -20,6 +21,20 @@ class RagApp extends EgwApp
 	constructor()
 	{
 		super('rag');
+	}
+
+	/**
+	 * col_filter[type] is the type of search, not a filter
+	 *
+	 * @param filterValues
+	 * @param fwApp
+	 */
+	getFilterInfo(filterValues : { [id : string] : any }, fwApp : EgwFrameworkApp) : FilterInfo
+	{
+		const values = {...(filterValues ?? {})};
+		values.col_filter = {...(values.col_filter ?? {})};
+		delete values.col_filter.type;
+		return fwApp.filterInfo(values);
 	}
 
 	/**

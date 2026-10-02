@@ -15,16 +15,16 @@
 			</columns>
 			<rows>
 				<row class="th">
-					<nextmatch-header id="id" label="ID"></nextmatch-header>
-					<nextmatch-header id="app" label="App"></nextmatch-header>
-					<nextmatch-header id="app_id" label="App ID"></nextmatch-header>
+					<et2-nextmatch-header  id="id" label="ID"></et2-nextmatch-header>
+					<et2-nextmatch-header  id="app" label="App"></et2-nextmatch-header>
+					<et2-nextmatch-header  id="app_id" label="App ID"></et2-nextmatch-header>
 					<et2-hbox  width="100%">
-						<nextmatch-header id="title" label="Title" width="90%"></nextmatch-header>
-						<nextmatch-sortheader id="default" label="Default sorting" sortmode="ASC" align="right"></nextmatch-sortheader>
+						<et2-nextmatch-header  id="title" label="Title" width="90%"></et2-nextmatch-header>
+						<et2-nextmatch-sortheader  id="default" label="Default sorting" sortmode="ASC" align="right"></et2-nextmatch-sortheader>
 					</et2-hbox>
-					<nextmatch-sortheader id="modified" label="Modified" sortmode="DESC"></nextmatch-sortheader>
-					<nextmatch-sortheader id="distance" label="Distance" sortmode="ASC"></nextmatch-sortheader>
-					<nextmatch-sortheader id="relevance" label="Relevance" sortmode="DESC"></nextmatch-sortheader>
+					<et2-nextmatch-sortheader  id="modified" label="Modified" sortmode="DESC"></et2-nextmatch-sortheader>
+					<et2-nextmatch-sortheader  id="distance" label="Distance" sortmode="ASC"></et2-nextmatch-sortheader>
+					<et2-nextmatch-sortheader  id="relevance" label="Relevance" sortmode="DESC"></et2-nextmatch-sortheader>
 				</row>
 				<row class="row">
 					<et2-description  id="${row}[id]"></et2-description>
@@ -62,8 +62,16 @@
 			</et2-vbox>
 		</et2-hbox>
 	</et2-template>
-	<et2-template  id="rag.index" template="" lang="" group="0" version="26.1">
+	<!-- layout="stack": the search form above takes its own height, the list the rest of the page -->
+	<et2-template  id="rag.index" template="" lang="" group="0" version="26.1" layout="stack">
 		<et2-template  template="rag.index.header" content="nm"></et2-template>
-		<nextmatch id="nm" template="rag.index.rows"></nextmatch>
+		<et2-nextmatch  id="nm" template="rag.index.rows" grow="1"></et2-nextmatch>
+		<et2-styles>
+			/* grow="1" does not reach the DOM from a .xet yet, so the list needs this to take the rest */
+			et2-template[layout="stack"] > et2-nextmatch {
+				flex: 1 1 auto;
+				min-height: 0;
+			}
+		</et2-styles>
 	</et2-template>
 </overlay>

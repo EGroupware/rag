@@ -94,6 +94,17 @@ abstract class Base
 	const CHUNK_SIZE = 10;
 
 	/**
+	 * Expression to order the not yet / outdated entries by, default: the MODIFIED column
+	 *
+	 * Ordering by a plain indexed column makes MariaDB walk that index in order, stopping after CHUNK_SIZE matches.
+	 * That is fast, as long as many entries need (re-)indexing, but needs to read the whole index, if (almost) none does.
+	 * With many soft-deleted rows (eg. calendar with millions of deleted events) that takes many seconds per query,
+	 * while starting with the (few) non-deleted entries and sorting just the matches takes milliseconds.
+	 * A plugin can therefore use an expression (eg. "col+0"), which can NOT use the index for ordering.
+	 */
+	const ORDER_BY = null;
+
+	/**
 	 * @var Api\Db;
 	 */
 	protected $db;
@@ -152,7 +163,7 @@ abstract class Base
 		{
 			$r = 0;
 			foreach ($entries ?? $this->db->select(static::TABLE, $cols,
-				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . static::MODIFIED . ' ASC', '',
+				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . (static::ORDER_BY ?? static::MODIFIED) . ' ASC', '',
 				static::CHUNK_SIZE, $join) as $row)
 			{
 				if (!empty($row[static::MODIFIED]) && !is_object($row[static::MODIFIED]))

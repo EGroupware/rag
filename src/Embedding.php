@@ -21,6 +21,7 @@ class Embedding
 {
 	const APP = 'rag';
 	const TABLE = 'egw_rag';
+	const EMBEDDING_ID = 'rag_id';
 	const EMBEDDING_UPDATED = 'rag_updated';
 	const EMBEDDING_APP = 'rag_app';
 	const EMBEDDING_CACHE = '*cache*';  // used as EMBEDDING_APP for cached embeddings
@@ -30,6 +31,7 @@ class Embedding
 	const EMBEDDING_MODIFIED = 'rag_updated';
 	const EMBEDDING_HASH = 'rag_hash';
 	const FULLTEXT_TABLE = 'egw_rag_fulltext';
+	const FULLTEXT_ID = 'ft_id';
 	const FULLTEXT_UPDATED = 'ft_updated';
 	const FULLTEXT_APP = 'ft_app';
 	const FULLTEXT_APP_ID = 'ft_app_id';
@@ -534,7 +536,12 @@ class Embedding
 					$plugin = new $class();
 
 					// purge deleted entries (run only once for async job and fulltext, purges both indexes)
-					if ($fulltext && !$hook_data) $plugin->purgeDeleted();
+					// in chunks and with a time-limit, so it can be incomplete and the async job has to continue it
+					if ($fulltext && !$hook_data &&
+						!$plugin->purgeDeleted(min(30.0, max(1.0, self::$max_runtime / 4 - (microtime(true) - $start)))))
+					{
+						$purge_incomplete = true;
+					}
 
 					// check if only certain apps are enabled for RAG or fulltext
 					if ($fulltext && !empty(self::$fulltext_apps) && !in_array($app, self::$fulltext_apps) ||
@@ -639,7 +646,8 @@ class Embedding
 			}
 		}
 		// if we finished, we can remove the job (gets readded for new entries via notify hook)
-		if (!$hook_data && microtime(true) - $start < self::$max_runtime)
+		// but not while there is still something to purge, the job continues the purge with its next run
+		if (!$hook_data && empty($purge_incomplete) && microtime(true) - $start < self::$max_runtime)
 		{
 			self::removeAsyncJob();
 		}

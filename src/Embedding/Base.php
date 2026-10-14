@@ -359,40 +359,94 @@ abstract class Base
 	}
 
 	/**
+	 * Number of entries deleted from an index with one DELETE statement when purging
+	 */
+	const PURGE_CHUNK_SIZE = 1000;
+
+	/**
 	 * Purge deleted / no longer existing entries from the RAG's indexes (max once daily)
 	 *
-	 * @return void
+	 * Purging is done in chunks of PURGE_CHUNK_SIZE entries and for at most $time_limit seconds per call.
+	 * Deleting all entries with one statement did not finish on tables with a huge number of orphaned entries
+	 * (eg. after millions of events were deleted): the statement was killed by max_statement_time or created
+	 * a huge transaction (a problem on Galera clusters), and the failed purge was still marked as done for a day.
+	 *
+	 * If there is more to purge, it is NOT marked as done and false is returned, so the next call continues
+	 * where this one stopped, until everything is purged. Then the next purge is due in a day.
+	 *
+	 * @param float $time_limit =30.0 maximum number of seconds to spend on purging
+	 * @return bool true: everything purged (or already purged today), false: time-limit reached, there is more to purge
 	 */
-	public function purgeDeleted()
+	public function purgeDeleted(float $time_limit=30.0) : bool
 	{
 		// self::APP (and __CLASS__) would resolve to Base's OWN empty '' constant here, not the
 		// calling subclass's - self:: isn't late-static-bound for constant lookups, unlike
 		// static::. Using the wrong one made every app plugin share the same once-daily cache
 		// key, so only the first app processed each day ever actually got purged.
-		Api\Cache::getInstance(static::class, 'purge-'.static::APP, function()
+		$cache_location = 'purge-'.static::APP;
+		if (Api\Cache::getInstance(static::class, $cache_location) !== null)
 		{
-			try {
-				// clean fulltext index
-				$this->db->query('DELETE ' . Embedding::FULLTEXT_TABLE . ' FROM ' . Embedding::FULLTEXT_TABLE .
-					' LEFT JOIN ' . static::TABLE . ' ON ' .
-					Embedding::FULLTEXT_TABLE . '.' . Embedding::FULLTEXT_APP_ID . '=' . static::TABLE . '.' . static::ID .
-					' WHERE ' . Embedding::FULLTEXT_APP . '=' . $this->db->quote(static::APP) .
-					' AND (' . static::TABLE . '.' . static::ID . ' IS NULL' . (static::NOT_DELETED ? ' OR NOT ' . static::NOT_DELETED : '') . ')',
-					__LINE__, __FILE__);
-				// clean RAG
-				$this->db->query('DELETE ' . Embedding::TABLE . ' FROM ' . Embedding::TABLE .
-					' LEFT JOIN ' . static::TABLE . ' ON ' .
-					Embedding::TABLE . '.' . Embedding::EMBEDDING_APP_ID . '=' . static::TABLE . '.' . static::ID .
-					' WHERE ' . Embedding::EMBEDDING_APP . '=' . $this->db->quote(static::APP) .
-					' AND (' . static::TABLE . '.' . static::ID . ' IS NULL' . (static::NOT_DELETED ? ' OR NOT ' . static::NOT_DELETED : '') . ')',
-					__LINE__, __FILE__);
-			}
-			catch (Api\Db\Exception\InvalidSql $e)
-			{
-				// ignore exception, as VECTOR / RAG table might be missing
-				_egw_log_exception($e);
-			}
+			return true;	// already purged today
+		}
+		$start = microtime(true);
+		try {
+			// clean fulltext index and RAG
+			$complete = $this->purgeIndex(Embedding::FULLTEXT_TABLE, Embedding::FULLTEXT_ID,
+					Embedding::FULLTEXT_APP, Embedding::FULLTEXT_APP_ID, $start, $time_limit) &&
+				$this->purgeIndex(Embedding::TABLE, Embedding::EMBEDDING_ID,
+					Embedding::EMBEDDING_APP, Embedding::EMBEDDING_APP_ID, $start, $time_limit);
+		}
+		catch (Api\Db\Exception\InvalidSql $e)
+		{
+			// ignore exception, as VECTOR / RAG table might be missing, but try again in an hour
+			_egw_log_exception($e);
+			Api\Cache::setInstance(static::class, $cache_location, true, 3600);
 			return true;
-		}, [], 86400);
+		}
+		if ($complete)
+		{
+			Api\Cache::setInstance(static::class, $cache_location, true, 86400);
+		}
+		return $complete;
+	}
+
+	/**
+	 * Purge the entries of one index (fulltext or RAG), whose entry of the app was deleted or no longer exists, in chunks
+	 *
+	 * @param string $table Embedding::FULLTEXT_TABLE or Embedding::TABLE
+	 * @param string $id_col primary key of $table
+	 * @param string $app_col column of $table with the name of the app
+	 * @param string $app_id_col column of $table with the id of the entry in the app
+	 * @param float $start microtime(true) when purging was started
+	 * @param float $time_limit maximum number of seconds purging is allowed to take
+	 * @return bool true: nothing (more) to purge, false: time-limit reached, call again to continue
+	 * @throws Api\Db\Exception\InvalidSql
+	 */
+	protected function purgeIndex(string $table, string $id_col, string $app_col, string $app_id_col, float $start, float $time_limit) : bool
+	{
+		$sql = 'SELECT ' . $table . '.' . $id_col . ' FROM ' . $table .
+			' LEFT JOIN ' . static::TABLE . ' ON ' . $table . '.' . $app_id_col . '=' . static::TABLE . '.' . static::ID .
+			' WHERE ' . $app_col . '=' . $this->db->quote(static::APP) .
+			' AND (' . static::TABLE . '.' . static::ID . ' IS NULL' . (static::NOT_DELETED ? ' OR NOT ' . static::NOT_DELETED : '') . ')' .
+			' LIMIT ' . (int)static::PURGE_CHUNK_SIZE;
+		do
+		{
+			$ids = [];
+			foreach($this->db->query($sql, __LINE__, __FILE__) as $row)
+			{
+				$ids[] = (int)$row[$id_col];
+			}
+			if ($ids)
+			{
+				$this->db->delete($table, [$id_col => $ids], __LINE__, __FILE__, Embedding::APP);
+			}
+			if (count($ids) < static::PURGE_CHUNK_SIZE)
+			{
+				return true;	// that was the last chunk
+			}
+		}
+		while (microtime(true) - $start <= $time_limit);
+
+		return false;
 	}
 }

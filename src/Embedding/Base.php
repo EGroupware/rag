@@ -110,6 +110,27 @@ abstract class Base
 	protected $db;
 
 	/**
+	 * Ids of entries skipped by this plugin instance, as they have nothing to index or failed
+	 *
+	 * getUpdated() always asks for the first CHUNK_SIZE not yet indexed entries. Entries which can not be indexed
+	 * (eg. calendar events with empty title and description, or an embedding error) would stay in the result and
+	 * block all entries behind them, while being queried again and again.
+	 *
+	 * @var int[]
+	 */
+	protected array $skipped = [];
+
+	/**
+	 * Skip an entry for the rest of the lifetime of this plugin instance, eg. as there is nothing to index
+	 *
+	 * @param int $id
+	 */
+	public function skip(int $id) : void
+	{
+		$this->skipped[$id] = $id;
+	}
+
+	/**
 	 * Constructor
 	 */
 	public function __construct()
@@ -162,8 +183,13 @@ abstract class Base
 		do
 		{
 			$r = 0;
+			$query_where = $where;
+			if ($this->skipped)
+			{
+				$query_where[] = static::TABLE . '.' . static::ID . ' NOT IN (' . implode(',', array_map('intval', $this->skipped)) . ')';
+			}
 			foreach ($entries ?? $this->db->select(static::TABLE, $cols,
-				$where, __LINE__, __FILE__, 0, 'ORDER BY ' . (static::ORDER_BY ?? static::MODIFIED) . ' ASC', '',
+				$query_where, __LINE__, __FILE__, 0, 'ORDER BY ' . (static::ORDER_BY ?? static::MODIFIED) . ' ASC', '',
 				static::CHUNK_SIZE, $join) as $row)
 			{
 				if (!empty($row[static::MODIFIED]) && !is_object($row[static::MODIFIED]))

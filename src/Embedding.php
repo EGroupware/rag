@@ -603,7 +603,17 @@ class Embedding
 									$chunks = self::chunkSplit($field, $chunks);
 								}
 							}
-							$response = $this->create($chunks);
+							// nothing to embed (eg. calendar event with empty title and description): no embedding is stored, so the
+							// entry would stay "not yet indexed" and block all entries behind it --> skip it, but remove old chunks
+							if (!array_filter($chunks, static fn($chunk) => trim((string)$chunk) !== ''))
+							{
+								$plugin->skip($id);
+								$response = [];
+							}
+							else
+							{
+								$response = $this->create($chunks);
+							}
 						}
 						catch (\Throwable $e)
 						{
@@ -615,6 +625,8 @@ class Embedding
 							// if called in hook, don't continue
 							if ($hook_data) return;
 							unset($e);
+							// failed entries must not block the ones behind them, they are retried by the next run
+							$plugin->skip($id);
 							continue;
 						}
 						$n = -1;

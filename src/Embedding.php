@@ -323,35 +323,6 @@ class Embedding
 	}
 
 	/**
-	 * Write the fulltext index row of an entry: update it, if it exists, otherwise insert it
-	 *
-	 * Api\Db::insert() uses REPLACE for a table with a unique key, which deletes the row and inserts it again with a NEW
-	 * auto-increment ft_id: every re-index used up an id, and the INT of an instance ran out of ids with only 2,826 rows,
-	 * after which no entry could be indexed any more.
-	 *
-	 * @param string $app
-	 * @param int|string $id id of the entry in the app
-	 * @param array $data values for the FULLTEXT_* columns, except app and app-id
-	 * @throws Api\Db\Exception
-	 */
-	protected function upsertFulltext(string $app, $id, array $data) : void
-	{
-		$where = [
-			self::FULLTEXT_APP => $app,
-			self::FULLTEXT_APP_ID => $id,
-		];
-		if ($this->db->select(self::FULLTEXT_TABLE, 'COUNT(*)', $where, __LINE__, __FILE__, false, '', self::APP)->fetchColumn())
-		{
-			$this->db->update(self::FULLTEXT_TABLE, $data, $where, __LINE__, __FILE__, self::APP);
-		}
-		else
-		{
-			// no $where, to get a plain INSERT, so the key columns have to be in the data
-			$this->db->insert(self::FULLTEXT_TABLE, $data + $where, [], __LINE__, __FILE__, self::APP);
-		}
-	}
-
-	/**
 	 * run an async job to update the RAG
 	 *
 	 * @return void
@@ -607,12 +578,15 @@ class Embedding
 									$extra = json_encode($extra,
 										JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
 								}
-								$this->upsertFulltext($app, $id, [
+								$this->db->insert(self::FULLTEXT_TABLE, [
 									self::FULLTEXT_TITLE => $title ?: null,
 									self::FULLTEXT_DESCRIPTION => $description ?: null,
 									self::FULLTEXT_EXTRA => $extra,
 									self::FULLTEXT_MODIFIED => $modified,
-								]);
+								], [
+									self::FULLTEXT_APP => $app,
+									self::FULLTEXT_APP_ID => $id,
+								], __LINE__, __FILE__, self::APP);
 								continue;
 							}
 							if (self::$minimize_chunks)

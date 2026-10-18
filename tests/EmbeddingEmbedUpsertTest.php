@@ -155,6 +155,33 @@ class EmbeddingEmbedUpsertTest extends Api\LoggedInTest
 		$this->assertSame($firstCount, $this->chunkCount($this->contactId));
 	}
 
+	private function fulltextRow(int $contactId) : array
+	{
+		return $GLOBALS['egw']->db->select(Embedding::FULLTEXT_TABLE, ['ft_id', 'ft_description'], [
+			'ft_app' => 'addressbook', 'ft_app_id' => $contactId,
+		], __LINE__, __FILE__, false, '', Embedding::APP)->fetch() ?: [];
+	}
+
+	/**
+	 * Re-indexing used REPLACE, which deletes and inserts the row with a new auto-increment ft_id: after millions of
+	 * re-indexes the INT of an instance was full (2,826 rows, ft_id at 2,147,483,644) and nothing could be indexed any more
+	 */
+	public function testReindexingAChangedEntryKeepsItsFulltextId()
+	{
+		$this->contactId = $this->insertRawContact(str_repeat('first version '.uniqid().' of the note. ', 3));
+		$this->embeddingWithFakeClient()->embed(['app' => 'addressbook', 'id' => $this->contactId]);
+		$before = $this->fulltextRow($this->contactId);
+		$this->assertNotEmpty($before, 'indexed');
+
+		$note = str_repeat('second version '.uniqid().' of the note. ', 3);
+		$this->updateContactNote($this->contactId, $note);
+		$this->embeddingWithFakeClient()->embed(['app' => 'addressbook', 'id' => $this->contactId]);
+		$after = $this->fulltextRow($this->contactId);
+
+		$this->assertSame($note, $after['ft_description'], 'the changed note is indexed');
+		$this->assertSame($before['ft_id'], $after['ft_id'], 'the row is updated, not deleted and inserted with a new id');
+	}
+
 	public function testShrinkingContentDeletesExcessOldChunks()
 	{
 		$chunkSizeProp = new ReflectionProperty(Embedding::class, 'chunk_size');

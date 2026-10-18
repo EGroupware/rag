@@ -323,6 +323,35 @@ class Embedding
 	}
 
 	/**
+	 * Write the fulltext index row of an entry: update it, if it exists, otherwise insert it
+	 *
+	 * Api\Db::insert() uses REPLACE for a table with a unique key, which deletes the row and inserts it again with a NEW
+	 * auto-increment ft_id: every re-index used up an id, and the INT of an instance ran out of ids with only 2,826 rows,
+	 * after which no entry could be indexed any more.
+	 *
+	 * @param string $app
+	 * @param int|string $id id of the entry in the app
+	 * @param array $data values for the FULLTEXT_* columns, except app and app-id
+	 * @throws Api\Db\Exception
+	 */
+	protected function upsertFulltext(string $app, $id, array $data) : void
+	{
+		$where = [
+			self::FULLTEXT_APP => $app,
+			self::FULLTEXT_APP_ID => $id,
+		];
+		if ($this->db->select(self::FULLTEXT_TABLE, 'COUNT(*)', $where, __LINE__, __FILE__, false, '', self::APP)->fetchColumn())
+		{
+			$this->db->update(self::FULLTEXT_TABLE, $data, $where, __LINE__, __FILE__, self::APP);
+		}
+		else
+		{
+			// no $where, to get a plain INSERT, so the key columns have to be in the data
+			$this->db->insert(self::FULLTEXT_TABLE, $data + $where, [], __LINE__, __FILE__, self::APP);
+		}
+	}
+
+	/**
 	 * run an async job to update the RAG
 	 *
 	 * @return void
@@ -578,15 +607,12 @@ class Embedding
 									$extra = json_encode($extra,
 										JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS);
 								}
-								$this->db->insert(self::FULLTEXT_TABLE, [
+								$this->upsertFulltext($app, $id, [
 									self::FULLTEXT_TITLE => $title ?: null,
 									self::FULLTEXT_DESCRIPTION => $description ?: null,
 									self::FULLTEXT_EXTRA => $extra,
 									self::FULLTEXT_MODIFIED => $modified,
-								], [
-									self::FULLTEXT_APP => $app,
-									self::FULLTEXT_APP_ID => $id,
-								], __LINE__, __FILE__, self::APP);
+								]);
 								continue;
 							}
 							if (self::$minimize_chunks)
@@ -676,21 +702,63 @@ class Embedding
 	 */
 	public static function logError(\Throwable $e, $app=null, $fulltext=null, $entry=null)
 	{
-		error_log(__METHOD__ . "() app=$app, fulltext=$fulltext, entry=".json_encode($entry, JSON_INVALID_UTF8_IGNORE));
-		_egw_log_exception($e);
+		// the same error for one entry after the other (eg. a full table) must neither flood the log nor write the config
+		// for every one of them: log the first 3 in full, then only every 100th with the number of occurrences
+		$key = get_class($e).'|'.$app.'|'.$e->getCode().'|'.substr(preg_replace('/\s+/', ' ', $e->getMessage()), 0, 60);
+		$count = self::$logged_errors[$key] = (self::$logged_errors[$key] ?? 0) + 1;
+		if ($count > self::LOG_ERRORS_IN_FULL && $count % 100)
+		{
+			return;
+		}
+		error_log(__METHOD__ . "() app=$app, fulltext=$fulltext, ".get_class($e).': '.self::shorten($e->getMessage()).
+			($count > 1 ? " ($count. time in this run)" : '').' entry='.
+			self::shorten((string)json_encode($entry, JSON_INVALID_UTF8_IGNORE)));
+		if ($count <= self::LOG_ERRORS_IN_FULL)
+		{
+			error_log(__METHOD__ . "() ".$e->getFile().':'.$e->getLine()."\n".self::shorten($e->getTraceAsString(), 2000));
+		}
 		// store the last N errors to display in RAG config
 		$errors = (array)(Api\Config::read(self::APP)[self::RAG_LAST_ERRORS] ?? []);
+		if (is_array($entry))
+		{
+			array_walk_recursive($entry, static function (&$value) {
+				if (is_string($value)) $value = self::shorten($value, 1000);
+			});
+		}
 		array_unshift($errors, [
 			'date' => new Api\DateTime(),
-			'message' => $e->getMessage(),
+			'message' => self::shorten($e->getMessage(), 1000),
 			'app' => $app,
 			'rag-or-fulltext' => $fulltext ? 'fulltext' : 'rag',
 			'entry' => $entry,
 			'code' => $e->getCode(),
 			'class' => get_class($e),
-			'trace' => $e->getTrace(),
+			// without the arguments, which can contain the whole entry
+			'trace' => array_map(static function (array $frame) { unset($frame['args']); return $frame; }, $e->getTrace()),
 		]);
 		Api\Config::save_value(self::RAG_LAST_ERRORS, array_slice($errors, 0, 5), self::APP);
+	}
+
+	/**
+	 * Number of errors of the same kind logged in full per run, afterwards only every 100th
+	 */
+	const LOG_ERRORS_IN_FULL = 3;
+
+	/**
+	 * @var int[] number of errors by kind in this run
+	 */
+	protected static array $logged_errors = [];
+
+	/**
+	 * Shorten a string, eg. to not log the whole text of an entry
+	 *
+	 * @param string $str
+	 * @param int $max default 500
+	 * @return string
+	 */
+	protected static function shorten(string $str, int $max=500) : string
+	{
+		return mb_strlen($str) <= $max ? $str : mb_substr($str, 0, $max).'... (+'.(mb_strlen($str)-$max).' chars)';
 	}
 
 	/**

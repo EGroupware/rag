@@ -304,12 +304,12 @@ class Embedding
 		}
 		catch (InvalidFulltextSyntax $e) {
 			Api\Json\Response::get()->message($e->getMessage(), 'error');
-			$filter[] = '0=1';  // never true --> finds nothing
+			$filter[] = Api\Db\SqlFragment::raw('0=1');  // never true --> finds nothing
 			if (self::$log_level) error_log(__METHOD__."(app='$app', criteria='$criteria_in', ...) returning true --> Fulltext syntax error");
 			return true;
 		}
 		$plugin = new (self::plugins()[$app]);
-		$filter[] = $db->expression($plugin->table(), $plugin->table().'.', [$plugin->id() => array_keys($ids)]);
+		$filter[] = Api\Db\SqlFragment::raw($db->expression($plugin->table(), $plugin->table().'.', [$plugin->id() => array_keys($ids)]));
 		// should we order by relevance, or keep order chosen in the app
 		if (($GLOBALS['egw_info']['user']['preferences']['rag']['default_search_order'] ?? 'app') === 'relevance')
 		{
@@ -646,7 +646,7 @@ class Embedding
 						$this->db->delete(self::TABLE, [
 							self::EMBEDDING_APP => $app,
 							self::EMBEDDING_APP_ID => $id,
-							self::EMBEDDING_CHUNK . '>' . $n,
+							Api\Db\SqlFragment::raw(self::EMBEDDING_CHUNK . '>' . $n),
 						], __LINE__, __FILE__, self::APP);
 					}
 				}
@@ -1144,13 +1144,13 @@ class Embedding
 			if ($min_relevance)
 			{
 				$max_relevance = $this->db->select(self::FULLTEXT_TABLE, $match.' AS relevance',
-					($app ? [self::FULLTEXT_APP => $app] : []) + [$match],
+					($app ? [self::FULLTEXT_APP => $app] : []) + [Api\Db\SqlFragment::raw($match)],
 					__LINE__, __FILE__, 0, 'ORDER BY relevance DESC', self::APP, 1)->fetchColumn();
 				$min_relevance *= $max_relevance;
 			}
 			$id_relevance = [];
 			foreach ($this->db->select(self::FULLTEXT_TABLE, 'SQL_CALC_FOUND_ROWS ' . implode(',', $cols),
-				($app ? [self::FULLTEXT_APP => $app] : []) + [$match . ' > '.$min_relevance],
+				($app ? [self::FULLTEXT_APP => $app] : []) + [Api\Db\SqlFragment::raw($match . ' > '.$min_relevance)],
 				__LINE__, __FILE__, $start, 'ORDER BY '.$order, self::APP, $num_rows) as $row)
 			{
 				if ($row['relevance'] < $min_relevance)

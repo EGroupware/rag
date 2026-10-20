@@ -177,7 +177,7 @@ abstract class Base
 		}
 		if (!$fulltext && static::RAG_EXTRA_CONDITION)
 		{
-			$where[] = static::RAG_EXTRA_CONDITION;
+			$where[] = Api\Db\SqlFragment::raw(static::RAG_EXTRA_CONDITION);
 		}
 		$join = $this->getJoin($where, $fulltext, $ignoreStaleness);
 		do
@@ -186,7 +186,7 @@ abstract class Base
 			$query_where = $where;
 			if ($this->skipped)
 			{
-				$query_where[] = static::TABLE . '.' . static::ID . ' NOT IN (' . implode(',', array_map('intval', $this->skipped)) . ')';
+				$query_where[] = Api\Db\SqlFragment::raw(static::TABLE . '.' . static::ID . ' NOT IN (' . implode(',', array_map('intval', $this->skipped)) . ')');
 			}
 			foreach ($entries ?? $this->db->select(static::TABLE, $cols,
 				$query_where, __LINE__, __FILE__, 0, 'ORDER BY ' . (static::ORDER_BY ?? static::MODIFIED) . ' ASC', '',
@@ -233,13 +233,13 @@ abstract class Base
 	{
 		if (static::NOT_DELETED)
 		{
-			$where[] = static::NOT_DELETED; // no need to embed deleted entries
+			$where[] = Api\Db\SqlFragment::raw(static::NOT_DELETED); // no need to embed deleted entries
 		}
 		if (!$fulltext)
 		{
 			if (!$ignoreStaleness)
 			{
-				$where[] = '('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$this->modified().')';
+				$where[] = Api\Db\SqlFragment::raw('('.Embedding::EMBEDDING_UPDATED.' IS NULL OR '.Embedding::EMBEDDING_UPDATED.'<'.$this->modified().')');
 			}
 			return 'LEFT JOIN '.Embedding::TABLE.' ON '.
 				Embedding::EMBEDDING_APP.'='.$this->db->quote(static::APP).' AND '.
@@ -247,7 +247,7 @@ abstract class Base
 		}
 		if (!$ignoreStaleness)
 		{
-			$where[] = '('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$this->modified().')';
+			$where[] = Api\Db\SqlFragment::raw('('.Embedding::FULLTEXT_UPDATED.' IS NULL OR '.Embedding::FULLTEXT_UPDATED.'<'.$this->modified().')');
 		}
 		return 'LEFT JOIN '.Embedding::FULLTEXT_TABLE.' ON '.
 			Embedding::FULLTEXT_APP.'='.$this->db->quote(static::APP).' AND '.

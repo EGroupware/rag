@@ -93,8 +93,8 @@ class EmbeddingSkipEntriesTest extends Api\LoggedInTest
 	private function removeEntries() : void
 	{
 		$db = $GLOBALS['egw']->db;
-		$db->delete('egw_cal', ['cal_id >= '.self::FIRST_ID, 'cal_id < '.(self::FIRST_ID + self::ENTRIES)], __LINE__, __FILE__, 'calendar');
-		$db->delete('egw_infolog', ['info_id >= '.self::FIRST_ID, 'info_id < '.(self::FIRST_ID + self::ENTRIES)], __LINE__, __FILE__, 'infolog');
+		$db->delete('egw_cal', [Api\Db\SqlFragment::raw('cal_id >= '.self::FIRST_ID), Api\Db\SqlFragment::raw('cal_id < '.(self::FIRST_ID + self::ENTRIES))], __LINE__, __FILE__, 'calendar');
+		$db->delete('egw_infolog', [Api\Db\SqlFragment::raw('info_id >= '.self::FIRST_ID), Api\Db\SqlFragment::raw('info_id < '.(self::FIRST_ID + self::ENTRIES))], __LINE__, __FILE__, 'infolog');
 	}
 
 	/**

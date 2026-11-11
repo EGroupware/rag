@@ -98,4 +98,23 @@ class EmbeddingSearchFulltextTest extends Api\LoggedInTest
 
 		$this->assertCount(1, $page, 'num_rows=1 must return exactly one result');
 	}
+
+	/**
+	 * A project/ticket number shape ("P-2018-0001") has two embedded dashes. The guard meant to
+	 * force natural-language mode for a single-dash word (eg. "domain-name") only matched exactly
+	 * one dash, so a two-(or more-)dash pattern fell through into boolean mode instead - where
+	 * MySQL's parser reads each "-segment" as "exclude this word", so it could never match at all.
+	 * Live report: searching for an exact project number on boulder.egroupware.org found nothing.
+	 */
+	public function testMultiDashPatternLikeAProjectNumberIsFound()
+	{
+		$keyword = 'zzzP-'.uniqid().'-0001';
+		$match = $this->createContact('FulltextDash', "project number $keyword is referenced here");
+
+		$embedding = new Embedding();
+		$result = $embedding->searchFulltext($keyword, 'addressbook', 0, 50, true);
+
+		$this->assertArrayHasKey($match, $result,
+			'a multi-dash pattern like a project number must still be found, not fall into boolean mode');
+	}
 }

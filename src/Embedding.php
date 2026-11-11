@@ -1101,7 +1101,10 @@ class Embedding
 		// we must NOT use boolean mode, but natural language mode.
 		// Because in boolean mode it will never match because the dash before the 2nd word will exclude all matches with that word :(
 		// And we can not add an asterisk after the word, as that requires boolean mode
-		if (!$mode && preg_match('/^[\\pL\\pN.]+-[\\pL\\pN.]*$/ui', $pattern) ||
+		// One or more embedded dashes, not just one - a project/ticket number like "P-2018-0001"
+		// has two and was falling through this guard into boolean mode, where MySQL's parser reads
+		// each "-segment" as "exclude this word", so it could never match
+		if (!$mode && preg_match('/^[\\pL\\pN.]+(?:-[\\pL\\pN.]*)+$/ui', $pattern) ||
 			// @ in boolean mode always gives a syntax error: unexpected '@', expecting $end (1064) --> use NATURAL LANGUAGE MODE
 			strpos($pattern, '@') !== false)
 		{
